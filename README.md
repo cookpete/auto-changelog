@@ -8,11 +8,13 @@ Command line tool for generating a changelog from git tags and commit history
 [![Dependency Status](https://img.shields.io/david/CookPete/auto-changelog.svg)](https://david-dm.org/CookPete/auto-changelog)
 [![devDependency Status](https://img.shields.io/david/dev/CookPete/auto-changelog.svg)](https://david-dm.org/CookPete/auto-changelog#info=devDependencies)
 
+
 ### Installation
 
 ```bash
 npm install -g auto-changelog
 ```
+
 
 ### Usage
 
@@ -26,12 +28,6 @@ Specify an output file with `-o` or `--output`.
 
 ```bash
 auto-changelog --output HISTORY.md # Writes log to HISTORY.md
-```
-
-Use `-p` or `--package` to use the `version` from `package.json` as the latest release, which will parse _all commits between the previous release and now_ as part of that release. Essentially anything that would normally be parsed as `Unreleased` will now come under the `version` from `package.json`
-
-```bash
-auto-changelog --package
 ```
 
 #### What you might do if you’re clever
@@ -50,6 +46,8 @@ auto-changelog --package
   }
 }
 ```
+
+Using `--package` or `-p` uses the `version` from `package.json` as the latest release, so that _all commits between the previous release and now_ become part of that release. Essentially anything that would normally be parsed as `Unreleased` will now come under the `version` from `package.json`
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
 
