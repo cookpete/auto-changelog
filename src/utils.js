@@ -1,27 +1,76 @@
+import fs from 'fs'
 import { spawn } from 'child_process'
 
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
 // Simple util for calling a child process
-export function cmd (cmd, args = [], options = {}) {
+export function cmd (string) {
+  const [ cmd, ...args ] = string.split(' ')
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, options)
+    const child = spawn(cmd, args)
     let data = ''
 
-    child.stdout.on('data', buffer => data += buffer.toString())
+    child.stdout.on('data', buffer => { data += buffer.toString() })
     child.stdout.on('end', () => resolve(data))
     child.on('error', reject)
   })
 }
 
-export function uniq (array, property) {
-  let unique = {}
-  let distinct = []
+export async function getGitVersion () {
+  const output = await cmd('git --version')
+  const match = output.match(/\d+\.\d+\.\d+/)
+  return match ? match[0] : null
+}
 
-  array.forEach(x => {
-    if (!unique[x[property]]) {
-      distinct.push(x)
-      unique[x[property]] = true
-    }
+export function niceDate (string) {
+  const date = new Date(string)
+  const day = date.getUTCDate()
+  const month = MONTH_NAMES[date.getUTCMonth()]
+  const year = date.getUTCFullYear()
+  return `${day} ${month} ${year}`
+}
+
+export function isLink (string) {
+  return /^http/.test(string)
+}
+
+export function parseLimit (limit) {
+  return limit === 'false' ? false : parseInt(limit, 10)
+}
+
+export function replaceText (string, options) {
+  if (!options.replaceText) {
+    return string
+  }
+  return Object.keys(options.replaceText).reduce((string, pattern) => {
+    return string.replace(new RegExp(pattern, 'g'), options.replaceText[pattern])
+  }, string)
+}
+
+const createCallback = (resolve, reject) => (err, data) => {
+  if (err) reject(err)
+  else resolve(data)
+}
+
+export function readFile (path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf-8', createCallback(resolve, reject))
   })
+}
 
-  return distinct
+export function writeFile (path, data) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(path, data, createCallback(resolve, reject))
+  })
+}
+
+export function fileExists (path) {
+  return new Promise(resolve => {
+    fs.access(path, err => resolve(!err))
+  })
+}
+
+export async function readJson (path) {
+  const json = await readFile(path)
+  return JSON.parse(json)
 }

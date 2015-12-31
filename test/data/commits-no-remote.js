@@ -11,11 +11,11 @@ export default [
     "fixes": [
       {
         "id": "6",
-        "href": "https://github.com/user/repo/issues/6"
+        "href": null
       }
     ],
     "merge": null,
-    "href": "https://github.com/user/repo/commit/2401ee4706e94629f48830bab9ed5812c032734a",
+    "href": null,
     "breaking": false,
     "files": 5,
     "insertions": 10,
@@ -32,7 +32,7 @@ export default [
     "message": "1.0.0",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/77bb243170408cd18e70ca05bf8b3ca7646ea437",
+    "href": null,
     "breaking": false,
     "files": 2,
     "insertions": 8,
@@ -49,7 +49,7 @@ export default [
     "message": "Some breaking change",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "href": null,
     "breaking": false,
     "files": 5,
     "insertions": 10,
@@ -66,7 +66,7 @@ export default [
     "message": "0.1.0",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/db92947e6129cc20cd7777b7ed90b2bd547918c0",
+    "href": null,
     "breaking": false,
     "files": 2,
     "insertions": 8,
@@ -83,7 +83,7 @@ export default [
     "message": "Another commit that fixes nothing but with less changes",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/e9a43b2bf50449fc0d84465308e6008cc1597bb3",
+    "href": null,
     "breaking": false,
     "files": 1,
     "insertions": 1,
@@ -100,7 +100,7 @@ export default [
     "message": "Commit that fixes nothing",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
+    "href": null,
     "breaking": false,
     "files": 1,
     "insertions": 2,
@@ -117,7 +117,7 @@ export default [
     "message": "0.0.2",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/ef17dcc732d282f027aa3bddf8f91cbb05998cc8",
+    "href": null,
     "breaking": false,
     "files": 2,
     "insertions": 8,
@@ -136,9 +136,9 @@ export default [
     "merge": {
       "id": "5",
       "message": "Should not parse #4 in PR title",
-      "href": "https://github.com/user/repo/pull/5"
+      "href": null
     },
-    "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
+    "href": null,
     "breaking": false
   },
   {
@@ -152,7 +152,7 @@ export default [
     "message": "Merge remote-tracking branch 'random-branch' into master",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/92839699a6aaea148dcd72ea897321e66cae0c18",
+    "href": null,
     "breaking": false,
     "files": 1,
     "insertions": 1,
@@ -170,11 +170,11 @@ export default [
     "fixes": [
       {
         "id": "4",
-        "href": "https://github.com/user/repo/issues/4"
+        "href": null
       }
     ],
     "merge": null,
-    "href": "https://github.com/user/repo/commit/17fbef87e82889f01d8257900f7edc55b05918a2",
+    "href": null,
     "breaking": false,
     "files": 1,
     "insertions": 1,
@@ -191,7 +191,7 @@ export default [
     "message": "0.0.1",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/796edd129a6aaea148dcd72ea897321e66cae0c1",
+    "href": null,
     "breaking": false,
     "files": 2,
     "insertions": 8,
@@ -210,9 +210,9 @@ export default [
     "merge": {
       "id": "3",
       "message": "Third commit with same name as PR",
-      "href": "https://github.com/user/repo/pull/3"
+      "href": null
     },
-    "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
+    "href": null,
     "breaking": false
   },
   {
@@ -226,7 +226,7 @@ export default [
     "message": "Third commit with same name as PR",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
+    "href": null,
     "breaking": false,
     "files": 8,
     "insertions": 57,
@@ -244,15 +244,15 @@ export default [
     "fixes": [
       {
         "id": "1",
-        "href": "https://github.com/user/repo/issues/1"
+        "href": null
       },
       {
         "id": "2",
-        "href": "https://github.com/user/repo/issues/2"
+        "href": null
       }
     ],
     "merge": null,
-    "href": "https://github.com/user/repo/commit/90ef33485369fc7892d11b2e4da04ffb64df1e99",
+    "href": null,
     "breaking": false,
     "files": 8,
     "insertions": 57,
@@ -269,7 +269,7 @@ export default [
     "message": "First commit",
     "fixes": null,
     "merge": null,
-    "href": "https://github.com/user/repo/commit/158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
+    "href": null,
     "breaking": false,
     "files": 7,
     "insertions": 37,

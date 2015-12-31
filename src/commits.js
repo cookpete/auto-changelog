@@ -1,72 +1,188 @@
-import 'array.prototype.find'
+import semver from 'semver'
+import { cmd, isLink, replaceText, getGitVersion } from './utils'
 
-const COMMIT_SEPARATOR = '===COMMIT_SEPARATOR==='
-const MESSAGE_SEPARATOR = '---MESSAGE_SEPARATOR---'
-
-export const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%D%n%aI%n%an%n%ae%n%B' + MESSAGE_SEPARATOR
-
-const MATCH_COMMIT = /(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
+const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
+const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
+const MATCH_COMMIT = /(.*)\n(?:\s\((.*)\))?\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
 const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) deletions?...)?/
-const TAG_PREFIX = 'tag: '
+const BODY_FORMAT = '%B'
+const FALLBACK_BODY_FORMAT = '%s%n%n%b'
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
-const MATCH_ISSUE_FIX = /(?:close(?:s|d)?|fix(?:es|ed)?|resolve(?:s|d)?)\s(#\d+|https?\:\/\/github\.com\/[^\/]+\/[^\/]+\/issues\/\d+)/gi
-const MATCH_PULL_MERGE = /Merge pull request (#\d+) from .+\n\n(.+)/
+const DEFAULT_FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/(?:issues|pull|pull-requests|merge_requests)\/(\d+)))/gi
 
-export function parseCommits (string) {
-  return string.split(COMMIT_SEPARATOR).slice(1).map(commit => {
-    const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
-    const [message, stats] = tail.split(MESSAGE_SEPARATOR)
-    return {
-      hash,
-      tag: refs ? tagFromRefs(refs) : null,
-      author,
-      email,
-      date,
-      subject: getSubject(message),
-      message: message.trim(),
-      ...parseStats(stats.trim())
+const MERGE_PATTERNS = [
+  /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
+  /^(.+) \(#(\d+)\)(?:$|\n\n)/, // Github squash merge
+  /Merged in .+ \(pull request #(\d+)\)\n\n(.+)/, // BitBucket merge
+  /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
+]
+
+export async function fetchCommits (remote, options, branch = null) {
+  const command = branch ? `git log ${branch}` : 'git log'
+  const format = await getLogFormat()
+  const log = await cmd(`${command} --shortstat --pretty=format:${format}`)
+  return parseCommits(log, remote, options)
+}
+
+async function getLogFormat () {
+  const gitVersion = await getGitVersion()
+  const bodyFormat = gitVersion && semver.gte(gitVersion, '1.7.2') ? BODY_FORMAT : FALLBACK_BODY_FORMAT
+  return `${COMMIT_SEPARATOR}%H%n%d%n%ai%n%an%n%ae%n${bodyFormat}${MESSAGE_SEPARATOR}`
+}
+
+function parseCommits (string, remote, options = {}) {
+  const commits = string
+    .split(COMMIT_SEPARATOR)
+    .slice(1)
+    .map(commit => parseCommit(commit, remote, options))
+    .filter(commit => {
+      if (options.ignoreCommitPattern) {
+        return new RegExp(options.ignoreCommitPattern).test(commit.subject) === false
+      }
+      return true
+    })
+
+  if (options.startingCommit) {
+    const index = commits.findIndex(c => c.hash.indexOf(options.startingCommit) === 0)
+    if (index === -1) {
+      throw new Error(`Starting commit ${options.startingCommit} was not found`)
     }
-  })
+    return commits.slice(0, index + 1)
+  }
+
+  return commits
 }
 
-function tagFromRefs (refs) {
-  const valid = refs.split(', ').find(ref => ref.indexOf(TAG_PREFIX) === 0)
-  return valid ? valid.replace(TAG_PREFIX, '') : null
-}
-
-function parseStats (stats) {
-  if (!stats) return {}
-  const [, files, insertions, deletions] = stats.match(MATCH_STATS)
+function parseCommit (commit, remote, options = {}) {
+  const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
+  const [message, stats] = tail.split(MESSAGE_SEPARATOR)
   return {
-    files: parseInt(files || 0, 10),
-    insertions: parseInt(insertions || 0, 10),
-    deletions: parseInt(deletions || 0, 10)
+    hash,
+    shorthash: hash.slice(0, 7),
+    author,
+    email,
+    date: new Date(date).toISOString(),
+    tag: getTag(refs, options),
+    subject: replaceText(getSubject(message), options),
+    message: message.trim(),
+    fixes: getFixes(message, remote, options),
+    merge: getMerge(message, remote, options),
+    href: getCommitLink(hash, remote),
+    breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
+    ...getStats(stats.trim())
   }
 }
 
-export function findFixes (message) {
-  let fixes = []
-  let match = MATCH_ISSUE_FIX.exec(message)
-  if (!match) return null
-  while (match) {
-    fixes.push(match[1] || match[2])
-    match = MATCH_ISSUE_FIX.exec(message)
-  }
-  return fixes
-}
-
-export function findMerge (message) {
-  const match = message.match(MATCH_PULL_MERGE)
-  if (match) {
-    return {
-      pr: match[1],
-      message: match[2]
+function getTag (refs, options) {
+  if (!refs) return null
+  for (let ref of refs.split(', ')) {
+    const prefix = `tag: ${options.tagPrefix}`
+    if (ref.indexOf(prefix) === 0) {
+      const version = ref.replace(prefix, '')
+      if (semver.valid(version)) {
+        return version
+      }
     }
   }
   return null
 }
 
 function getSubject (message) {
+  if (!message) {
+    return '_No commit message_'
+  }
   return message.match(/[^\n]+/)[0]
+}
+
+function getStats (stats) {
+  if (!stats) return {}
+  const [, files, insertions, deletions] = stats.match(MATCH_STATS)
+  return {
+    files: parseInt(files || 0),
+    insertions: parseInt(insertions || 0),
+    deletions: parseInt(deletions || 0)
+  }
+}
+
+function getFixes (message, remote, options = {}) {
+  const pattern = getFixPattern(options)
+  let fixes = []
+  let match = pattern.exec(message)
+  if (!match) return null
+  while (match) {
+    const id = getFixID(match)
+    const href = getIssueLink(match, id, remote, options.issueUrl)
+    fixes.push({ id, href })
+    match = pattern.exec(message)
+  }
+  return fixes
+}
+
+function getFixID (match) {
+  // Get the last non-falsey value in the match array
+  for (let i = match.length; i >= 0; i--) {
+    if (match[i]) {
+      return match[i]
+    }
+  }
+}
+
+function getFixPattern (options) {
+  if (options.issuePattern) {
+    return new RegExp(options.issuePattern, 'g')
+  }
+  return DEFAULT_FIX_PATTERN
+}
+
+function getMerge (message, remote, options = {}) {
+  for (let pattern of MERGE_PATTERNS) {
+    const match = message.match(pattern)
+    if (match) {
+      const id = /^\d+$/.test(match[1]) ? match[1] : match[2]
+      const message = /^\d+$/.test(match[1]) ? match[2] : match[1]
+      return {
+        id,
+        message: replaceText(message, options),
+        href: getMergeLink(id, remote)
+      }
+    }
+  }
+  return null
+}
+
+function getCommitLink (hash, remote) {
+  if (!remote) {
+    return null
+  }
+  if (/bitbucket/.test(remote.hostname)) {
+    return `${remote.url}/commits/${hash}`
+  }
+  return `${remote.url}/commit/${hash}`
+}
+
+function getIssueLink (match, id, remote, issueUrl) {
+  if (!remote) {
+    return null
+  }
+  if (isLink(match[2])) {
+    return match[2]
+  }
+  if (issueUrl) {
+    return issueUrl.replace('{id}', id)
+  }
+  return `${remote.url}/issues/${id}`
+}
+
+function getMergeLink (id, remote) {
+  if (!remote) {
+    return null
+  }
+  if (/bitbucket/.test(remote.hostname)) {
+    return `${remote.url}/pull-requests/${id}`
+  }
+  if (/gitlab/.test(remote.hostname)) {
+    return `${remote.url}/merge_requests/${id}`
+  }
+  return `${remote.url}/pull/${id}`
 }
