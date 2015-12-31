@@ -37,7 +37,7 @@ function getPackageVersion () {
     return new Promise((resolve, reject) => {
       readFile('package.json', 'utf-8', (err, file) => {
         if (err) reject(err)
-        resolve(JSON.parse(file).version)
+        resolve(NPM_VERSION_TAG_PREFIX + JSON.parse(file).version)
       })
     })
   }
@@ -45,7 +45,7 @@ function getPackageVersion () {
 }
 
 function generateLog ([ commits, origin, packageVersion ]) {
-  const releases = parseReleases(commits, NPM_VERSION_TAG_PREFIX + packageVersion)
+  const releases = parseReleases(commits, packageVersion)
   const log = new Template(origin).render(releases)
 
   return new Promise((resolve, reject) => {
