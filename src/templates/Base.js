@@ -21,7 +21,7 @@ export default class Base {
     return [
       this.logHeader,
       releases.map(this.renderRelease).join('\n\n\n')
-    ].join('\n\n\n')
+    ].join('\n\n\n') + '\n'
   }
 
   renderRelease = (release, index, releases) => {
