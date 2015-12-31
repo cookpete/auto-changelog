@@ -16,6 +16,14 @@ npm install -g auto-changelog
 
 ### Usage
 
+Just run in a local git repo. `git log` is run behind the scenes in order to parse commits.
+
 ```bash
-auto-changelog # Outputs log to CHANGELOG.md in current directory
+auto-changelog # Writes log to CHANGELOG.md in current directory
+```
+
+Specify an output file with `-o` or `--output`
+
+```bash
+auto-changelog --output HISTORY.md # Writes log to HISTORY.md
 ```
