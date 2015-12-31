@@ -10,6 +10,7 @@
     "test": "mocha test --compilers js:babel-core/register",
     "clean": "rm -rf lib",
     "build": "babel src -d lib",
+    "version": "babel-node src/index.js --package; git add CHANGELOG.md",
     "prepublish": "npm run build",
     "postpublish": "npm run clean"
   },
