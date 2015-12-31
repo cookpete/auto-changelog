@@ -62,7 +62,8 @@ export default class Base {
   }
 
   renderMerge = ({ pr, message }) => {
-    return `* ${pr}: ${message}`
+    const href = pr.replace('#', this.origin + '/pull/')
+    return `* [${pr}](${href}): ${message}`
   }
 
   renderFixes = (fixes) => {
@@ -77,7 +78,9 @@ export default class Base {
   }
 
   renderFixNumber = (string) => {
-    return string.replace(this.origin + '/issues/', '#')
+    const href = string.replace('#', this.origin + '/issues/')
+    const number = string.replace(this.origin + '/issues/', '#')
+    return `[${number}](${href})`
   }
 
   renderCommits = (commits) => {
@@ -91,7 +94,9 @@ export default class Base {
   }
 
   renderCommit = ({ hash, subject }) => {
-    return `* ${hash.slice(0, this.commitHashLength)}: ${subject}`
+    const href = `${this.origin}/commit/${hash}`
+    const shortHash = hash.slice(0, this.commitHashLength)
+    return `* [\`${shortHash}\`](${href}): ${subject}`
   }
 
   sortCommits = (a, b) => {
