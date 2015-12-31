@@ -52,3 +52,15 @@ auto-changelog --package
 ```
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
+
+
+### FAQ
+
+#### What’s a changelog?
+See [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog#whats-a-change-log).
+
+#### What does this do?
+The command parses a git commit history and generates a changelog based on tagged versions, merged pull requests and closed issues. The default output attempts to follow the schema outlined by [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog). See a simple example in [this very repo](https://github.com/CookPete/auto-changelog/blob/master/CHANGELOG.md).
+
+#### Why do I need it?
+Because keeping a changelog can be tedious and difficult to get right. If you don’t have the patience for a hand-crafted, bespoke changelog then this makes keeping one rather easy. It also can be automated if you’re feeling extra lazy (see [What you might do if you’re clever](#what-you-might-do-if-youre-clever) above).
