@@ -19,9 +19,3 @@ npm install -g auto-changelog
 ```bash
 auto-changelog # Outputs log to CHANGELOG.md in current directory
 ```
-
-### Todo
-
-- Specify output file
-- More templates
-- Better error handling
