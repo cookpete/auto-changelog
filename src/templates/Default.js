@@ -19,10 +19,6 @@ export default class Default {
     this.origin = origin
   }
 
-  formatDate = (date) => {
-    return date.slice(0, 10)
-  }
-
   render = (releases) => {
     return [
       this.logHeader,
@@ -124,5 +120,9 @@ export default class Default {
   sortCommits = (a, b) => {
     // If we have to list commits, list the juicy ones first
     return b.insertions + b.deletions - a.insertions + a.deletions
+  }
+
+  formatDate = (date) => {
+    return date.slice(0, 10)
   }
 }

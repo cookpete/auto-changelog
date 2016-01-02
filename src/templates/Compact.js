@@ -13,15 +13,15 @@ export default class Compact extends Default {
 
   renderReleaseHeading = (release, previousRelease) => {
     const title = this.renderReleaseTitle(release, previousRelease)
-    const date = release.tag ? `\n> ${formatDate(release.date)}` : ''
+    const date = release.tag ? `\n> ${this.formatDate(release.date)}` : ''
     return `#### ${title}${date}\n`
   }
-}
 
-function formatDate (string) {
-  const date = new Date(string)
-  const day = date.getDate()
-  const month = months[date.getMonth()]
-  const year = date.getFullYear()
-  return `${day} ${month} ${year}`
+  formatDate = (string) => {
+    const date = new Date(string)
+    const day = date.getDate()
+    const month = months[date.getMonth()]
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
+  }
 }
