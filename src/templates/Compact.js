@@ -2,6 +2,8 @@
 
 import Default from './Default'
 
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
 export default class Compact extends Default {
   mergesTitle = null
   fixesTitle = null
@@ -22,7 +24,7 @@ export default class Compact extends Default {
 function formatDate (string) {
   const date = new Date(string)
   const day = date.getDate()
-  const month = date.toLocaleString('en', { month: 'long' })
+  const month = months[date.getMonth()]
   const year = date.getFullYear()
   return `${day} ${month} ${year}`
 }
