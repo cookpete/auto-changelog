@@ -3,12 +3,34 @@ export default [{
   tag: null,
   author: 'Pete Cook',
   email: 'email@example.com',
-  date: '2015-12-28T21:57:19+00:00',
+  date: '2015-12-29T21:57:19+00:00',
   subject: 'Unreleased commit',
   message: 'Unreleased commit\n\nFixes #6',
   files: 5,
   insertions: 10,
   deletions: 10
+}, {
+  hash: 'db92947e6129cc20cd7777b7ed90b2bd547918c0',
+  tag: 'v0.1.0',
+  author: 'Pete Cook',
+  email: 'email@example.com',
+  date: '2015-12-29T21:19:17+00:00',
+  subject: '0.1.0',
+  message: '0.1.0',
+  files: 2,
+  insertions: 8,
+  deletions: 2
+}, {
+  hash: '12c0624e7e419a70bd5f3b403d7e0bd8f23ec617',
+  tag: null,
+  author: 'Pete Cook',
+  email: 'email@example.com',
+  date: '2015-12-29T21:18:19+00:00',
+  subject: 'Commit that fixes nothing',
+  message: 'Commit that fixes nothing',
+  files: 1,
+  insertions: 2,
+  deletions: 3
 }, {
   hash: 'ef17dcc732d282f027aa3bddf8f91cbb05998cc8',
   tag: 'v0.0.2',

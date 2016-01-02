@@ -1,6 +1,6 @@
 export default `===COMMIT_SEPARATOR===b0b304049847d9568585bc11399fa6cfa4cab5dc
 HEAD -> master, origin/master
-2015-12-28T21:57:19+00:00
+2015-12-29T21:57:19+00:00
 Pete Cook
 email@example.com
 Unreleased commit
@@ -8,6 +8,24 @@ Unreleased commit
 Fixes #6
 ---MESSAGE_SEPARATOR---
  5 files changed, 10 insertions(+), 10 deletions(-)
+
+===COMMIT_SEPARATOR===db92947e6129cc20cd7777b7ed90b2bd547918c0
+tag: v0.1.0
+2015-12-29T21:19:17+00:00
+Pete Cook
+email@example.com
+0.1.0
+---MESSAGE_SEPARATOR---
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+===COMMIT_SEPARATOR===12c0624e7e419a70bd5f3b403d7e0bd8f23ec617
+
+2015-12-29T21:18:19+00:00
+Pete Cook
+email@example.com
+Commit that fixes nothing
+---MESSAGE_SEPARATOR---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
 ===COMMIT_SEPARATOR===ef17dcc732d282f027aa3bddf8f91cbb05998cc8
 tag: v0.0.2
