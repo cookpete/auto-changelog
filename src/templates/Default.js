@@ -9,9 +9,6 @@ export default class Default {
   fixesTitle = 'Fixed'
   commitsTitle = 'Commits'
 
-  fixPrefix = ''
-  mergePrefix = ''
-
   commitListLimit = 3
   commitHashLength = 7
 
@@ -66,30 +63,39 @@ export default class Default {
 
   renderMerges = (merges) => {
     if (merges.length === 0) return []
-    const list = merges.map(this.renderMerge).join('\n')
+    const list = merges.map(merge => {
+      const href = merge.pr.replace('#', this.origin + '/pull/')
+      return this.renderMerge({
+        message: merge.message,
+        link: `[\`${merge.pr}\`](${href})`
+      })
+    }).join('\n')
     return this.renderList(this.mergesTitle, list)
   }
 
-  renderMerge = ({ pr, message }) => {
-    const href = pr.replace('#', this.origin + '/pull/')
-    return `* ${this.mergePrefix}[${pr}](${href}): ${message}`
+  renderMerge = ({ message, link }) => {
+    return `* ${message} ${link}`
   }
 
   renderFixes = (fixes) => {
     if (fixes.length === 0) return []
-    const list = fixes.map(this.renderFix).join('\n')
+    const list = fixes
+      .map(fix => this.renderFix({
+        commit: fix.commit,
+        links: fix.fixes.map(this.renderFixLink)
+      }))
+      .join('\n')
     return this.renderList(this.fixesTitle, list)
   }
 
-  renderFix = ({ fixes, commit }) => {
-    const numbers = fixes.map(this.renderFixNumber).join(', ')
-    return `* ${this.fixPrefix}${numbers}: ${commit.subject}`
+  renderFix = ({ links, commit }) => {
+    return `* ${commit.subject} ${links.join(', ')}`
   }
 
-  renderFixNumber = (string) => {
+  renderFixLink = (string) => {
     const href = string.replace('#', this.origin + '/issues/')
     const number = string.replace(this.origin + '/issues/', '#')
-    return `[${number}](${href})`
+    return `[\`${number}\`](${href})`
   }
 
   renderCommits = (commits) => {
@@ -97,15 +103,22 @@ export default class Default {
     const list = commits
       .sort(this.sortCommits)
       .slice(0, this.commitListLimit)
-      .map(this.renderCommit)
+      .map(commit => this.renderCommit({
+        subject: commit.subject,
+        link: this.renderCommitLink(commit)
+      }))
       .join('\n')
     return this.renderList(this.commitsTitle, list)
   }
 
-  renderCommit = ({ hash, subject }) => {
-    const href = `${this.origin}/commit/${hash}`
+  renderCommit = ({ subject, link }) => {
+    return `* ${subject} ${link}`
+  }
+
+  renderCommitLink = ({ hash }) => {
     const shortHash = hash.slice(0, this.commitHashLength)
-    return `* [\`${shortHash}\`](${href}): ${subject}`
+    const href = `${this.origin}/commit/${hash}`
+    return `[\`${shortHash}\`](${href})`
   }
 
   sortCommits = (a, b) => {

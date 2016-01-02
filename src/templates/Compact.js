@@ -9,15 +9,12 @@ export default class Compact extends Default {
   fixesTitle = null
   commitsTitle = null
 
-  fixPrefix = 'Fixed '
-  mergePrefix = 'Merged '
-
   listSpacing = '\n'
 
   renderReleaseHeading = (release, previousRelease) => {
     const title = this.renderReleaseTitle(release, previousRelease)
     const date = release.tag ? `\n> ${formatDate(release.date)}` : ''
-    return `### ${title}${date}\n`
+    return `#### ${title}${date}\n`
   }
 }
 
