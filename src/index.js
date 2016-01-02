@@ -7,16 +7,24 @@ import { version } from '../package.json'
 import { cmd } from './utils'
 import { parseCommits, LOG_FORMAT } from './commits'
 import { parseReleases } from './releases'
-import Template from './templates/Base'
+import templates from './templates'
 
 const DEFAULT_OUTPUT = 'CHANGELOG.md'
+const DEFAULT_TEMPLATE = 'default'
 const NPM_VERSION_TAG_PREFIX = 'v'
 
 commander
-  .option('-o, --output [file]', `output file (default: ${DEFAULT_OUTPUT})`, DEFAULT_OUTPUT)
+  .option('-o, --output [file]', `output file, default: ${DEFAULT_OUTPUT}`, DEFAULT_OUTPUT)
   .option('-p, --package', 'use version from package.json as latest release')
+  .option('-t, --template [template]', `specify template to use for output, templates: ${Object.keys(templates).join(', ')}`, DEFAULT_TEMPLATE)
   .version(version)
   .parse(process.argv)
+
+const Template = templates[commander.template]
+
+if (!Template) {
+  throw new Error(`Template '${commander.template}' was not found`)
+}
 
 function getCommits () {
   return cmd('git', ['log', '--shortstat', '--pretty=format:' + LOG_FORMAT]).then(parseCommits)

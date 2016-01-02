@@ -30,6 +30,12 @@ Specify an output file with `-o` or `--output`.
 auto-changelog --output HISTORY.md # Writes log to HISTORY.md
 ```
 
+Specify a theme with `-t` or `--template`.
+
+```bash
+auto-changelog --template compact # Writes log using compact template
+```
+
 #### What you might do if you’re clever
 
 - `npm install auto-changelog --save-dev`
