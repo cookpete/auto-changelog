@@ -9,6 +9,7 @@ export default class Compact extends Default {
   fixesTitle = null
   commitsTitle = null
 
+  minimumChangeCount = 3
   listSpacing = '\n'
 
   renderReleaseHeading = (release, previousRelease) => {

@@ -11,6 +11,7 @@ export default class Default {
 
   commitListLimit = 3
   commitHashLength = 7
+  minimumChangeCount = 1 // Minimum number of merges/fixes/commits to show per release
 
   sectionSpacing = '\n\n\n'
   listSpacing = '\n\n'
@@ -32,8 +33,9 @@ export default class Default {
     const merges = this.renderMerges(release.merges)
     const fixes = this.renderFixes(release.fixes)
     log = log.concat(merges).concat(fixes)
-    if (merges.length + fixes.length === 0) {
-      log = log.concat(this.renderCommits(release.commits))
+    const backfillCount = this.minimumChangeCount - (release.merges.length + release.fixes.length)
+    if (backfillCount > 0) {
+      log = log.concat(this.renderCommits(release.commits, backfillCount))
     }
     return log.join(this.listSpacing)
   }
@@ -94,11 +96,12 @@ export default class Default {
     return `[\`${number}\`](${href})`
   }
 
-  renderCommits = (commits) => {
+  renderCommits = (commits, limit) => {
     if (commits.length === 0) return []
+    limit = Math.min(limit, this.commitListLimit)
     const list = commits
       .sort(this.sortCommits)
-      .slice(0, this.commitListLimit)
+      .slice(0, limit)
       .map(commit => this.renderCommit({
         subject: commit.subject,
         link: this.renderCommitLink(commit)
