@@ -92,7 +92,7 @@ export default class Default {
 
   renderFixLink = (string) => {
     const href = string.replace('#', this.origin + '/issues/')
-    const number = string.replace(this.origin + '/issues/', '#')
+    const number = string.replace(new RegExp(this.origin + '/issues/', 'i'), '#')
     return `[\`${number}\`](${href})`
   };
 
