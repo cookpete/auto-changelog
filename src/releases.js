@@ -1,6 +1,5 @@
 import semver from 'semver'
 
-import { uniq } from './utils'
 import { findFixes, findMerge } from './commits'
 
 export function parseReleases (commits, packageVersion) {
@@ -23,7 +22,6 @@ function newRelease (tag, date = new Date().toISOString()) {
 
 function commitReducer (releases, commit) {
   if (commit.tag && semver.valid(commit.tag)) {
-    releases[0].fixes = uniq(releases[0].fixes, 'issue') // Remove duplicate fixes
     releases.unshift(newRelease(commit.tag, commit.date))
   }
 

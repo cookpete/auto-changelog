@@ -11,17 +11,3 @@ export function cmd (cmd, args = [], options = {}) {
     child.on('error', reject)
   })
 }
-
-export function uniq (array, property) {
-  let unique = {}
-  let distinct = []
-
-  array.forEach(x => {
-    if (!unique[x[property]]) {
-      distinct.push(x)
-      unique[x[property]] = true
-    }
-  })
-
-  return distinct
-}
