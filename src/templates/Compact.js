@@ -5,18 +5,18 @@ import Default from './Default'
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 export default class Compact extends Default {
-  mergesTitle = null
-  fixesTitle = null
-  commitsTitle = null
+  mergesTitle = null;
+  fixesTitle = null;
+  commitsTitle = null;
 
-  minimumChangeCount = 3
-  listSpacing = '\n'
+  minimumChangeCount = 3;
+  listSpacing = '\n';
 
   renderReleaseHeading = (release, previousRelease) => {
     const title = this.renderReleaseTitle(release, previousRelease)
     const date = release.tag ? `\n> ${this.formatDate(release.date)}` : ''
     return `#### ${title}${date}\n`
-  }
+  };
 
   formatDate = (string) => {
     const date = new Date(string)
@@ -24,5 +24,5 @@ export default class Compact extends Default {
     const month = months[date.getMonth()]
     const year = date.getFullYear()
     return `${day} ${month} ${year}`
-  }
+  };
 }
