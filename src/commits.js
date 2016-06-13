@@ -1,4 +1,6 @@
-import 'array.prototype.find'
+import find from 'array.prototype.find'
+
+find.shim()
 
 const COMMIT_SEPARATOR = '===COMMIT_SEPARATOR==='
 const MESSAGE_SEPARATOR = '---MESSAGE_SEPARATOR---'
