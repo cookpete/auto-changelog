@@ -6,7 +6,7 @@ export function cmd (cmd, args = [], options = {}) {
     const child = spawn(cmd, args, options)
     let data = ''
 
-    child.stdout.on('data', buffer => data += buffer.toString())
+    child.stdout.on('data', buffer => { data += buffer.toString() })
     child.stdout.on('end', () => resolve(data))
     child.on('error', reject)
   })
