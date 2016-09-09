@@ -2,8 +2,8 @@ import find from 'array.prototype.find'
 
 find.shim()
 
-const COMMIT_SEPARATOR = '===COMMIT_SEPARATOR==='
-const MESSAGE_SEPARATOR = '---MESSAGE_SEPARATOR---'
+const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
+const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
 
 export const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%D%n%aI%n%an%n%ae%n%B' + MESSAGE_SEPARATOR
 
