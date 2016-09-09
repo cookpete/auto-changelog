@@ -27,11 +27,11 @@ if (!Template) {
 }
 
 function getCommits () {
-  return cmd('git', ['log', '--shortstat', '--pretty=format:' + LOG_FORMAT]).then(parseCommits)
+  return cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`).then(parseCommits)
 }
 
 function getOrigin () {
-  return cmd('git', ['remote', 'show', 'origin']).then(origin => {
+  return cmd('git remote show origin').then(origin => {
     const match = origin.match(/https:\/\/github.com\/[^\/]+\/[^\.]+/)
     if (!match) {
       throw new Error('Must have a git remote called origin')
