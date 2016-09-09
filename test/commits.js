@@ -23,6 +23,12 @@ describe('findFixes', () => {
     expect(findFixes(message)).to.deep.equal(expected)
   })
 
+  it('finds fix in commit notes', () => {
+    const message = 'Commit message\n\nCloses #8'
+    const expected = [ '#8' ]
+    expect(findFixes(message)).to.deep.equal(expected)
+  })
+
   it('finds multiple fixes', () => {
     const message = 'Commit message\n\nFixes #1, fix #2, resolved #3, closes #4'
     const expected = ['#1', '#2', '#3', '#4']
