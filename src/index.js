@@ -2,6 +2,7 @@
 
 import { readFile, writeFile } from 'fs'
 import commander from 'commander'
+import parseRepoURL from 'parse-github-url'
 
 import { version } from '../package.json'
 import { cmd } from './utils'
@@ -30,13 +31,12 @@ function getCommits () {
   return cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`).then(parseCommits)
 }
 
-function getOrigin () {
-  return cmd('git remote show origin').then(origin => {
-    const match = origin.match(/https:\/\/github.com\/[^\/]+\/[^\.]+/)
-    if (!match) {
+function parseOrigin () {
+  return cmd('git config --get remote.origin.url').then(origin => {
+    if (!origin) {
       throw new Error('Must have a git remote called origin')
     }
-    return match[0]
+    return parseRepoURL(origin)
   })
 }
 
@@ -74,6 +74,6 @@ function error (error) {
   throw new Error(error)
 }
 
-const promises = [ getCommits(), getOrigin(), getPackageVersion() ]
+const promises = [ getCommits(), parseOrigin(), getPackageVersion() ]
 
 Promise.all(promises).then(generateLog).then(success, error)

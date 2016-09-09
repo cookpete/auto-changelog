@@ -6,7 +6,10 @@ import changelogDefault from './data/changelog-default'
 import changelogCompact from './data/changelog-compact'
 import templates from '../src/templates'
 
-const origin = 'https://github.com/user/repo'
+const origin = {
+  host: 'github.com',
+  repo: 'user/repo'
+}
 
 describe('Template', () => {
   it('renders using default template', () => {
