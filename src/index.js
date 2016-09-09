@@ -65,7 +65,7 @@ function generateLog ([ commits, origin, packageVersion ]) {
 
 function success (log) {
   const bytes = Buffer.byteLength(log, 'utf8')
-  console.log(bytes + ' bytes written to ' + commander.output)
+  console.log(`${bytes} bytes written to ${commander.output}`)
   process.exit(0)
 }
 
