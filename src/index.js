@@ -21,12 +21,6 @@ commander
   .version(version)
   .parse(process.argv)
 
-const Template = templates[commander.template]
-
-if (!Template) {
-  throw new Error(`Template '${commander.template}' was not found`)
-}
-
 function getCommits () {
   return cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`).then(parseCommits)
 }
@@ -53,6 +47,11 @@ function getPackageVersion () {
 }
 
 function generateLog ([ commits, origin, packageVersion ]) {
+  const Template = templates[commander.template]
+  if (!Template) {
+    throw new Error(`Template '${commander.template}' was not found`)
+  }
+
   const releases = parseReleases(commits, packageVersion)
   const log = new Template(origin).render(releases)
 
@@ -71,9 +70,9 @@ function success (log) {
 }
 
 function error (error) {
-  throw new Error(error)
+  console.error(error.message)
 }
 
 const promises = [ getCommits(), parseOrigin(), getPackageVersion() ]
 
-Promise.all(promises).then(generateLog).then(success, error)
+Promise.all(promises).then(generateLog).then(success).catch(error)
