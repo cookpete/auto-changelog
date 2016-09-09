@@ -50,9 +50,9 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "chai": "^3.4.1",
-    "mocha": "^2.3.4",
+    "mocha": "^3.0.2",
     "snazzy": "^4.0.0",
-    "standard": "^7.1.2"
+    "standard": "^8.0.0"
   },
   "babel": {
     "presets": [
