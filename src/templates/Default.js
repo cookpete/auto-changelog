@@ -35,7 +35,12 @@ export default class Default {
     log = log.concat(merges).concat(fixes)
     const backfillCount = this.minimumChangeCount - (release.merges.length + release.fixes.length)
     if (backfillCount > 0) {
-      log = log.concat(this.renderCommits(release.commits, backfillCount))
+      // Ignore some commit subjects because they exist in merges and fixes already
+      const ignoreSubjects = [
+        ...release.merges.map(merge => merge.message),
+        ...release.fixes.map(fix => fix.commit.subject)
+      ]
+      log = log.concat(this.renderCommits(release.commits, backfillCount, ignoreSubjects))
     }
     return log.join(this.listSpacing)
   }
@@ -96,10 +101,11 @@ export default class Default {
     return `[\`${number}\`](${href})`
   }
 
-  renderCommits = (commits, limit) => {
+  renderCommits = (commits, limit, ignoreSubjects) => {
     if (commits.length === 0) return []
     limit = Math.min(limit, this.commitListLimit)
     const list = commits
+      .filter(commit => ignoreSubjects.indexOf(commit.subject) === -1)
       .sort(this.sortCommits)
       .slice(0, limit)
       .map(commit => this.renderCommit({
