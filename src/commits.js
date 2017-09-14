@@ -12,7 +12,7 @@ const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) d
 const TAG_PREFIX = 'tag: '
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
-const MATCH_ISSUE_FIX = /(?:close(?:s|d)?|fix(?:es|ed)?|resolve(?:s|d)?)\s(#\d+|https?:\/\/github\.com\/[^\/]+\/[^\/]+\/issues\/\d+)/gi
+const MATCH_ISSUE_FIX = /(?:close(?:s|d)?|fix(?:es|ed)?|resolve(?:s|d)?)\s(#\d+|https?:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+)/gi
 const MATCH_PULL_MERGE = /Merge pull request (#\d+) from .+\n\n(.+)/
 
 export function parseCommits (string) {
