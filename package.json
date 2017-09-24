@@ -39,7 +39,6 @@
   ],
   "license": "CC0-1.0",
   "dependencies": {
-    "array.prototype.find": "^2.0.0",
     "commander": "^2.9.0",
     "parse-github-url": "^1.0.0",
     "semver": "^5.1.0"

@@ -1,7 +1,3 @@
-import find from 'array.prototype.find'
-
-find.shim()
-
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
 
@@ -33,8 +29,12 @@ export function parseCommits (string) {
 }
 
 function tagFromRefs (refs) {
-  const valid = refs.split(', ').find(ref => ref.indexOf(TAG_PREFIX) === 0)
-  return valid ? valid.replace(TAG_PREFIX, '') : null
+  for (let ref of refs.split(', ')) {
+    if (ref.indexOf(TAG_PREFIX) === 0) {
+      return ref.replace(TAG_PREFIX, '')
+    }
+  }
+  return null
 }
 
 function parseStats (stats) {
