@@ -21,17 +21,17 @@ commander
   .version(version)
   .parse(process.argv)
 
-function getCommits () {
-  return cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`).then(parseCommits)
+async function getCommits () {
+  const log = await cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`)
+  return parseCommits(log)
 }
 
-function parseOrigin () {
-  return cmd('git config --get remote.origin.url').then(origin => {
-    if (!origin) {
-      throw new Error('Must have a git remote called origin')
-    }
-    return parseRepoURL(origin)
-  })
+async function getOrigin () {
+  const origin = await cmd('git config --get remote.origin.url')
+  if (!origin) {
+    throw new Error('Must have a git remote called origin')
+  }
+  return parseRepoURL(origin)
 }
 
 function getPackageVersion () {
@@ -46,33 +46,32 @@ function getPackageVersion () {
   return Promise.resolve(null)
 }
 
-function generateLog ([ commits, origin, packageVersion ]) {
-  const Template = templates[commander.template]
-  if (!Template) {
-    throw new Error(`Template '${commander.template}' was not found`)
-  }
-
-  const releases = parseReleases(commits, packageVersion)
-  const log = new Template(origin).render(releases)
-
-  return new Promise((resolve, reject) => {
-    writeFile(commander.output, log, err => {
-      if (err) reject(err)
-      resolve(log)
-    })
+function writeLog (log) {
+  writeFile(commander.output, log, err => {
+    if (err) throw err
+    const bytes = Buffer.byteLength(log, 'utf8')
+    console.log(`${bytes} bytes written to ${commander.output}`)
+    process.exit(0)
   })
 }
 
-function success (log) {
-  const bytes = Buffer.byteLength(log, 'utf8')
-  console.log(`${bytes} bytes written to ${commander.output}`)
-  process.exit(0)
+async function generateLog () {
+  try {
+    const Template = templates[commander.template]
+    if (!Template) {
+      throw new Error(`Template '${commander.template}' was not found`)
+    }
+    const [ commits, origin, packageVersion ] = [
+      await getCommits(),
+      await getOrigin(),
+      await getPackageVersion()
+    ]
+    const releases = parseReleases(commits, packageVersion)
+    const log = new Template(origin).render(releases)
+    writeLog(log)
+  } catch (e) {
+    console.error(e)
+  }
 }
 
-function error (error) {
-  console.error(error.message)
-}
-
-const promises = [ getCommits(), parseOrigin(), getPackageVersion() ]
-
-Promise.all(promises).then(generateLog).then(success).catch(error)
+generateLog()

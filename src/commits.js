@@ -17,18 +17,19 @@ export function parseCommits (string) {
     const [message, stats] = tail.split(MESSAGE_SEPARATOR)
     return {
       hash,
-      tag: refs ? tagFromRefs(refs) : null,
       author,
       email,
       date,
+      tag: getTag(refs),
       subject: getSubject(message),
       message: message.trim(),
-      ...parseStats(stats.trim())
+      ...getStats(stats.trim())
     }
   })
 }
 
-function tagFromRefs (refs) {
+function getTag (refs) {
+  if (!refs) return null
   for (let ref of refs.split(', ')) {
     if (ref.indexOf(TAG_PREFIX) === 0) {
       return ref.replace(TAG_PREFIX, '')
@@ -37,7 +38,7 @@ function tagFromRefs (refs) {
   return null
 }
 
-function parseStats (stats) {
+function getStats (stats) {
   if (!stats) return {}
   const [, files, insertions, deletions] = stats.match(MATCH_STATS)
   return {
