@@ -14,6 +14,6 @@ describe('parseReleases', () => {
   it('supports a package version override', () => {
     const result = parseReleases(commits, 'v3.0.0')
     expect(result).to.be.an('array')
-    expect(result).to.have.deep.property('[0].tag', 'v3.0.0')
+    expect(result[0]).to.have.property('tag', 'v3.0.0')
   })
 })
