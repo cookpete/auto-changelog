@@ -41,9 +41,9 @@ function parseStats (stats) {
   if (!stats) return {}
   const [, files, insertions, deletions] = stats.match(MATCH_STATS)
   return {
-    files: parseInt(files || 0, 10),
-    insertions: parseInt(insertions || 0, 10),
-    deletions: parseInt(deletions || 0, 10)
+    files: parseInt(files || 0),
+    insertions: parseInt(insertions || 0),
+    deletions: parseInt(deletions || 0)
   }
 }
 
