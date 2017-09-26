@@ -132,6 +132,6 @@ export default class Default {
   }
 
   formatDate = (date) => {
-    return date.slice(0)
+    return date.slice(0, 10)
   }
 }
