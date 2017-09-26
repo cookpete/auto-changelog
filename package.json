@@ -65,5 +65,12 @@
   },
   "standard": {
     "parser": "babel-eslint"
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "temp-directory": "./coverage/.nyc_output"
   }
 }
