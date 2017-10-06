@@ -39,6 +39,7 @@
   ],
   "license": "CC0-1.0",
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "commander": "^2.9.0",
     "parse-github-url": "^1.0.0",
     "semver": "^5.1.0"
