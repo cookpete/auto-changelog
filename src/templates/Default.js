@@ -17,7 +17,7 @@ export default class Default {
   listSpacing = '\n\n'
 
   constructor (origin) {
-    this.origin = `https://${origin.host}/${origin.repo}`
+    this.origin = `https://${origin.hostname}/${origin.repo}`
   }
 
   render = (releases) => {

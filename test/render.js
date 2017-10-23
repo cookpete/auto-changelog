@@ -7,7 +7,7 @@ import changelogCompact from './data/changelog-compact'
 import templates from '../src/templates'
 
 const origin = {
-  host: 'github.com',
+  hostname: 'github.com',
   repo: 'user/repo'
 }
 
