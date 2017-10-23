@@ -54,9 +54,17 @@ export default class Default {
   renderReleaseTitle = (release, previousRelease) => {
     let heading = release.tag || this.unreleasedTitle
     if (previousRelease) {
-      heading = `[${heading}](${this.origin}/compare/${previousRelease.tag}...${release.tag || 'HEAD'})`
+      const href = this.renderCompareHref(this.origin, previousRelease.tag, release.tag)
+      heading = `[${heading}](${href})`
     }
     return heading
+  }
+
+  renderCompareHref = (origin, fromTag, toTag = 'HEAD') => {
+    if (/bitbucket\.com\//.test(origin)) {
+      return `${origin}/compare/${toTag}%0D${fromTag}`
+    }
+    return `${origin}/compare/${fromTag}...${toTag}`
   }
 
   renderList = (title, list) => {
