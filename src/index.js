@@ -1,6 +1,6 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 import 'babel-polyfill'
-import generateLog from './generate-log'
+import run from './run'
 
-generateLog()
+run().catch(e => console.error(e))

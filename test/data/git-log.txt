@@ -1,4 +1,4 @@
-export default `__AUTO_CHANGELOG_COMMIT_SEPARATOR__b0b304049847d9568585bc11399fa6cfa4cab5dc
+__AUTO_CHANGELOG_COMMIT_SEPARATOR__b0b304049847d9568585bc11399fa6cfa4cab5dc
 HEAD -> master, origin/master
 2015-12-29T21:57:19+00:00
 Pete Cook
@@ -93,5 +93,3 @@ email@example.com
 First commit
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
  7 files changed, 37 insertions(+), 22 deletions(-)
-
-`

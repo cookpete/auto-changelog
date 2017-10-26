@@ -7,13 +7,13 @@
   },
   "scripts": {
     "lint": "standard --verbose | snazzy",
-    "test": "nyc mocha test --compilers js:babel-core/register",
+    "test": "cross-env NODE_ENV=test nyc mocha test",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "clean": "rm -rf lib",
     "build": "babel src -d lib",
     "preversion": "npm run lint && npm run test",
     "version": "babel-node src/index.js --package --template compact && git add CHANGELOG.md",
-    "prepublish": "npm run build",
+    "prepublish": "npm run clean && npm run build",
     "postpublish": "npm run clean"
   },
   "author": "Pete Cook <pete@cookpete.com> (http://github.com/cookpete)",
@@ -37,21 +37,26 @@
     "commits",
     "history"
   ],
-  "license": "CC0-1.0",
+  "license": "MIT",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "commander": "^2.9.0",
+    "fs-extra": "^4.0.2",
+    "handlebars": "^4.0.11",
     "parse-github-url": "^1.0.0",
     "semver": "^5.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",
-    "babel-core": "^6.3.26",
-    "babel-eslint": "^8.0.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-stage-0": "^6.3.13",
+    "babel-eslint": "^8.0.1",
+    "babel-plugin-istanbul": "^4.1.5",
+    "babel-plugin-rewire": "^1.1.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "codecov": "^3.0.0",
+    "cross-env": "^5.1.0",
     "mocha": "^4.0.1",
     "nyc": "^11.2.1",
     "snazzy": "^7.0.0",
@@ -60,17 +65,36 @@
   "babel": {
     "presets": [
       "env",
-      "stage-0"
-    ]
+      "stage-3"
+    ],
+    "env": {
+      "test": {
+        "plugins": [
+          "istanbul",
+          "rewire"
+        ]
+      }
+    }
   },
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "ignore": [
+      "test/data/"
+    ]
   },
   "nyc": {
+    "all": true,
+    "include": "src",
+    "sourceMap": false,
+    "instrument": false,
+    "temp-directory": "./coverage/.nyc_output",
+    "require": [
+      "babel-polyfill",
+      "babel-register"
+    ],
     "reporter": [
       "text",
       "html"
-    ],
-    "temp-directory": "./coverage/.nyc_output"
+    ]
   }
 }
