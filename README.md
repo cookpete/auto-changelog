@@ -1,6 +1,8 @@
 auto-changelog
 ==============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/CookPete/auto-changelog.svg)](https://greenkeeper.io/)
+
 Command line tool for generating a changelog from git tags and commit history
 
 [![Latest npm version](https://img.shields.io/npm/v/auto-changelog.svg)](https://www.npmjs.com/package/auto-changelog)
