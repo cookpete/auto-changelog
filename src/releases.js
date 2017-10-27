@@ -23,7 +23,7 @@ export function parseReleases (commits, origin, packageVersion, includeUnrelease
         fixes: commit.fixes,
         commit
       })
-    } else if (filterCommit(commit)) {
+    } else if (filterCommit(commit, release.merges)) {
       release.commits.push(commit)
     }
   }
@@ -45,8 +45,16 @@ function newRelease (tag = null, date = new Date().toISOString()) {
   return release
 }
 
-function filterCommit (commit) {
-  return !semver.valid(commit.subject) // Filter out version commits
+function filterCommit (commit, merges) {
+  if (semver.valid(commit.subject)) {
+    // Filter out version commits
+    return false
+  }
+  if (merges.findIndex(m => m.message === commit.subject) !== -1) {
+    // Filter out commits with the same message as an existing merge
+    return false
+  }
+  return true
 }
 
 function getCompareLink (from, to, origin) {
