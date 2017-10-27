@@ -17,9 +17,10 @@ If you are upgrading from `0.x`, the same options are still supported out of the
   - If you still want to use the [`keepachangelog`](http://keepachangelog.com) format, use `--template keepachangelog`
 - Templates now use `-` instead of `*` for lists
 - Up to 3 commits are now shown per release
-- Unreleased changes are no longer listed by default, use `--unreleased` to list them
+- Unreleased changes are no longer listed by default, use `--unreleased` to include them
 - [GitLab](https://gitlab.com) and [BitBucket](https://bitbucket.org) are now fully supported
 
+If anything isn’t working correctly, [open an issue](https://github.com/CookPete/auto-changelog/issues).
 
 ### Installation
 
