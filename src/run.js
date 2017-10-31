@@ -1,5 +1,5 @@
 import commander from 'commander'
-import { readJson, writeFile } from 'fs-extra'
+import { readJson, writeFile, pathExists } from 'fs-extra'
 
 import { version } from '../package.json'
 import { fetchOrigin } from './origin'
@@ -21,25 +21,17 @@ commander
   .version(version)
   .parse(process.argv)
 
-async function getPackageVersion () {
-  const pkg = await readJson('package.json')
-  return NPM_VERSION_TAG_PREFIX + pkg.version
-}
-
 export default async function run () {
-  const pkg = await readJson('package.json')
+  const pkg = await pathExists('package.json') && await readJson('package.json')
   let options = { ...commander }
   if (pkg) {
-    options = {
-      ...options,
-      ...pkg['auto-changelog']
-    }
+    options = { ...options, ...pkg['auto-changelog'] }
   } else if (commander.package) {
     throw Error('package.json could not be found')
   }
   const origin = await fetchOrigin(options.remote)
   const commits = await fetchCommits(origin)
-  const packageVersion = options.package ? await getPackageVersion() : null
+  const packageVersion = options.package ? NPM_VERSION_TAG_PREFIX + pkg.version : null
   const releases = parseReleases(commits, origin, packageVersion, options.unreleased)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
