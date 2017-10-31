@@ -8,7 +8,7 @@ export async function fetchOrigin (remote) {
     throw new Error(`Git remote ${remote} was not found`)
   }
   const origin = parseRepoURL(originURL)
-  const protocol = origin.protocol || 'http:'
+  const protocol = origin.protocol || 'https:'
   const host = origin.hostname || origin.host
   return {
     ...origin,
