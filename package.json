@@ -12,7 +12,7 @@
     "clean": "rm -rf lib",
     "build": "babel src -d lib",
     "preversion": "npm run lint && npm run test",
-    "version": "babel-node src/index.js --package --template compact && git add CHANGELOG.md",
+    "version": "babel-node src/index.js -p && git add CHANGELOG.md",
     "prepublish": "npm run clean && npm run build",
     "postpublish": "npm run clean"
   },
