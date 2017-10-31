@@ -99,7 +99,7 @@ describe('getMerge', () => {
       expect(getMerge(message, origin.github)).to.deep.equal({
         id: '3',
         message: 'Pull request title',
-        href: 'https://github.com/user/repo/pulls/3'
+        href: 'https://github.com/user/repo/pull/3'
       })
     })
 
@@ -108,7 +108,7 @@ describe('getMerge', () => {
       expect(getMerge(message, origin.github)).to.deep.equal({
         id: '10',
         message: 'Update dependencies to enable Greenkeeper 🌴',
-        href: 'https://github.com/user/repo/pulls/10'
+        href: 'https://github.com/user/repo/pull/10'
       })
     })
 

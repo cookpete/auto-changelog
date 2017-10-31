@@ -64,7 +64,7 @@ export default [
       {
         "id": "5",
         "message": "Should not parse #4 in PR title",
-        "href": "https://github.com/user/repo/pulls/5"
+        "href": "https://github.com/user/repo/pull/5"
       }
     ],
     "tag": "v0.0.2",
@@ -136,7 +136,7 @@ export default [
       {
         "id": "3",
         "message": "Pull request title",
-        "href": "https://github.com/user/repo/pulls/3"
+        "href": "https://github.com/user/repo/pull/3"
       }
     ],
     "tag": "v0.0.1",

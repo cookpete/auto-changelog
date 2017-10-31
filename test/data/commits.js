@@ -81,7 +81,7 @@ export default [
     "merge": {
       "id": "5",
       "message": "Should not parse #4 in PR title",
-      "href": "https://github.com/user/repo/pulls/5"
+      "href": "https://github.com/user/repo/pull/5"
     },
     "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672"
   },
@@ -135,7 +135,7 @@ export default [
     "merge": {
       "id": "3",
       "message": "Pull request title",
-      "href": "https://github.com/user/repo/pulls/3"
+      "href": "https://github.com/user/repo/pull/3"
     },
     "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3"
   },

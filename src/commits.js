@@ -119,5 +119,5 @@ function getPullLink (id, origin) {
   if (origin.hostname === 'gitlab.com') {
     return `${origin.repoURL}/merge_requests/${id}`
   }
-  return `${origin.repoURL}/pulls/${id}`
+  return `${origin.repoURL}/pull/${id}`
 }
