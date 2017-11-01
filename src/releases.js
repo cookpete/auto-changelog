@@ -2,7 +2,7 @@ import semver from 'semver'
 
 import { niceDate } from './utils'
 
-export function parseReleases (commits, origin, packageVersion, includeUnreleased) {
+export function parseReleases (commits, origin, packageVersion, includeUnreleased, commitLimit) {
   let release = newRelease(packageVersion)
   const releases = []
   for (let commit of commits) {
@@ -23,7 +23,7 @@ export function parseReleases (commits, origin, packageVersion, includeUnrelease
         fixes: commit.fixes,
         commit
       })
-    } else if (filterCommit(commit, release.merges)) {
+    } else if (filterCommit(commit, release.merges) && (!commitLimit || release.commits.length < commitLimit)) {
       release.commits.push(commit)
     }
   }

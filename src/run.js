@@ -10,6 +10,7 @@ import { compileTemplate } from './template'
 const DEFAULT_OUTPUT = 'CHANGELOG.md'
 const DEFAULT_TEMPLATE = 'compact'
 const DEFAULT_REMOTE = 'origin'
+const DEFAULT_COMMIT_LIMIT = 3
 const NPM_VERSION_TAG_PREFIX = 'v'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 
@@ -20,6 +21,7 @@ function getOptions (argv, pkg) {
     .option('-r, --remote [remote]', `specify git remote to use for links, default: ${DEFAULT_REMOTE}`, DEFAULT_REMOTE)
     .option('-p, --package', 'use version from package.json as latest release')
     .option('-u, --unreleased', 'include section for unreleased changes')
+    .option('-l, --commit-limit [count]', `modify the limit of rendered commits per release, default: ${DEFAULT_COMMIT_LIMIT}`, DEFAULT_COMMIT_LIMIT)
     .version(version)
     .parse(argv)
 
@@ -41,7 +43,8 @@ export default async function run (argv) {
   const origin = await fetchOrigin(options.remote)
   const commits = await fetchCommits(origin)
   const packageVersion = options.package ? NPM_VERSION_TAG_PREFIX + pkg.version : null
-  const releases = parseReleases(commits, origin, packageVersion, options.unreleased)
+  const commitLimit = options.commitLimit === 'false' ? false : parseInt(options.commitLimit, 10)
+  const releases = parseReleases(commits, origin, packageVersion, options.unreleased, commitLimit)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
   return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`
