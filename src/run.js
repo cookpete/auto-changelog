@@ -13,7 +13,7 @@ const DEFAULT_REMOTE = 'origin'
 const NPM_VERSION_TAG_PREFIX = 'v'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 
-function getOptions (pkg) {
+function getOptions (argv, pkg) {
   const options = commander
     .option('-o, --output [file]', `output file, default: ${DEFAULT_OUTPUT}`, DEFAULT_OUTPUT)
     .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_TEMPLATE}`, DEFAULT_TEMPLATE)
@@ -21,7 +21,7 @@ function getOptions (pkg) {
     .option('-p, --package', 'use version from package.json as latest release')
     .option('-u, --unreleased', 'include section for unreleased changes')
     .version(version)
-    .parse(process.argv)
+    .parse(argv)
 
   if (!pkg) {
     if (options.package) {
@@ -35,15 +35,14 @@ function getOptions (pkg) {
   }
 }
 
-export default async function run () {
+export default async function run (argv) {
   const pkg = await pathExists('package.json') && await readJson('package.json')
-  const options = getOptions(pkg)
+  const options = getOptions(argv, pkg)
   const origin = await fetchOrigin(options.remote)
   const commits = await fetchCommits(origin)
   const packageVersion = options.package ? NPM_VERSION_TAG_PREFIX + pkg.version : null
   const releases = parseReleases(commits, origin, packageVersion, options.unreleased)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
-  console.log(`${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`)
-  process.exit(0)
+  return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`
 }
