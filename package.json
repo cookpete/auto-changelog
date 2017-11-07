@@ -87,7 +87,8 @@
     "include": "src",
     "sourceMap": false,
     "instrument": false,
-    "temp-directory": "./coverage/.nyc_output",
+    "report-dir": "./test/coverage",
+    "temp-directory": "./test/coverage/.nyc_output",
     "require": [
       "babel-polyfill",
       "babel-register"
