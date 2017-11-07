@@ -24,7 +24,9 @@ export function niceDate (string) {
 }
 
 export function removeIndentation (string) {
-  return string.replace(/\n +/g, '\n')
+  return string
+    .replace(/\n +/g, '\n')
+    .replace(/^ +/, '')
 }
 
 export function isLink (string) {
