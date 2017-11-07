@@ -1,55 +1,41 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
+import origins from './data/origins'
 import {
   fetchOrigin,
   __Rewire__ as mock,
   __ResetDependency__ as unmock
 } from '../src/origin'
 
-const origin = {
-  github: {
-    hostname: 'github.com',
-    url: 'https://github.com/user/repo'
-  },
-  gitlab: {
-    hostname: 'gitlab.com',
-    url: 'https://gitlab.com/user/repo'
-  },
-  bitbucket: {
-    hostname: 'bitbucket.org',
-    url: 'https://bitbucket.org/user/repo'
-  }
-}
-
 const TEST_DATA = [
   {
     remote: 'https://github.com/user/repo',
-    expected: origin.github
+    expected: origins.github
   },
   {
     remote: 'https://github.com:8080/user/repo',
-    expected: origin.github
+    expected: origins.github
   },
   {
     remote: 'git@github.com:user/repo.git',
-    expected: origin.github
+    expected: origins.github
   },
   {
     remote: 'https://gitlab.com/user/repo',
-    expected: origin.gitlab
+    expected: origins.gitlab
   },
   {
     remote: 'git@gitlab.com:user/repo.git',
-    expected: origin.gitlab
+    expected: origins.gitlab
   },
   {
     remote: 'https://bitbucket.org/user/repo',
-    expected: origin.bitbucket
+    expected: origins.bitbucket
   },
   {
     remote: 'git@bitbucket.org:user/repo.git',
-    expected: origin.bitbucket
+    expected: origins.bitbucket
   }
 ]
 
