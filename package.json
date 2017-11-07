@@ -85,6 +85,7 @@
   "nyc": {
     "all": true,
     "include": "src",
+    "exclude": "src/index.js",
     "sourceMap": false,
     "instrument": false,
     "report-dir": "./test/coverage",
