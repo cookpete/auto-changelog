@@ -32,3 +32,7 @@ export function removeIndentation (string) {
 export function isLink (string) {
   return /^http/.test(string)
 }
+
+export function parseLimit (limit) {
+  return limit === 'false' ? false : parseInt(limit, 10)
+}

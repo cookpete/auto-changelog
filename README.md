@@ -43,7 +43,7 @@ Options:
   -r, --remote [remote]      # specify git remote to use for links, default: origin
   -p, --package              # use version from package.json as latest release
   -u, --unreleased           # include section for unreleased changes
-  -l, --commit-limit [count] # modify the limit of rendered commits per release, default: 3
+  -l, --commit-limit [count] # number of commits to display per release, default: 3
   -V, --version              # output the version number
   -h, --help                 # output usage information
 
