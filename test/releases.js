@@ -7,8 +7,7 @@ import { parseReleases } from '../src/releases'
 
 const origin = {
   hostname: 'github.com',
-  repoURL: 'https://github.com/user/repo',
-  repo: 'user/repo'
+  url: 'https://github.com/user/repo'
 }
 
 describe('parseReleases', () => {

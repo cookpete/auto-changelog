@@ -20,18 +20,15 @@ const getMerge = __get__('getMerge')
 const origin = {
   github: {
     hostname: 'github.com',
-    repoURL: 'https://github.com/user/repo',
-    repo: 'user/repo'
+    url: 'https://github.com/user/repo'
   },
   gitlab: {
     hostname: 'gitlab.com',
-    repoURL: 'https://gitlab.com/user/repo',
-    repo: 'user/repo'
+    url: 'https://gitlab.com/user/repo'
   },
   bitbucket: {
     hostname: 'bitbucket.org',
-    repoURL: 'https://bitbucket.org/user/repo',
-    repo: 'user/repo'
+    url: 'https://bitbucket.org/user/repo'
   }
 }
 

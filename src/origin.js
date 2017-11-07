@@ -9,9 +9,9 @@ export async function fetchOrigin (remote) {
   }
   const origin = parseRepoURL(originURL)
   const protocol = origin.protocol === 'http:' ? 'http:' : 'https:'
-  const host = origin.hostname || origin.host
+  const hostname = origin.hostname || origin.host
   return {
-    ...origin,
-    repoURL: `${protocol}//${host}/${origin.repo}`
+    hostname,
+    url: `${protocol}//${hostname}/${origin.repo}`
   }
 }

@@ -59,9 +59,9 @@ function filterCommit (commit, merges) {
 
 function getCompareLink (from, to, origin) {
   if (origin.hostname === 'bitbucket.org') {
-    return `${origin.repoURL}/compare/${to}%0D${from}`
+    return `${origin.url}/compare/${to}%0D${from}`
   }
-  return `${origin.repoURL}/compare/${from}...${to}`
+  return `${origin.url}/compare/${from}...${to}`
 }
 
 function sortCommits (a, b) {

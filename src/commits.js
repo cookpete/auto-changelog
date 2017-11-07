@@ -103,21 +103,21 @@ function getMerge (message, origin) {
 
 function getCommitLink (hash, origin) {
   if (origin.hostname === 'bitbucket.org') {
-    return `${origin.repoURL}/commits/${hash}`
+    return `${origin.url}/commits/${hash}`
   }
-  return `${origin.repoURL}/commit/${hash}`
+  return `${origin.url}/commit/${hash}`
 }
 
 function getIssueLink (id, origin) {
-  return `${origin.repoURL}/issues/${id}`
+  return `${origin.url}/issues/${id}`
 }
 
 function getPullLink (id, origin) {
   if (origin.hostname === 'bitbucket.org') {
-    return `${origin.repoURL}/pull-requests/${id}`
+    return `${origin.url}/pull-requests/${id}`
   }
   if (origin.hostname === 'gitlab.com') {
-    return `${origin.repoURL}/merge_requests/${id}`
+    return `${origin.url}/merge_requests/${id}`
   }
-  return `${origin.repoURL}/pull/${id}`
+  return `${origin.url}/pull/${id}`
 }
