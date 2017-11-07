@@ -3,10 +3,10 @@ import { spawn } from 'child_process'
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 // Simple util for calling a child process
-export function cmd (string, options = {}) {
+export function cmd (string) {
   const [ cmd, ...args ] = string.split(' ')
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, options)
+    const child = spawn(cmd, args)
     let data = ''
 
     child.stdout.on('data', buffer => { data += buffer.toString() })
