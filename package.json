@@ -9,7 +9,7 @@
     "lint": "standard --verbose | snazzy",
     "test": "cross-env NODE_ENV=test nyc mocha test",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "clean": "rm -rf lib",
+    "clean": "rm -rf lib test/coverage",
     "build": "babel src -d lib",
     "preversion": "npm run lint && npm run test",
     "version": "babel-node src/index.js --package && git add CHANGELOG.md",
