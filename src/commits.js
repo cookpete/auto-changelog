@@ -8,7 +8,7 @@ const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) d
 const TAG_PREFIX = 'tag: '
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
-const FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+\/issues\/(\d+)))/gi
+const FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/issues\/(\d+)))/gi
 
 const MERGE_PATTERNS = [
   /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge

@@ -55,6 +55,14 @@ describe('getFixes', () => {
     ])
   })
 
+  it('parses multiple fixes by issue URL', () => {
+    const message = 'Commit message\n\nFixes https://github.com/user/repo/issues/1 and fixes https://github.com/user/repo/issues/2'
+    expect(getFixes(message, origins.github)).to.deep.equal([
+      { id: '1', href: 'https://github.com/user/repo/issues/1' },
+      { id: '2', href: 'https://github.com/user/repo/issues/2' }
+    ])
+  })
+
   it('parses external repo issues', () => {
     const message = 'Commit message\n\nFixes https://github.com/other-user/external-repo/issues/1'
     expect(getFixes(message, origins.github)).to.deep.equal([
