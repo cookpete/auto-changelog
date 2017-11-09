@@ -9,19 +9,6 @@ Command line tool for generating a changelog from git tags and commit history
 [![Test Coverage](https://img.shields.io/codecov/c/github/cookpete/auto-changelog.svg)](https://codecov.io/gh/CookPete/auto-changelog)
 
 
-#### Migrating to `1.0.0`
-
-If you are upgrading from `0.x`, the same options are still supported out of the box. Nothing will break, but your changelog may look slightly different:
-
-- The default template is now `compact`
-  - If you still want to use the [`keepachangelog`](http://keepachangelog.com) format, use `--template keepachangelog`
-- Templates now use `-` instead of `*` for lists
-- Up to 3 commits are now shown per release by default
-- Unreleased changes are no longer listed by default, use `--unreleased` to include them
-- [GitLab](https://gitlab.com) and [BitBucket](https://bitbucket.org) are now fully supported
-
-If anything isn’t working correctly, [open an issue](https://github.com/CookPete/auto-changelog/issues).
-
 ### Installation
 
 ```bash
@@ -95,7 +82,7 @@ npm install auto-changelog --save-dev
 yarn add auto-changelog --dev
 ```
 
-Add `auto-changelog -p; git add CHANGELOG.md` to the `version` scripts in your `package.json`:
+Add `auto-changelog -p && git add CHANGELOG.md` to the `version` scripts in your `package.json`:
 
 ```json
 {
@@ -151,6 +138,21 @@ To see exactly what data is passed in to the templates, you can generate a JSON 
 ```bash
 auto-changelog --template json --output changelog-data.json
 ```
+
+
+### Migrating to `1.x`
+
+If you are upgrading from `0.x`, the same options are still supported out of the box. Nothing will break, but your changelog may look slightly different:
+
+- The default template is now `compact`
+  - If you still want to use the [`keepachangelog`](http://keepachangelog.com) format, use `--template keepachangelog`
+- Templates now use `-` instead of `*` for lists
+- Up to 3 commits are now shown per release by default, use `--commit-limit` to change this
+- Unreleased changes are no longer listed by default, use `--unreleased` to include them
+- [GitLab](https://gitlab.com) and [BitBucket](https://bitbucket.org) are now fully supported
+
+If anything isn’t working correctly, [open an issue](https://github.com/CookPete/auto-changelog/issues).
+
 
 ### FAQ
 
