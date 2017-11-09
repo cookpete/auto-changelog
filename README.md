@@ -16,7 +16,7 @@ If you are upgrading from `0.x`, the same options are still supported out of the
 - The default template is now `compact`
   - If you still want to use the [`keepachangelog`](http://keepachangelog.com) format, use `--template keepachangelog`
 - Templates now use `-` instead of `*` for lists
-- Up to 3 commits are now shown per release
+- Up to 3 commits are now shown per release by default
 - Unreleased changes are no longer listed by default, use `--unreleased` to include them
 - [GitLab](https://gitlab.com) and [BitBucket](https://bitbucket.org) are now fully supported
 
@@ -43,6 +43,7 @@ Options:
   -r, --remote [remote]      # specify git remote to use for links, default: origin
   -p, --package              # use version from package.json as latest release
   -u, --unreleased           # include section for unreleased changes
+  -l, --commit-limit [count] # number of commits to display per release, default: 3
   -V, --version              # output the version number
   -h, --help                 # output usage information
 
@@ -58,6 +59,12 @@ auto-changelog --template keepachangelog
 
 # Write log using custom handlebars template in current directory
 auto-changelog --template my-custom-template.hbs
+
+# Change rendered commit limit to 5
+auto-changelog --commit-limit 5
+
+# Disable the commit limit, rendering all commits
+auto-changelog --commit-limit false
 ```
 
 You can also set options in `package.json`:
@@ -72,7 +79,8 @@ You can also set options in `package.json`:
   "auto-changelog": {
     "output": "HISTORY.md",
     "template": "keepachangelog",
-    "unreleased": true
+    "unreleased": true,
+    "commitLimit": false
   }
 }
 ```
@@ -97,7 +105,7 @@ Add `auto-changelog -p; git add CHANGELOG.md` to the `version` scripts in your `
     "auto-changelog": "*"
   },
   "scripts": {
-    "version": "auto-changelog -p; git add CHANGELOG.md"
+    "version": "auto-changelog -p && git add CHANGELOG.md"
   }
 }
 ```
@@ -126,9 +134,9 @@ My custom changelog template. Don’t worry about indentation here; it is automa
   {{#each fixes}}
     - Each fix has a {{commit}} with a {{commit.subject}}, an {{id}} and a {{href}} to the fixed issue.
   {{/each}}
-  {{#limit commits limit="5"}}
+  {{#each commits}}
     - Commits have a {{shorthash}}, a {{subject}} and a {{href}}, amongst other things.
-  {{/limit}}
+  {{/each}}
 {{/each}}
 ```
 

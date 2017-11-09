@@ -2,12 +2,12 @@ import semver from 'semver'
 
 import { niceDate } from './utils'
 
-export function parseReleases (commits, origin, packageVersion, includeUnreleased) {
+export function parseReleases (commits, origin, packageVersion, options) {
   let release = newRelease(packageVersion)
   const releases = []
   for (let commit of commits) {
     if (commit.tag && semver.valid(commit.tag)) {
-      if (release.tag || includeUnreleased) {
+      if (release.tag || options.unreleased) {
         releases.push({
           ...release,
           href: getCompareLink(commit.tag, release.tag || 'HEAD', origin),
@@ -23,7 +23,7 @@ export function parseReleases (commits, origin, packageVersion, includeUnrelease
         fixes: commit.fixes,
         commit
       })
-    } else if (filterCommit(commit, release.merges)) {
+    } else if (filterCommit(commit, release, options.commitLimit)) {
       release.commits.push(commit)
     }
   }
@@ -45,16 +45,19 @@ function newRelease (tag = null, date = new Date().toISOString()) {
   return release
 }
 
-function filterCommit (commit, merges) {
+function filterCommit (commit, release, limit) {
   if (semver.valid(commit.subject)) {
     // Filter out version commits
     return false
   }
-  if (merges.findIndex(m => m.message === commit.subject) !== -1) {
+  if (release.merges.findIndex(m => m.message === commit.subject) !== -1) {
     // Filter out commits with the same message as an existing merge
     return false
   }
-  return true
+  if (limit === false) {
+    return true
+  }
+  return release.commits.length < limit
 }
 
 function getCompareLink (from, to, origin) {

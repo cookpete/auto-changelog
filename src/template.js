@@ -6,16 +6,6 @@ import { removeIndentation } from './utils'
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
 
-Handlebars.registerHelper('limit', function (context, block) {
-  let string = ''
-  for (let i = 0; i !== parseInt(block.hash.limit); i++) {
-    if (context[i]) {
-      string += block.fn(context[i])
-    }
-  }
-  return string
-})
-
 Handlebars.registerHelper('json', function (object) {
   return new Handlebars.SafeString(JSON.stringify(object, null, 2))
 })
