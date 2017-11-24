@@ -17,12 +17,12 @@ const origin = {
 async function run () {
   const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'), 'utf-8')
   const commits = parseCommits(gitLog, origin)
-  const releases = parseReleases(commits, origin, null, false)
+  const releases = parseReleases(commits, origin, null, { unreleased: false, commitLimit: 3 })
   await writeFile(join(DATA_DIR, 'commits.js'), 'export default ' + JSON.stringify(commits, null, 2))
   await writeFile(join(DATA_DIR, 'releases.js'), 'export default ' + JSON.stringify(releases, null, 2))
   await writeFile(join(DATA_DIR, 'template-compact.md'), await compileTemplate('compact', { releases }))
   await writeFile(join(DATA_DIR, 'template-keepachangelog.md'), await compileTemplate('keepachangelog', { releases }))
-  await writeFile(join(DATA_DIR, 'template-json.md'), await compileTemplate('json', { releases }))
+  await writeFile(join(DATA_DIR, 'template-json.json'), await compileTemplate('json', { releases }))
 }
 
 run().catch(e => console.error(e))
