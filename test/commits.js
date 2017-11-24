@@ -96,6 +96,15 @@ describe('getMerge', () => {
       })
     })
 
+    it('parses a broken message squash merge', () => {
+      const message = 'Expose minify and manifest options for the web preset, allow passing …\n\n…false to exclude. (#465)'
+      expect(getMerge(message, origins.github)).to.deep.equal({
+        id: '465',
+        message: 'Expose minify and manifest options for the web preset, allow passing false to exclude.',
+        href: 'https://github.com/user/repo/pull/465'
+      })
+    })
+
     it('parses a squash merge with no message', () => {
       const message = 'Generate changelogs that show the commits between tags (#411)'
       expect(getMerge(message, origins.github)).to.deep.equal({
