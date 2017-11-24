@@ -12,7 +12,7 @@ const FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\
 
 const MERGE_PATTERNS = [
   /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
-  /(.+) \(#(\d+)\)\n\n\*/, // Github squash merge
+  /^(.+) \(#(\d+)\)(?:$|\n\n)/, // Github squash merge
   /Merged in .+ \(pull request #(\d+)\)\n\n(.+)/, // BitBucket merge
   /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request !(\d+)/ // GitLab merge
 ]

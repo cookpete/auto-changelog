@@ -96,9 +96,13 @@ describe('getMerge', () => {
       })
     })
 
-    it('does not parse a not-quite squash merge', () => {
-      const message = 'Update dependencies to enable Greenkeeper 🌴 (#10)\n\nSomething that isnt a squashed commit'
-      expect(getMerge(message, origins.github)).to.equal(null)
+    it('parses a squash merge with no message', () => {
+      const message = 'Generate changelogs that show the commits between tags (#411)'
+      expect(getMerge(message, origins.github)).to.deep.equal({
+        id: '411',
+        message: 'Generate changelogs that show the commits between tags',
+        href: 'https://github.com/user/repo/pull/411'
+      })
     })
   })
 
