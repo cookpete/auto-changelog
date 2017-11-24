@@ -25,7 +25,8 @@ export default [
     "title": "v0.1.0",
     "niceDate": "29 December 2015",
     "isoDate": "2015-12-29",
-    "href": "https://github.com/user/repo/compare/v0.0.2...v0.1.0"
+    "href": "https://github.com/user/repo/compare/v0.0.2...v0.1.0",
+    "major": false
   },
   {
     "commits": [],
@@ -72,7 +73,8 @@ export default [
     "title": "v0.0.2",
     "niceDate": "28 December 2015",
     "isoDate": "2015-12-28",
-    "href": "https://github.com/user/repo/compare/v0.0.1...v0.0.2"
+    "href": "https://github.com/user/repo/compare/v0.0.1...v0.0.2",
+    "major": false
   },
   {
     "commits": [
