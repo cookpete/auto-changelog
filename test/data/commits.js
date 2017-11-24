@@ -21,6 +21,38 @@ export default [
     "deletions": 10
   },
   {
+    "hash": "b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "shorthash": "b0b3040",
+    "author": "Pete Cook",
+    "email": "email@example.com",
+    "date": "2015-12-15T12:03:09+00:00",
+    "tag": "v1.0.0",
+    "subject": "1.0.0",
+    "message": "1.0.0",
+    "fixes": null,
+    "merge": null,
+    "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "files": 2,
+    "insertions": 8,
+    "deletions": 2
+  },
+  {
+    "hash": "b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "shorthash": "b0b3040",
+    "author": "Pete Cook",
+    "email": "email@example.com",
+    "date": "2015-12-29T21:57:19+00:00",
+    "tag": null,
+    "subject": "Some breaking change",
+    "message": "Some breaking change",
+    "fixes": null,
+    "merge": null,
+    "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "files": 5,
+    "insertions": 10,
+    "deletions": 10
+  },
+  {
     "hash": "db92947e6129cc20cd7777b7ed90b2bd547918c0",
     "shorthash": "db92947",
     "author": "Pete Cook",

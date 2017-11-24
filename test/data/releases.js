@@ -2,6 +2,35 @@ export default [
   {
     "commits": [
       {
+        "hash": "b0b304049847d9568585bc11399fa6cfa4cab5dc",
+        "shorthash": "b0b3040",
+        "author": "Pete Cook",
+        "email": "email@example.com",
+        "date": "2015-12-29T21:57:19+00:00",
+        "tag": null,
+        "subject": "Some breaking change",
+        "message": "Some breaking change",
+        "fixes": null,
+        "merge": null,
+        "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
+        "files": 5,
+        "insertions": 10,
+        "deletions": 10
+      }
+    ],
+    "fixes": [],
+    "merges": [],
+    "tag": "v1.0.0",
+    "date": "2015-12-15T12:03:09+00:00",
+    "title": "v1.0.0",
+    "niceDate": "15 December 2015",
+    "isoDate": "2015-12-15",
+    "href": "https://github.com/user/repo/compare/v0.1.0...v1.0.0",
+    "major": true
+  },
+  {
+    "commits": [
+      {
         "hash": "12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
         "shorthash": "12c0624",
         "author": "Pete Cook",

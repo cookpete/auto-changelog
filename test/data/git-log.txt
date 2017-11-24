@@ -9,6 +9,24 @@ Fixes #6
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
  5 files changed, 10 insertions(+), 10 deletions(-)
 
+__AUTO_CHANGELOG_COMMIT_SEPARATOR__b0b304049847d9568585bc11399fa6cfa4cab5dc
+tag: v1.0.0
+2015-12-15T12:03:09+00:00
+Pete Cook
+email@example.com
+1.0.0
+__AUTO_CHANGELOG_MESSAGE_SEPARATOR__
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+__AUTO_CHANGELOG_COMMIT_SEPARATOR__b0b304049847d9568585bc11399fa6cfa4cab5dc
+
+2015-12-29T21:57:19+00:00
+Pete Cook
+email@example.com
+Some breaking change
+__AUTO_CHANGELOG_MESSAGE_SEPARATOR__
+ 5 files changed, 10 insertions(+), 10 deletions(-)
+
  __AUTO_CHANGELOG_COMMIT_SEPARATOR__db92947e6129cc20cd7777b7ed90b2bd547918c0
 tag: v0.1.0
 2015-12-29T21:19:17+00:00
