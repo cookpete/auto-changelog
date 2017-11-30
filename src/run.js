@@ -23,6 +23,7 @@ function getOptions (argv, pkg) {
     .option('-p, --package', 'use version from package.json as latest release')
     .option('-u, --unreleased', 'include section for unreleased changes')
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_COMMIT_LIMIT}`, parseLimit, DEFAULT_COMMIT_LIMIT)
+    .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
     .version(version)
     .parse(argv)
 
@@ -42,7 +43,7 @@ export default async function run (argv) {
   const pkg = await pathExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
   const origin = await fetchOrigin(options.remote)
-  const commits = await fetchCommits(origin)
+  const commits = await fetchCommits(origin, options)
   const packageVersion = options.package ? NPM_VERSION_TAG_PREFIX + pkg.version : null
   const releases = parseReleases(commits, origin, packageVersion, options)
   const log = await compileTemplate(options.template, { releases })

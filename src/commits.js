@@ -18,19 +18,19 @@ const MERGE_PATTERNS = [
   /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request !(\d+)/ // GitLab merge
 ]
 
-export async function fetchCommits (origin) {
+export async function fetchCommits (origin, options) {
   const log = await cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`)
-  return parseCommits(log, origin)
+  return parseCommits(log, origin, options)
 }
 
-function parseCommits (string, origin) {
+function parseCommits (string, origin, options) {
   return string
     .split(COMMIT_SEPARATOR)
     .slice(1)
-    .map(commit => parseCommit(commit, origin))
+    .map(commit => parseCommit(commit, origin, options))
 }
 
-function parseCommit (commit, origin) {
+function parseCommit (commit, origin, options = {}) {
   const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [message, stats] = tail.split(MESSAGE_SEPARATOR)
   return {
@@ -42,7 +42,7 @@ function parseCommit (commit, origin) {
     tag: getTag(refs),
     subject: getSubject(message),
     message: message.trim(),
-    fixes: getFixes(message, origin),
+    fixes: getFixes(message, origin, options.issueUrl),
     merge: getMerge(message, origin),
     href: getCommitLink(hash, origin),
     ...getStats(stats.trim())
@@ -73,20 +73,20 @@ function getStats (stats) {
   }
 }
 
-function getFixes (message, origin) {
+function getFixes (message, origin, issueUrl) {
   let fixes = []
   let match = FIX_PATTERN.exec(message)
   if (!match) return null
   while (match) {
     const id = isLink(match[2]) ? match[3] : match[1]
-    const href = isLink(match[2]) ? match[2] : getIssueLink(match[1], origin)
+    const href = isLink(match[2]) ? match[2] : getIssueLink(match[1], origin, issueUrl)
     fixes.push({ id, href })
     match = FIX_PATTERN.exec(message)
   }
   return fixes
 }
 
-function getMerge (message, origin) {
+function getMerge (message, origin, mergeUrl) {
   for (let pattern of MERGE_PATTERNS) {
     const match = message.match(pattern)
     if (match) {
@@ -95,7 +95,7 @@ function getMerge (message, origin) {
       return {
         id,
         message: message.replace('…\n\n…', ''),
-        href: getPullLink(id, origin)
+        href: getMergeLink(id, origin, mergeUrl)
       }
     }
   }
@@ -109,11 +109,14 @@ function getCommitLink (hash, origin) {
   return `${origin.url}/commit/${hash}`
 }
 
-function getIssueLink (id, origin) {
+function getIssueLink (id, origin, issueUrl) {
+  if (issueUrl) {
+    return issueUrl.replace('{id}', id)
+  }
   return `${origin.url}/issues/${id}`
 }
 
-function getPullLink (id, origin) {
+function getMergeLink (id, origin) {
   if (origin.hostname === 'bitbucket.org') {
     return `${origin.url}/pull-requests/${id}`
   }

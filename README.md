@@ -31,6 +31,7 @@ Options:
   -p, --package              # use version from package.json as latest release
   -u, --unreleased           # include section for unreleased changes
   -l, --commit-limit [count] # number of commits to display per release, default: 3
+  -i, --issue-url [url]      # override url for issues, use {id} for issue id
   -V, --version              # output the version number
   -h, --help                 # output usage information
 
@@ -54,7 +55,14 @@ auto-changelog --commit-limit 5
 auto-changelog --commit-limit false
 ```
 
-You can also set options in `package.json`:
+By default, changelogs will link to the appropriate pages for commits, issues and merge requests based on the `origin` remote of your repo. GitHub, BitBucket and GitLab are all supported. If you [close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords) but refer to issues outside of your repository, you can use `--issue-url` to link somewhere else:
+
+```bash
+# Link all issues to redmine
+auto-changelog --issue-url https://www.redmine.org/issues/{id}
+```
+
+You can also set any option in `package.json` under the `auto-changelog` key:
 
 ```js
 {
@@ -67,7 +75,8 @@ You can also set options in `package.json`:
     "output": "HISTORY.md",
     "template": "keepachangelog",
     "unreleased": true,
-    "commitLimit": false
+    "commitLimit": false,
+    "issueUrl": "https://code.com/user/repo/issue/{id}"
   }
 }
 ```

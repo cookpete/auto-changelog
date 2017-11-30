@@ -69,6 +69,13 @@ describe('getFixes', () => {
       { id: '1', href: 'https://github.com/other-user/external-repo/issues/1' }
     ])
   })
+
+  it('supports issueUrl parameter', () => {
+    const message = 'Commit message\n\nCloses #8'
+    expect(getFixes(message, origins.github, 'http://example.com/issues/{id}')).to.deep.equal([
+      { id: '8', href: 'http://example.com/issues/8' }
+    ])
+  })
 })
 
 describe('getMerge', () => {
