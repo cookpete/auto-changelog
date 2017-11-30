@@ -81,6 +81,15 @@ You can also set any option in `package.json` under the `auto-changelog` key:
 }
 ```
 
+#### Requirements
+
+`auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. The only absolute requirement is that all versions are tagged using [semver](https://semver.org) tag names. This happens by default when using [`npm version`](https://docs.npmjs.com/cli/version).
+
+There are some less strict requirements to improve your changelog:
+
+- [Close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords)
+- Merge pull requests using the standard merge commit message for your platform
+
 #### What you might do if you’re clever
 
 Install `auto-changelog` to dev dependencies:
