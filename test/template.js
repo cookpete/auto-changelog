@@ -21,4 +21,10 @@ describe('compileTemplate', () => {
     const expected = await readFile(join(__dirname, 'data', 'template-json.json'), 'utf-8')
     expect(await compileTemplate('json', { releases })).to.equal(expected)
   })
+
+  it('throws an error when no template found', done => {
+    compileTemplate('not-found', { releases })
+      .then(() => done('Should throw an error'))
+      .catch(() => done())
+  })
 })

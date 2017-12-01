@@ -33,7 +33,7 @@ describe('run', () => {
       expect(log).to.equal(expected)
     })
 
-    return run([]).then(message => {
+    return run(['', '']).then(message => {
       expect(message).to.be.a('string')
       expect(message).to.have.string('bytes written to')
     })
@@ -41,6 +41,12 @@ describe('run', () => {
 
   it('throws an error when no package found', done => {
     run(['', '', '--package'])
+      .then(() => done('Should throw an error'))
+      .catch(() => done())
+  })
+
+  it('throws an error when no template found', done => {
+    run(['', '', '--template', 'not-found'])
       .then(() => done('Should throw an error'))
       .catch(() => done())
   })

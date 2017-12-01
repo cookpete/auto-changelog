@@ -5,16 +5,36 @@ import { join } from 'path'
 
 import origins from './data/origins'
 import commits from './data/commits'
-import { __get__ } from '../src/commits'
+import {
+  fetchCommits,
+  __get__,
+  __Rewire__ as mock,
+  __ResetDependency__ as unmock
+  } from '../src/commits'
 
 const parseCommits = __get__('parseCommits')
 const getFixes = __get__('getFixes')
 const getMerge = __get__('getMerge')
 
+describe('fetchCommits', () => {
+  it('fetches commits', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    mock('cmd', () => gitLog)
+    expect(await fetchCommits(origins.github)).to.deep.equal(commits)
+    unmock('cmd')
+  })
+})
+
 describe('parseCommits', () => {
   it('parses commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
     expect(parseCommits(gitLog, origins.github)).to.deep.equal(commits)
+  })
+
+  it('parses bitbucket commit', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const commits = parseCommits(gitLog, origins.bitbucket)
+    expect(commits[0].href).to.equal('https://bitbucket.org/user/repo/commits/b0b304049847d9568585bc11399fa6cfa4cab5dc')
   })
 })
 
