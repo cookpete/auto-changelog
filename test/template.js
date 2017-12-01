@@ -22,6 +22,12 @@ describe('compileTemplate', () => {
     expect(await compileTemplate('json', { releases })).to.equal(expected)
   })
 
+  it('compiles using path to template file', async () => {
+    const path = join(__dirname, 'data', 'template-compact.md')
+    const expected = await readFile(path, 'utf-8')
+    expect(await compileTemplate(path, { releases })).to.equal(expected)
+  })
+
   it('throws an error when no template found', done => {
     compileTemplate('not-found', { releases })
       .then(() => done('Should throw an error'))
