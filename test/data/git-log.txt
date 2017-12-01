@@ -90,9 +90,18 @@ Pete Cook
 email@example.com
 Merge pull request #3 from repo/branch
 
-Pull request title
+Third commit with same name as PR
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
-__AUTO_CHANGELOG_COMMIT_SEPARATOR__90ef33485369fc7892d11b2e4da04ffb64df1e99
+__AUTO_CHANGELOG_COMMIT_SEPARATOR__1c2694e44a032d2ab6d6eaa381beaf23ba3d9573
+
+2015-12-15T11:31:06+00:00
+Pete Cook
+email@example.com
+Third commit with same name as PR
+__AUTO_CHANGELOG_MESSAGE_SEPARATOR__
+ 8 files changed, 57 insertions(+), 53 deletions(-)
+
+ __AUTO_CHANGELOG_COMMIT_SEPARATOR__90ef33485369fc7892d11b2e4da04ffb64df1e99
 
 2015-12-15T11:31:06+00:00
 Pete Cook

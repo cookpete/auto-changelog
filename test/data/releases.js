@@ -166,7 +166,7 @@ export default [
     "merges": [
       {
         "id": "3",
-        "message": "Pull request title",
+        "message": "Third commit with same name as PR",
         "href": "https://github.com/user/repo/pull/3"
       }
     ],

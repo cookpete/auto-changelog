@@ -162,14 +162,30 @@ export default [
     "date": "2015-12-15T11:37:05+00:00",
     "tag": null,
     "subject": "Merge pull request #3 from repo/branch",
-    "message": "Merge pull request #3 from repo/branch\n\nPull request title",
+    "message": "Merge pull request #3 from repo/branch\n\nThird commit with same name as PR",
     "fixes": null,
     "merge": {
       "id": "3",
-      "message": "Pull request title",
+      "message": "Third commit with same name as PR",
       "href": "https://github.com/user/repo/pull/3"
     },
     "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3"
+  },
+  {
+    "hash": "1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
+    "shorthash": "1c2694e",
+    "author": "Pete Cook",
+    "email": "email@example.com",
+    "date": "2015-12-15T11:31:06+00:00",
+    "tag": null,
+    "subject": "Third commit with same name as PR",
+    "message": "Third commit with same name as PR",
+    "fixes": null,
+    "merge": null,
+    "href": "https://github.com/user/repo/commit/1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
+    "files": 8,
+    "insertions": 57,
+    "deletions": 53
   },
   {
     "hash": "90ef33485369fc7892d11b2e4da04ffb64df1e99",
