@@ -36,6 +36,15 @@ email@example.com
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
  2 files changed, 8 insertions(+), 2 deletions(-)
 
+ __AUTO_CHANGELOG_COMMIT_SEPARATOR__e9a43b2bf50449fc0d84465308e6008cc1597bb3
+
+2015-12-29T21:19:19+00:00
+Pete Cook
+email@example.com
+Another commit that fixes nothing but with less changes
+__AUTO_CHANGELOG_MESSAGE_SEPARATOR__
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
  __AUTO_CHANGELOG_COMMIT_SEPARATOR__12c0624e7e419a70bd5f3b403d7e0bd8f23ec617
 
 2015-12-29T21:18:19+00:00

@@ -69,6 +69,22 @@ export default [
     "deletions": 2
   },
   {
+    "hash": "e9a43b2bf50449fc0d84465308e6008cc1597bb3",
+    "shorthash": "e9a43b2",
+    "author": "Pete Cook",
+    "email": "email@example.com",
+    "date": "2015-12-29T21:19:19+00:00",
+    "tag": null,
+    "subject": "Another commit that fixes nothing but with less changes",
+    "message": "Another commit that fixes nothing but with less changes",
+    "fixes": null,
+    "merge": null,
+    "href": "https://github.com/user/repo/commit/e9a43b2bf50449fc0d84465308e6008cc1597bb3",
+    "files": 1,
+    "insertions": 1,
+    "deletions": 1
+  },
+  {
     "hash": "12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
     "shorthash": "12c0624",
     "author": "Pete Cook",
