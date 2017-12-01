@@ -2,6 +2,8 @@ import semver from 'semver'
 
 import { niceDate } from './utils'
 
+const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
+
 export function parseReleases (commits, origin, packageVersion, options) {
   let release = newRelease(packageVersion)
   const releases = []
@@ -49,6 +51,10 @@ function newRelease (tag = null, date = new Date().toISOString()) {
 function filterCommit (commit, release, limit) {
   if (semver.valid(commit.subject)) {
     // Filter out version commits
+    return false
+  }
+  if (MERGE_COMMIT_PATTERN.test(commit.subject)) {
+    // Filter out merge commits
     return false
   }
   if (release.merges.findIndex(m => m.message === commit.subject) !== -1) {
