@@ -10,6 +10,12 @@ Handlebars.registerHelper('json', function (object) {
   return new Handlebars.SafeString(JSON.stringify(object, null, 2))
 })
 
+Handlebars.registerHelper('notmerge', function(object) {
+  if (object.subject.indexOf('Merge branch ') < 0) {
+    return object;
+  }
+});
+
 async function getTemplate (template) {
   if (await pathExists(template)) {
     return readFile(template, 'utf-8')
