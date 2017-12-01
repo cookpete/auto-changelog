@@ -13,7 +13,6 @@ const FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\
 const MERGE_PATTERNS = [
   /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
   /^(.+) \(#(\d+)\)(?:$|\n\n)/, // Github squash merge
-  /(.+…\n\n….+) \(#(\d+)\)$/, // Github broken message squash merge
   /Merged in .+ \(pull request #(\d+)\)\n\n(.+)/, // BitBucket merge
   /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request !(\d+)/ // GitLab merge
 ]
@@ -94,7 +93,7 @@ function getMerge (message, origin, mergeUrl) {
       const message = /^\d+$/.test(match[1]) ? match[2] : match[1]
       return {
         id,
-        message: message.replace('…\n\n…', ''),
+        message,
         href: getMergeLink(id, origin, mergeUrl)
       }
     }
