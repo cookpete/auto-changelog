@@ -58,6 +58,27 @@ describe('getFixes', () => {
     ])
   })
 
+  it('parses a commit that closes a pull request', () => {
+    const message = 'Commit message\n\nCloses https://github.com/user/repo/pull/14'
+    expect(getFixes(message, origins.github)).to.deep.equal([
+      { id: '14', href: 'https://github.com/user/repo/pull/14' }
+    ])
+  })
+
+  it('parses a commit that closes a bitbucket pull request', () => {
+    const message = 'Commit message\n\nCloses https://github.com/user/repo/pull-requests/14'
+    expect(getFixes(message, origins.github)).to.deep.equal([
+      { id: '14', href: 'https://github.com/user/repo/pull-requests/14' }
+    ])
+  })
+
+  it('parses a commit that closes a gitlab pull request', () => {
+    const message = 'Commit message\n\nCloses https://github.com/user/repo/merge_requests/14'
+    expect(getFixes(message, origins.github)).to.deep.equal([
+      { id: '14', href: 'https://github.com/user/repo/merge_requests/14' }
+    ])
+  })
+
   it('parses multiple fixes', () => {
     const message = 'Commit message\n\nFixes #1, fix #2, resolved #3, closes #4'
     expect(getFixes(message, origins.github)).to.deep.equal([
