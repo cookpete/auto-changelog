@@ -56,6 +56,13 @@ describe('run', () => {
     })
   })
 
+  it('supports unreleased option', () => {
+    return run(['', '', '--unreleased']).then(message => {
+      expect(message).to.be.a('string')
+      expect(message).to.have.string('bytes written to')
+    })
+  })
+
   it('uses options from package.json', async () => {
     const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'), 'utf-8')
 

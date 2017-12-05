@@ -14,7 +14,7 @@ export function parseReleases (commits, origin, packageVersion, options) {
           ...release,
           href: getCompareLink(commit.tag, release.tag || 'HEAD', origin),
           commits: release.commits.sort(sortCommits),
-          major: semver.diff(commit.tag, release.tag) === 'major'
+          major: commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
       }
       release = newRelease(commit.tag, commit.date)
