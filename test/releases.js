@@ -25,7 +25,7 @@ describe('parseReleases', () => {
     expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/v1.0.0%0Dv0.1.0')
   })
 
-  it('supports a package version override', () => {
+  it('supports a version override', () => {
     const result = parseReleases(commits, origins.github, 'v3.0.0', options)
     expect(result).to.be.an('array')
     expect(result[0]).to.have.property('tag', 'v3.0.0')

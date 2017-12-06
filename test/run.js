@@ -56,13 +56,6 @@ describe('run', () => {
     })
   })
 
-  it('supports unreleased option', () => {
-    return run(['', '', '--unreleased']).then(message => {
-      expect(message).to.be.a('string')
-      expect(message).to.have.string('bytes written to')
-    })
-  })
-
   it('uses options from package.json', async () => {
     const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'), 'utf-8')
 
@@ -83,6 +76,20 @@ describe('run', () => {
     })
   })
 
+  it('does not error when using unreleased option', () => {
+    return run(['', '', '--unreleased']).then(message => {
+      expect(message).to.be.a('string')
+      expect(message).to.have.string('bytes written to')
+    })
+  })
+
+  it('does not error when using latest version option', () => {
+    return run(['', '', '--latest-version', '3.0.0']).then(message => {
+      expect(message).to.be.a('string')
+      expect(message).to.have.string('bytes written to')
+    })
+  })
+
   it('throws an error when no package found', done => {
     run(['', '', '--package'])
       .then(() => done('Should throw an error'))
@@ -91,6 +98,12 @@ describe('run', () => {
 
   it('throws an error when no template found', done => {
     run(['', '', '--template', 'not-found'])
+      .then(() => done('Should throw an error'))
+      .catch(() => done())
+  })
+
+  it('throws an error when given an invalid latest version', done => {
+    run(['', '', '--latest-version', 'invalid'])
       .then(() => done('Should throw an error'))
       .catch(() => done())
   })
