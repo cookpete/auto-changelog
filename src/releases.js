@@ -4,8 +4,8 @@ import { niceDate } from './utils'
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 
-export function parseReleases (commits, origin, packageVersion, options) {
-  let release = newRelease(packageVersion)
+export function parseReleases (commits, origin, latestVersion, options) {
+  let release = newRelease(latestVersion)
   const releases = []
   for (let commit of commits) {
     if (commit.tag && semver.valid(commit.tag)) {
