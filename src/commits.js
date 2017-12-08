@@ -8,7 +8,7 @@ const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) d
 const TAG_PREFIX = 'tag: '
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
-const FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/(?:issues|pull|pull-requests|merge_requests)\/(\d+)))/gi
+const DEFAULT_FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/(?:issues|pull|pull-requests|merge_requests)\/(\d+)))/gi
 
 const MERGE_PATTERNS = [
   /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
@@ -41,7 +41,7 @@ function parseCommit (commit, origin, options = {}) {
     tag: getTag(refs),
     subject: getSubject(message),
     message: message.trim(),
-    fixes: getFixes(message, origin, options.issueUrl),
+    fixes: getFixes(message, origin, options),
     merge: getMerge(message, origin),
     href: getCommitLink(hash, origin),
     ...getStats(stats.trim())
@@ -72,17 +72,34 @@ function getStats (stats) {
   }
 }
 
-function getFixes (message, origin, issueUrl) {
+function getFixes (message, origin, options = {}) {
+  const pattern = getFixPattern(options)
   let fixes = []
-  let match = FIX_PATTERN.exec(message)
+  let match = pattern.exec(message)
   if (!match) return null
   while (match) {
-    const id = isLink(match[2]) ? match[3] : match[1]
-    const href = isLink(match[2]) ? match[2] : getIssueLink(match[1], origin, issueUrl)
+    const id = getFixID(match)
+    const href = getIssueLink(match, id, origin, options.issueUrl)
     fixes.push({ id, href })
-    match = FIX_PATTERN.exec(message)
+    match = pattern.exec(message)
   }
   return fixes
+}
+
+function getFixID (match) {
+  // Get the last non-falsey value in the match array
+  for (let i = match.length; i >= 0; i--) {
+    if (match[i]) {
+      return match[i]
+    }
+  }
+}
+
+function getFixPattern (options) {
+  if (options.issuePattern) {
+    return new RegExp(options.issuePattern, 'g')
+  }
+  return DEFAULT_FIX_PATTERN
 }
 
 function getMerge (message, origin, mergeUrl) {
@@ -108,7 +125,10 @@ function getCommitLink (hash, origin) {
   return `${origin.url}/commit/${hash}`
 }
 
-function getIssueLink (id, origin, issueUrl) {
+function getIssueLink (match, id, origin, issueUrl) {
+  if (isLink(match[2])) {
+    return match[2]
+  }
   if (issueUrl) {
     return issueUrl.replace('{id}', id)
   }

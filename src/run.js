@@ -26,6 +26,7 @@ function getOptions (argv, pkg) {
     .option('-u, --unreleased', 'include section for unreleased changes')
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_COMMIT_LIMIT}`, parseLimit, DEFAULT_COMMIT_LIMIT)
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
+    .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
     .version(version)
     .parse(argv)
 

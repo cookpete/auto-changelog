@@ -33,6 +33,7 @@ Options:
   -u, --unreleased               # include section for unreleased changes
   -l, --commit-limit [count]     # number of commits to display per release, default: 3
   -i, --issue-url [url]          # override url for issues, use {id} for issue id
+      --issue-pattern [regex]    # override regex pattern for issues in commit messages
   -V, --version                  # output the version number
   -h, --help                     # output usage information
 
@@ -63,7 +64,7 @@ By default, changelogs will link to the appropriate pages for commits, issues an
 auto-changelog --issue-url https://www.redmine.org/issues/{id}
 ```
 
-You can also set any option in `package.json` under the `auto-changelog` key:
+You can also set any option in `package.json` under the `auto-changelog` key, using camelCase options:
 
 ```js
 {
@@ -76,8 +77,7 @@ You can also set any option in `package.json` under the `auto-changelog` key:
     "output": "HISTORY.md",
     "template": "keepachangelog",
     "unreleased": true,
-    "commitLimit": false,
-    "issueUrl": "https://code.com/user/repo/issue/{id}"
+    "commitLimit": false
   }
 }
 ```
@@ -120,7 +120,6 @@ Using `-p` or `--package` uses the `version` from `package.json` as the latest r
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
 
-
 #### Custom templates
 
 If you aren’t happy with the default templates or want to tweak something, you can point to a [handlebars](http://handlebarsjs.com) template in your local repo. Check out the [existing templates](templates) to see what is possible.
@@ -156,6 +155,34 @@ To see exactly what data is passed in to the templates, you can generate a JSON 
 
 ```bash
 auto-changelog --template json --output changelog-data.json
+```
+
+#### Custom issue patterns
+
+By default, `auto-changelog` will parse [GitHub-style issue fixes](https://help.github.com/articles/closing-issues-using-keywords/) in your commit messages. If you use Jira or an alternative pattern in your commits to reference issues, you can pass in a custom regular expression to `--issue-pattern` along with `--issue-url`:
+
+```bash
+# Parse Jira-style issues in your commit messages, like PROJECT-418
+auto-changelog --issue-pattern [A-Z]+-\d+ --issue-url https://issues.apache.org/jira/browse/{id}
+```
+
+Or, in your `package.json`:
+
+```js
+{
+  "name": "my-awesome-package",
+  "auto-changelog": {
+    "issueUrl": "https://issues.apache.org/jira/browse/",
+    "issuePattern": "[A-Z]+-\d+"
+  }
+}
+```
+
+If you use a certain pattern before or after the issue number, like `fixes {id}`, just use a capturing group:
+
+```bash
+# "This commit fixes ISSUE-123" will now parse ISSUE-123 as an issue fix
+auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
 ```
 
 

@@ -112,9 +112,35 @@ describe('getFixes', () => {
   })
 
   it('supports issueUrl parameter', () => {
+    const options = {
+      issueUrl: 'http://example.com/issues/{id}'
+    }
     const message = 'Commit message\n\nCloses #8'
-    expect(getFixes(message, origins.github, 'http://example.com/issues/{id}')).to.deep.equal([
+    expect(getFixes(message, origins.github, options)).to.deep.equal([
       { id: '8', href: 'http://example.com/issues/8' }
+    ])
+  })
+
+  it('supports issuePattern parameter', () => {
+    const options = {
+      issuePattern: '[A-Z]+-\\d+',
+      issueUrl: 'http://example.com/issues/{id}'
+    }
+    const message = 'Commit message\n\nCloses ABC-1234'
+    expect(getFixes(message, origins.github, options)).to.deep.equal([
+      { id: 'ABC-1234', href: 'http://example.com/issues/ABC-1234' }
+    ])
+  })
+
+  it('supports issuePattern parameter with capture group', () => {
+    const options = {
+      issuePattern: '[Ff]ixes ([A-Z]+-\\d+)',
+      issueUrl: 'http://example.com/issues/{id}'
+    }
+    const message = 'Commit message\n\nFixes ABC-1234 and fixes ABC-2345 but not BCD-2345'
+    expect(getFixes(message, origins.github, options)).to.deep.equal([
+      { id: 'ABC-1234', href: 'http://example.com/issues/ABC-1234' },
+      { id: 'ABC-2345', href: 'http://example.com/issues/ABC-2345' }
     ])
   })
 })
