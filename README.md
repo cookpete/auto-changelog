@@ -34,6 +34,7 @@ Options:
   -l, --commit-limit [count]     # number of commits to display per release, default: 3
   -i, --issue-url [url]          # override url for issues, use {id} for issue id
       --issue-pattern [regex]    # override regex pattern for issues in commit messages
+      --starting-commit [hash]   # starting commit to use for changelog generation
   -V, --version                  # output the version number
   -h, --help                     # output usage information
 

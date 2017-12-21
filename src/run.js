@@ -30,12 +30,13 @@ function getOptions (argv, pkg) {
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
+    .option('--starting-commit [hash]', `starting commit to use for changelog generation`)
     .version(version)
     .parse(argv)
 
   if (!pkg) {
     if (options.package) {
-      throw Error('package.json could not be found')
+      throw new Error('package.json could not be found')
     }
     return {
       ...DEFAULT_OPTIONS,
@@ -52,7 +53,7 @@ function getOptions (argv, pkg) {
 function getLatestVersion (options, pkg) {
   if (options.latestVersion) {
     if (!semver.valid(options.latestVersion)) {
-      throw Error('--latest-version must be a valid semver version')
+      throw new Error('--latest-version must be a valid semver version')
     }
     return options.latestVersion
   }

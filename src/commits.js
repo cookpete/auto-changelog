@@ -22,11 +22,21 @@ export async function fetchCommits (origin, options) {
   return parseCommits(log, origin, options)
 }
 
-function parseCommits (string, origin, options) {
-  return string
+function parseCommits (string, origin, options = {}) {
+  const commits = string
     .split(COMMIT_SEPARATOR)
     .slice(1)
     .map(commit => parseCommit(commit, origin, options))
+
+  if (options.startingCommit) {
+    const index = commits.findIndex(c => c.hash.indexOf(options.startingCommit) === 0)
+    if (index === -1) {
+      throw new Error(`Starting commit ${options.startingCommit} was not found`)
+    }
+    return commits.slice(0, index + 1)
+  }
+
+  return commits
 }
 
 function parseCommit (commit, origin, options = {}) {

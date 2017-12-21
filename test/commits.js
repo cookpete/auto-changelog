@@ -36,6 +36,20 @@ describe('parseCommits', () => {
     const commits = parseCommits(gitLog, origins.bitbucket)
     expect(commits[0].href).to.equal('https://bitbucket.org/user/repo/commits/b0b304049847d9568585bc11399fa6cfa4cab5dc')
   })
+
+  it('supports startingCommit option', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const options = { startingCommit: '17fbef87e82889f01d8257900f7edc55b05918a2' }
+    expect(parseCommits(gitLog, origins.github, options)).to.have.length(9)
+  })
+
+  it('invalid startingCommit throws an error', done => {
+    const options = { startingCommit: 'not-a-hash' }
+    readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+      .then(gitLog => parseCommits(gitLog, origins.github, options))
+      .then(() => done('Should throw an error'))
+      .catch(() => done())
+  })
 })
 
 describe('getFixes', () => {
