@@ -72,6 +72,15 @@ Merge pull request #5 from repo/branch
 
 Should not parse #4 in PR title
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
+__AUTO_CHANGELOG_COMMIT_SEPARATOR__92839699a6aaea148dcd72ea897321e66cae0c18
+
+2015-12-29T11:35:54+00:00
+Pete Cook
+email@example.com
+Merge remote-tracking branch 'random-branch' into master
+__AUTO_CHANGELOG_MESSAGE_SEPARATOR__
+ 1 file changed, 1 insertion(+)
+
 __AUTO_CHANGELOG_COMMIT_SEPARATOR__17fbef87e82889f01d8257900f7edc55b05918a2
 
 2015-12-28T11:35:54+00:00

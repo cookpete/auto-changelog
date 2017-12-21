@@ -134,6 +134,22 @@ export default [
     "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672"
   },
   {
+    "hash": "92839699a6aaea148dcd72ea897321e66cae0c18",
+    "shorthash": "9283969",
+    "author": "Pete Cook",
+    "email": "email@example.com",
+    "date": "2015-12-29T11:35:54+00:00",
+    "tag": null,
+    "subject": "Merge remote-tracking branch 'random-branch' into master",
+    "message": "Merge remote-tracking branch 'random-branch' into master",
+    "fixes": null,
+    "merge": null,
+    "href": "https://github.com/user/repo/commit/92839699a6aaea148dcd72ea897321e66cae0c18",
+    "files": 1,
+    "insertions": 1,
+    "deletions": 0
+  },
+  {
     "hash": "17fbef87e82889f01d8257900f7edc55b05918a2",
     "shorthash": "17fbef8",
     "author": "Pete Cook",

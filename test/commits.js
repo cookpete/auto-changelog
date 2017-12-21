@@ -40,7 +40,7 @@ describe('parseCommits', () => {
   it('supports startingCommit option', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
     const options = { startingCommit: '17fbef87e82889f01d8257900f7edc55b05918a2' }
-    expect(parseCommits(gitLog, origins.github, options)).to.have.length(9)
+    expect(parseCommits(gitLog, origins.github, options)).to.have.length(10)
   })
 
   it('invalid startingCommit throws an error', done => {
