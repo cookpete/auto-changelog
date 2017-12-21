@@ -70,24 +70,29 @@ describe('run', () => {
       expect(log).to.equal(expected)
     })
 
-    return run(['', '']).then(message => {
-      expect(message).to.be.a('string')
-      expect(message).to.have.string('bytes written to')
+    return run(['', ''])
+  })
+
+  it('command line options override options from package.json', async () => {
+    mock('pathExists', () => true)
+    mock('readJson', () => ({
+      'auto-changelog': {
+        output: 'should-not-be-this.md'
+      }
+    }))
+    mock('writeFile', (output, log) => {
+      expect(output).to.equal('should-be-this.md')
     })
+
+    return run(['', '', '--output', 'should-be-this.md'])
   })
 
   it('does not error when using unreleased option', () => {
-    return run(['', '', '--unreleased']).then(message => {
-      expect(message).to.be.a('string')
-      expect(message).to.have.string('bytes written to')
-    })
+    return run(['', '', '--unreleased'])
   })
 
   it('does not error when using latest version option', () => {
-    return run(['', '', '--latest-version', '3.0.0']).then(message => {
-      expect(message).to.be.a('string')
-      expect(message).to.have.string('bytes written to')
-    })
+    return run(['', '', '--latest-version', '3.0.0'])
   })
 
   it('throws an error when no package found', done => {

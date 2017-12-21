@@ -9,22 +9,25 @@ import { parseReleases } from './releases'
 import { compileTemplate } from './template'
 import { parseLimit } from './utils'
 
-const DEFAULT_OUTPUT = 'CHANGELOG.md'
-const DEFAULT_TEMPLATE = 'compact'
-const DEFAULT_REMOTE = 'origin'
-const DEFAULT_COMMIT_LIMIT = 3
+const DEFAULT_OPTIONS = {
+  output: 'CHANGELOG.md',
+  template: 'compact',
+  remote: 'origin',
+  commitLimit: 3
+}
+
 const NPM_VERSION_TAG_PREFIX = 'v'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 
 function getOptions (argv, pkg) {
   const options = new Command()
-    .option('-o, --output [file]', `output file, default: ${DEFAULT_OUTPUT}`, DEFAULT_OUTPUT)
-    .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_TEMPLATE}`, DEFAULT_TEMPLATE)
-    .option('-r, --remote [remote]', `specify git remote to use for links, default: ${DEFAULT_REMOTE}`, DEFAULT_REMOTE)
+    .option('-o, --output [file]', `output file, default: ${DEFAULT_OPTIONS.output}`)
+    .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
+    .option('-r, --remote [remote]', `specify git remote to use for links, default: ${DEFAULT_OPTIONS.remote}`)
     .option('-p, --package', 'use version from package.json as latest release')
     .option('-v, --latest-version [version]', 'use specified version as latest release')
     .option('-u, --unreleased', 'include section for unreleased changes')
-    .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_COMMIT_LIMIT}`, parseLimit, DEFAULT_COMMIT_LIMIT)
+    .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
     .version(version)
@@ -34,11 +37,15 @@ function getOptions (argv, pkg) {
     if (options.package) {
       throw Error('package.json could not be found')
     }
-    return options
+    return {
+      ...DEFAULT_OPTIONS,
+      ...options
+    }
   }
   return {
-    ...options,
-    ...pkg[PACKAGE_OPTIONS_KEY]
+    ...DEFAULT_OPTIONS,
+    ...pkg[PACKAGE_OPTIONS_KEY],
+    ...options
   }
 }
 
