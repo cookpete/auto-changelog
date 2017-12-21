@@ -73,6 +73,18 @@ describe('run', () => {
     return run(['', ''])
   })
 
+  it('uses version from package.json', async () => {
+    mock('pathExists', () => true)
+    mock('readJson', () => ({
+      version: '2.0.0'
+    }))
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('v2.0.0')
+    })
+
+    return run(['', '', '--package'])
+  })
+
   it('command line options override options from package.json', async () => {
     mock('pathExists', () => true)
     mock('readJson', () => ({
