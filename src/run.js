@@ -13,10 +13,10 @@ const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
   template: 'compact',
   remote: 'origin',
-  commitLimit: 3
+  commitLimit: 3,
+  tagPrefix: 'v'
 }
 
-const NPM_VERSION_TAG_PREFIX = 'v'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 
 function getOptions (argv, pkg) {
@@ -31,6 +31,7 @@ function getOptions (argv, pkg) {
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
     .option('--starting-commit [hash]', `starting commit to use for changelog generation`)
+    .option('--tag-prefix [prefix]', `prefix used in version tags, default: ${DEFAULT_OPTIONS.tagPrefix}`)
     .version(version)
     .parse(argv)
 
@@ -58,7 +59,7 @@ function getLatestVersion (options, pkg) {
     return options.latestVersion
   }
   if (options.package) {
-    return NPM_VERSION_TAG_PREFIX + pkg.version
+    return options.tagPrefix + pkg.version
   }
   return null
 }

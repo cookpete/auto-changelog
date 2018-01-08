@@ -35,6 +35,7 @@ Options:
   -i, --issue-url [url]          # override url for issues, use {id} for issue id
       --issue-pattern [regex]    # override regex pattern for issues in commit messages
       --starting-commit [hash]   # starting commit to use for changelog generation
+      --tag-prefix [prefix]      # prefix used in version tags, default: v
   -V, --version                  # output the version number
   -h, --help                     # output usage information
 
@@ -63,6 +64,13 @@ By default, changelogs will link to the appropriate pages for commits, issues an
 ```bash
 # Link all issues to redmine
 auto-changelog --issue-url https://www.redmine.org/issues/{id}
+```
+
+Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
+
+```bash
+# When all versions are tagged like my-package/1.2.3
+auto-changelog --tag-prefix my-package/
 ```
 
 You can also set any option in `package.json` under the `auto-changelog` key, using camelCase options:

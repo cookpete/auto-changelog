@@ -16,11 +16,15 @@ const parseCommits = __get__('parseCommits')
 const getFixes = __get__('getFixes')
 const getMerge = __get__('getMerge')
 
+const options = {
+  tagPrefix: 'v'
+}
+
 describe('fetchCommits', () => {
   it('fetches commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
     mock('cmd', () => gitLog)
-    expect(await fetchCommits(origins.github)).to.deep.equal(commits)
+    expect(await fetchCommits(origins.github, options)).to.deep.equal(commits)
     unmock('cmd')
   })
 })
@@ -28,7 +32,7 @@ describe('fetchCommits', () => {
 describe('parseCommits', () => {
   it('parses commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
-    expect(parseCommits(gitLog, origins.github)).to.deep.equal(commits)
+    expect(parseCommits(gitLog, origins.github, options)).to.deep.equal(commits)
   })
 
   it('parses bitbucket commit', async () => {
