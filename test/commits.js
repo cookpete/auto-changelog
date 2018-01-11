@@ -47,6 +47,14 @@ describe('parseCommits', () => {
     expect(parseCommits(gitLog, origins.github, options)).to.have.length(10)
   })
 
+  it('supports ignoreCommitPattern option', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const options = { ignoreCommitPattern: 'Second commit' }
+    const result = parseCommits(gitLog, origins.github, options)
+    expect(result).to.have.length(commits.length - 1)
+    expect(JSON.stringify(result)).to.not.contain('Second commit')
+  })
+
   it('invalid startingCommit throws an error', done => {
     const options = { startingCommit: 'not-a-hash' }
     readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')

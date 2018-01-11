@@ -25,19 +25,20 @@ Usage: auto-changelog [options]
 
 Options:
 
-  -o, --output [file]            # output file, default: CHANGELOG.md
-  -t, --template [template]      # specify template to use [compact, keepachangelog, json], default: compact
-  -r, --remote [remote]          # specify git remote to use for links, default: origin
-  -p, --package                  # use version from package.json as latest release
-  -v, --latest-version [version] # use specified version as latest release
-  -u, --unreleased               # include section for unreleased changes
-  -l, --commit-limit [count]     # number of commits to display per release, default: 3
-  -i, --issue-url [url]          # override url for issues, use {id} for issue id
-      --issue-pattern [regex]    # override regex pattern for issues in commit messages
-      --starting-commit [hash]   # starting commit to use for changelog generation
-      --tag-prefix [prefix]      # prefix used in version tags, default: v
-  -V, --version                  # output the version number
-  -h, --help                     # output usage information
+  -o, --output [file]                 # output file, default: CHANGELOG.md
+  -t, --template [template]           # specify template to use [compact, keepachangelog, json], default: compact
+  -r, --remote [remote]               # specify git remote to use for links, default: origin
+  -p, --package                       # use version from package.json as latest release
+  -v, --latest-version [version]      # use specified version as latest release
+  -u, --unreleased                    # include section for unreleased changes
+  -l, --commit-limit [count]          # number of commits to display per release, default: 3
+  -i, --issue-url [url]               # override url for issues, use {id} for issue id
+      --issue-pattern [regex]         # override regex pattern for issues in commit messages
+      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
+      --starting-commit [hash]        # starting commit to use for changelog generation
+      --tag-prefix [prefix]           # prefix used in version tags, default: v
+  -V, --version                       # output the version number
+  -h, --help                          # output usage information
 
 
 # Write log to CHANGELOG.md in current directory

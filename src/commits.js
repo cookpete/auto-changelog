@@ -26,6 +26,12 @@ function parseCommits (string, origin, options = {}) {
     .split(COMMIT_SEPARATOR)
     .slice(1)
     .map(commit => parseCommit(commit, origin, options))
+    .filter(commit => {
+      if (options.ignoreCommitPattern) {
+        return new RegExp(options.ignoreCommitPattern).test(commit.subject) === false
+      }
+      return true
+    })
 
   if (options.startingCommit) {
     const index = commits.findIndex(c => c.hash.indexOf(options.startingCommit) === 0)
