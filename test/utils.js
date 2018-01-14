@@ -18,7 +18,6 @@ describe('niceDate', () => {
 
   it('formats date into nice date', () => {
     expect(niceDate(new Date(2016, 8, 2))).to.equal('2 September 2016')
-    expect(niceDate(new Date('2015-10-03'))).to.equal('3 October 2015')
   })
 })
 

@@ -1,6 +1,5 @@
 import { spawn } from 'child_process'
-
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+import moment from 'moment'
 
 // Simple util for calling a child process
 export function cmd (string) {
@@ -16,11 +15,7 @@ export function cmd (string) {
 }
 
 export function niceDate (string) {
-  const date = new Date(string)
-  const day = date.getDate()
-  const month = MONTH_NAMES[date.getMonth()]
-  const year = date.getFullYear()
-  return `${day} ${month} ${year}`
+  return moment(string).format('D MMMM YYYY')
 }
 
 export function removeIndentation (string) {
