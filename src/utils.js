@@ -1,6 +1,5 @@
 import { spawn } from 'child_process'
 import moment from 'moment'
-//const moment = require('moment')
 
 // Simple util for calling a child process
 export function cmd (string) {
