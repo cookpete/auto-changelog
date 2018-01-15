@@ -134,6 +134,9 @@ function getMerge (message, origin, mergeUrl) {
 }
 
 function getCommitLink (hash, origin) {
+  if (!origin) {
+    return null
+  }
   if (origin.hostname === 'bitbucket.org') {
     return `${origin.url}/commits/${hash}`
   }
@@ -141,6 +144,9 @@ function getCommitLink (hash, origin) {
 }
 
 function getIssueLink (match, id, origin, issueUrl) {
+  if (!origin) {
+    return null
+  }
   if (isLink(match[2])) {
     return match[2]
   }
@@ -151,6 +157,9 @@ function getIssueLink (match, id, origin, issueUrl) {
 }
 
 function getMergeLink (id, origin) {
+  if (!origin) {
+    return null
+  }
   if (origin.hostname === 'bitbucket.org') {
     return `${origin.url}/pull-requests/${id}`
   }

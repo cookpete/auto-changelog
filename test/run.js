@@ -5,6 +5,7 @@ import { join } from 'path'
 
 import origins from './data/origins'
 import commits from './data/commits'
+import commitsNoOrigin from './data/commits-no-origin'
 import run, {
   __get__,
   __Rewire__ as mock,
@@ -54,6 +55,19 @@ describe('run', () => {
       expect(message).to.be.a('string')
       expect(message).to.have.string('bytes written to')
     })
+  })
+
+  it('generates a changelog with no origin', async () => {
+    const expected = await readFile(join(__dirname, 'data', 'template-compact-no-origin.md'), 'utf-8')
+
+    mock('fetchOrigin', () => null)
+    mock('fetchCommits', () => commitsNoOrigin)
+    mock('writeFile', (output, log) => {
+      expect(output).to.equal('CHANGELOG.md')
+      expect(log).to.equal(expected)
+    })
+
+    return run(['', ''])
   })
 
   it('uses options from package.json', async () => {

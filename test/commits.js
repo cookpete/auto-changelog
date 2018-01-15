@@ -5,6 +5,7 @@ import { join } from 'path'
 
 import origins from './data/origins'
 import commits from './data/commits'
+import commitsNoOrigin from './data/commits-no-origin'
 import {
   fetchCommits,
   __get__,
@@ -35,7 +36,12 @@ describe('parseCommits', () => {
     expect(parseCommits(gitLog, origins.github, options)).to.deep.equal(commits)
   })
 
-  it('parses bitbucket commit', async () => {
+  it('parses commits without origin', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    expect(parseCommits(gitLog, null, options)).to.deep.equal(commitsNoOrigin)
+  })
+
+  it('parses bitbucket commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
     const commits = parseCommits(gitLog, origins.bitbucket)
     expect(commits[0].href).to.equal('https://bitbucket.org/user/repo/commits/b0b304049847d9568585bc11399fa6cfa4cab5dc')

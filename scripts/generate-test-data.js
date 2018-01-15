@@ -16,13 +16,27 @@ const origin = {
 
 async function run () {
   const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'), 'utf-8')
-  const commits = parseCommits(gitLog, origin)
+  const commits = parseCommits(gitLog, origin, { tagPrefix: 'v' })
   const releases = parseReleases(commits, origin, null, { unreleased: false, commitLimit: 3 })
   await writeFile(join(DATA_DIR, 'commits.js'), 'export default ' + JSON.stringify(commits, null, 2))
+  await writeFile(join(DATA_DIR, 'commits-no-origin.js'), 'export default ' + JSON.stringify(commitsWithoutLinks(commits), null, 2))
   await writeFile(join(DATA_DIR, 'releases.js'), 'export default ' + JSON.stringify(releases, null, 2))
   await writeFile(join(DATA_DIR, 'template-compact.md'), await compileTemplate('compact', { releases }))
   await writeFile(join(DATA_DIR, 'template-keepachangelog.md'), await compileTemplate('keepachangelog', { releases }))
   await writeFile(join(DATA_DIR, 'template-json.json'), await compileTemplate('json', { releases }))
+}
+
+function commitsWithoutLinks (commits) {
+  return commits.map(commit => {
+    const merge = commit.merge ? { ...commit.merge, href: null } : null
+    const fixes = commit.fixes ? commit.fixes.map(fix => ({ ...fix, href: null })) : null
+    return {
+      ...commit,
+      href: null,
+      fixes,
+      merge
+    }
+  })
 }
 
 run().catch(e => console.error(e))

@@ -68,6 +68,9 @@ function filterCommit (commit, release, limit) {
 }
 
 function getCompareLink (from, to, origin) {
+  if (!origin) {
+    return null
+  }
   if (origin.hostname === 'bitbucket.org') {
     return `${origin.url}/compare/${to}%0D${from}`
   }

@@ -48,9 +48,9 @@ describe('fetchOrigin', () => {
     })
   }
 
-  it('throws an error', done => {
+  it('returns null', async () => {
     mock('cmd', () => '')
-    fetchOrigin('origin').catch(() => done())
+    expect(await fetchOrigin('origin')).to.equal(null)
     unmock('cmd')
   })
 })
