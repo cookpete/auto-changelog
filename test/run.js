@@ -3,9 +3,9 @@ import { expect } from 'chai'
 import { readFile } from 'fs-extra'
 import { join } from 'path'
 
-import origins from './data/origins'
+import remotes from './data/remotes'
 import commits from './data/commits'
-import commitsNoOrigin from './data/commits-no-origin'
+import commitsNoRemote from './data/commits-no-remote'
 import run, {
   __get__,
   __Rewire__ as mock,
@@ -30,7 +30,7 @@ describe('run', () => {
   beforeEach(() => {
     mock('pathExists', () => false)
     mock('readJson', () => null)
-    mock('fetchOrigin', () => origins.github)
+    mock('fetchRemote', () => remotes.github)
     mock('fetchCommits', () => commits)
     mock('writeFile', () => {})
   })
@@ -38,7 +38,7 @@ describe('run', () => {
   afterEach(() => {
     unmock('pathExists')
     unmock('readJson')
-    unmock('fetchOrigin')
+    unmock('fetchRemote')
     unmock('fetchCommits')
     unmock('writeFile')
   })
@@ -57,11 +57,11 @@ describe('run', () => {
     })
   })
 
-  it('generates a changelog with no origin', async () => {
-    const expected = await readFile(join(__dirname, 'data', 'template-compact-no-origin.md'), 'utf-8')
+  it('generates a changelog with no remote', async () => {
+    const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'), 'utf-8')
 
-    mock('fetchOrigin', () => null)
-    mock('fetchCommits', () => commitsNoOrigin)
+    mock('fetchRemote', () => null)
+    mock('fetchCommits', () => commitsNoRemote)
     mock('writeFile', (output, log) => {
       expect(output).to.equal('CHANGELOG.md')
       expect(log).to.equal(expected)

@@ -9,17 +9,17 @@ const parseCommits = __get__('parseCommits')
 
 const DATA_DIR = join(__dirname, '..', 'test', 'data')
 
-const origin = {
+const remote = {
   hostname: 'github.com',
   url: 'https://github.com/user/repo'
 }
 
 async function run () {
   const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'), 'utf-8')
-  const commits = parseCommits(gitLog, origin, { tagPrefix: 'v' })
-  const releases = parseReleases(commits, origin, null, { unreleased: false, commitLimit: 3 })
+  const commits = parseCommits(gitLog, remote, { tagPrefix: 'v' })
+  const releases = parseReleases(commits, remote, null, { unreleased: false, commitLimit: 3 })
   await writeFile(join(DATA_DIR, 'commits.js'), 'export default ' + JSON.stringify(commits, null, 2))
-  await writeFile(join(DATA_DIR, 'commits-no-origin.js'), 'export default ' + JSON.stringify(commitsWithoutLinks(commits), null, 2))
+  await writeFile(join(DATA_DIR, 'commits-no-remote.js'), 'export default ' + JSON.stringify(commitsWithoutLinks(commits), null, 2))
   await writeFile(join(DATA_DIR, 'releases.js'), 'export default ' + JSON.stringify(releases, null, 2))
   await writeFile(join(DATA_DIR, 'template-compact.md'), await compileTemplate('compact', { releases }))
   await writeFile(join(DATA_DIR, 'template-keepachangelog.md'), await compileTemplate('keepachangelog', { releases }))

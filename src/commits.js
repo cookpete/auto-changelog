@@ -16,16 +16,16 @@ const MERGE_PATTERNS = [
   /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request !(\d+)/ // GitLab merge
 ]
 
-export async function fetchCommits (origin, options) {
+export async function fetchCommits (remote, options) {
   const log = await cmd(`git log --shortstat --pretty=format:${LOG_FORMAT}`)
-  return parseCommits(log, origin, options)
+  return parseCommits(log, remote, options)
 }
 
-function parseCommits (string, origin, options = {}) {
+function parseCommits (string, remote, options = {}) {
   const commits = string
     .split(COMMIT_SEPARATOR)
     .slice(1)
-    .map(commit => parseCommit(commit, origin, options))
+    .map(commit => parseCommit(commit, remote, options))
     .filter(commit => {
       if (options.ignoreCommitPattern) {
         return new RegExp(options.ignoreCommitPattern).test(commit.subject) === false
@@ -44,7 +44,7 @@ function parseCommits (string, origin, options = {}) {
   return commits
 }
 
-function parseCommit (commit, origin, options = {}) {
+function parseCommit (commit, remote, options = {}) {
   const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [message, stats] = tail.split(MESSAGE_SEPARATOR)
   return {
@@ -56,9 +56,9 @@ function parseCommit (commit, origin, options = {}) {
     tag: getTag(refs, options),
     subject: getSubject(message),
     message: message.trim(),
-    fixes: getFixes(message, origin, options),
-    merge: getMerge(message, origin),
-    href: getCommitLink(hash, origin),
+    fixes: getFixes(message, remote, options),
+    merge: getMerge(message, remote),
+    href: getCommitLink(hash, remote),
     ...getStats(stats.trim())
   }
 }
@@ -87,14 +87,14 @@ function getStats (stats) {
   }
 }
 
-function getFixes (message, origin, options = {}) {
+function getFixes (message, remote, options = {}) {
   const pattern = getFixPattern(options)
   let fixes = []
   let match = pattern.exec(message)
   if (!match) return null
   while (match) {
     const id = getFixID(match)
-    const href = getIssueLink(match, id, origin, options.issueUrl)
+    const href = getIssueLink(match, id, remote, options.issueUrl)
     fixes.push({ id, href })
     match = pattern.exec(message)
   }
@@ -117,7 +117,7 @@ function getFixPattern (options) {
   return DEFAULT_FIX_PATTERN
 }
 
-function getMerge (message, origin, mergeUrl) {
+function getMerge (message, remote, mergeUrl) {
   for (let pattern of MERGE_PATTERNS) {
     const match = message.match(pattern)
     if (match) {
@@ -126,25 +126,25 @@ function getMerge (message, origin, mergeUrl) {
       return {
         id,
         message,
-        href: getMergeLink(id, origin, mergeUrl)
+        href: getMergeLink(id, remote, mergeUrl)
       }
     }
   }
   return null
 }
 
-function getCommitLink (hash, origin) {
-  if (!origin) {
+function getCommitLink (hash, remote) {
+  if (!remote) {
     return null
   }
-  if (origin.hostname === 'bitbucket.org') {
-    return `${origin.url}/commits/${hash}`
+  if (remote.hostname === 'bitbucket.org') {
+    return `${remote.url}/commits/${hash}`
   }
-  return `${origin.url}/commit/${hash}`
+  return `${remote.url}/commit/${hash}`
 }
 
-function getIssueLink (match, id, origin, issueUrl) {
-  if (!origin) {
+function getIssueLink (match, id, remote, issueUrl) {
+  if (!remote) {
     return null
   }
   if (isLink(match[2])) {
@@ -153,18 +153,18 @@ function getIssueLink (match, id, origin, issueUrl) {
   if (issueUrl) {
     return issueUrl.replace('{id}', id)
   }
-  return `${origin.url}/issues/${id}`
+  return `${remote.url}/issues/${id}`
 }
 
-function getMergeLink (id, origin) {
-  if (!origin) {
+function getMergeLink (id, remote) {
+  if (!remote) {
     return null
   }
-  if (origin.hostname === 'bitbucket.org') {
-    return `${origin.url}/pull-requests/${id}`
+  if (remote.hostname === 'bitbucket.org') {
+    return `${remote.url}/pull-requests/${id}`
   }
-  if (origin.hostname === 'gitlab.com') {
-    return `${origin.url}/merge_requests/${id}`
+  if (remote.hostname === 'gitlab.com') {
+    return `${remote.url}/merge_requests/${id}`
   }
-  return `${origin.url}/pull/${id}`
+  return `${remote.url}/pull/${id}`
 }

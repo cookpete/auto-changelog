@@ -3,7 +3,7 @@ import { readJson, writeFile, pathExists } from 'fs-extra'
 import semver from 'semver'
 
 import { version } from '../package.json'
-import { fetchOrigin } from './origin'
+import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
 import { parseReleases } from './releases'
 import { compileTemplate } from './template'
@@ -68,10 +68,10 @@ function getLatestVersion (options, pkg) {
 export default async function run (argv) {
   const pkg = await pathExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
-  const origin = await fetchOrigin(options.remote)
-  const commits = await fetchCommits(origin, options)
+  const remote = await fetchRemote(options.remote)
+  const commits = await fetchCommits(remote, options)
   const latestVersion = getLatestVersion(options, pkg)
-  const releases = parseReleases(commits, origin, latestVersion, options)
+  const releases = parseReleases(commits, remote, latestVersion, options)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
   return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`

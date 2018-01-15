@@ -4,7 +4,7 @@ import { niceDate } from './utils'
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 
-export function parseReleases (commits, origin, latestVersion, options) {
+export function parseReleases (commits, remote, latestVersion, options) {
   let release = newRelease(latestVersion)
   const releases = []
   for (let commit of commits) {
@@ -12,7 +12,7 @@ export function parseReleases (commits, origin, latestVersion, options) {
       if (release.tag || options.unreleased) {
         releases.push({
           ...release,
-          href: getCompareLink(commit.tag, release.tag || 'HEAD', origin),
+          href: getCompareLink(commit.tag, release.tag || 'HEAD', remote),
           commits: release.commits.sort(sortCommits),
           major: commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
@@ -67,14 +67,14 @@ function filterCommit (commit, release, limit) {
   return release.commits.length < limit
 }
 
-function getCompareLink (from, to, origin) {
-  if (!origin) {
+function getCompareLink (from, to, remote) {
+  if (!remote) {
     return null
   }
-  if (origin.hostname === 'bitbucket.org') {
-    return `${origin.url}/compare/${to}%0D${from}`
+  if (remote.hostname === 'bitbucket.org') {
+    return `${remote.url}/compare/${to}%0D${from}`
   }
-  return `${origin.url}/compare/${from}...${to}`
+  return `${remote.url}/compare/${from}...${to}`
 }
 
 function sortCommits (a, b) {
