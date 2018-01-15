@@ -14,7 +14,7 @@ const DEFAULT_OPTIONS = {
   template: 'compact',
   remote: 'origin',
   commitLimit: 3,
-  tagPrefix: 'v'
+  tagPrefix: ''
 }
 
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
@@ -32,7 +32,7 @@ function getOptions (argv, pkg) {
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
     .option('--ignore-commit-pattern [regex]', `pattern to ignore when parsing commits`)
     .option('--starting-commit [hash]', `starting commit to use for changelog generation`)
-    .option('--tag-prefix [prefix]', `prefix used in version tags, default: ${DEFAULT_OPTIONS.tagPrefix}`)
+    .option('--tag-prefix [prefix]', `prefix used in version tags`)
     .version(version)
     .parse(argv)
 
@@ -60,7 +60,7 @@ function getLatestVersion (options, pkg) {
     return options.latestVersion
   }
   if (options.package) {
-    return options.tagPrefix + pkg.version
+    return `v${pkg.version}`
   }
   return null
 }

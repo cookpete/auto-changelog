@@ -1,3 +1,5 @@
+import semver from 'semver'
+
 import { cmd, isLink } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
@@ -66,8 +68,12 @@ function parseCommit (commit, remote, options = {}) {
 function getTag (refs, options) {
   if (!refs) return null
   for (let ref of refs.split(', ')) {
-    if (ref.indexOf(`tag: ${options.tagPrefix}`) === 0) {
-      return ref.replace('tag: ', '')
+    const prefix = `tag: ${options.tagPrefix}`
+    if (ref.indexOf(prefix) === 0) {
+      const version = ref.replace(prefix, '')
+      if (semver.valid(version)) {
+        return version
+      }
     }
   }
   return null

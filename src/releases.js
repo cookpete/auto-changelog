@@ -8,7 +8,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
   let release = newRelease(latestVersion)
   const releases = []
   for (let commit of commits) {
-    if (commit.tag && semver.valid(commit.tag)) {
+    if (commit.tag) {
       if (release.tag || options.unreleased) {
         releases.push({
           ...release,

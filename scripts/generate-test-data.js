@@ -16,7 +16,7 @@ const remote = {
 
 async function run () {
   const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'), 'utf-8')
-  const commits = parseCommits(gitLog, remote, { tagPrefix: 'v' })
+  const commits = parseCommits(gitLog, remote, { tagPrefix: '' })
   const releases = parseReleases(commits, remote, null, { unreleased: false, commitLimit: 3 })
   await writeFile(join(DATA_DIR, 'commits.js'), 'export default ' + JSON.stringify(commits, null, 2))
   await writeFile(join(DATA_DIR, 'commits-no-remote.js'), 'export default ' + JSON.stringify(commitsWithoutLinks(commits), null, 2))

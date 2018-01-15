@@ -18,7 +18,7 @@ const getFixes = __get__('getFixes')
 const getMerge = __get__('getMerge')
 
 const options = {
-  tagPrefix: 'v'
+  tagPrefix: ''
 }
 
 describe('fetchCommits', () => {
