@@ -1,6 +1,6 @@
 {
   "name": "auto-changelog",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Command line tool for generating a changelog from git tags and commit history",
   "bin": {
     "auto-changelog": "./lib/index.js"
