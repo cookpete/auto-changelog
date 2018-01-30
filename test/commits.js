@@ -16,6 +16,7 @@ import {
 const parseCommits = __get__('parseCommits')
 const getFixes = __get__('getFixes')
 const getMerge = __get__('getMerge')
+const getSubject = __get__('getSubject')
 
 const options = {
   tagPrefix: ''
@@ -232,5 +233,15 @@ describe('getMerge', () => {
         href: 'https://bitbucket.org/user/repo/pull-requests/4518'
       })
     })
+  })
+})
+
+describe('getSubject', () => {
+  it('returns commit subject', () => {
+    const message = 'Commit message\n\nCloses ABC-1234'
+    expect(getSubject(message)).to.equal('Commit message')
+  })
+  it('returns no commit message', () => {
+    expect(getSubject('')).to.equal('_No commit message_')
   })
 })

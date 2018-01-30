@@ -80,6 +80,9 @@ function getTag (refs, options) {
 }
 
 function getSubject (message) {
+  if (!message) {
+    return '_No commit message_'
+  }
   return message.match(/[^\n]+/)[0]
 }
 
