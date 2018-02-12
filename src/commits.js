@@ -15,7 +15,7 @@ const MERGE_PATTERNS = [
   /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
   /^(.+) \(#(\d+)\)(?:$|\n\n)/, // Github squash merge
   /Merged in .+ \(pull request #(\d+)\)\n\n(.+)/, // BitBucket merge
-  /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request !(\d+)/ // GitLab merge
+  /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
 ]
 
 export async function fetchCommits (remote, options) {
@@ -172,7 +172,7 @@ function getMergeLink (id, remote) {
   if (remote.hostname === 'bitbucket.org') {
     return `${remote.url}/pull-requests/${id}`
   }
-  if (remote.hostname === 'gitlab.com') {
+  if (/^gitlab\./.test(remote.hostname)) {
     return `${remote.url}/merge_requests/${id}`
   }
   return `${remote.url}/pull/${id}`
