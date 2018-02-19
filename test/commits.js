@@ -11,7 +11,7 @@ import {
   __get__,
   __Rewire__ as mock,
   __ResetDependency__ as unmock
-  } from '../src/commits'
+} from '../src/commits'
 
 const parseCommits = __get__('parseCommits')
 const getFixes = __get__('getFixes')
