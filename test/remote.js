@@ -30,7 +30,14 @@ const TEST_DATA = [
     expected: remotes.gitlab
   },
   {
-    remote: 'https://gitlab.com/user/repo#subgroup.git',
+    remote: 'https://gitlab.com/user/repo/subgroup.git',
+    expected: {
+      hostname: 'gitlab.com',
+      url: 'https://gitlab.com/user/repo/subgroup'
+    }
+  },
+  {
+    remote: 'git@gitlab.com:user/repo/subgroup.git',
     expected: {
       hostname: 'gitlab.com',
       url: 'https://gitlab.com/user/repo/subgroup'
