@@ -12,8 +12,15 @@ export async function fetchRemote (name) {
   const remote = parseRepoURL(remoteURL)
   const protocol = remote.protocol === 'http:' ? 'http:' : 'https:'
   const hostname = remote.hostname || remote.host
+  let repo = remote.repo
+
+  if (/gitlab/.test(hostname) && /\.git$/.test(remote.branch)) {
+    // Support gitlab subgroups
+    repo = `${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
+  }
+
   return {
     hostname,
-    url: `${protocol}//${hostname}/${remote.repo}`
+    url: `${protocol}//${hostname}/${repo}`
   }
 }
