@@ -71,7 +71,7 @@ function getCompareLink (from, to, remote) {
   if (!remote) {
     return null
   }
-  if (remote.hostname === 'bitbucket.org') {
+  if (/bitbucket/.test(remote.hostname)) {
     return `${remote.url}/compare/${to}%0D${from}`
   }
   return `${remote.url}/compare/${from}...${to}`

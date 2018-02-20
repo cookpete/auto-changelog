@@ -146,7 +146,7 @@ function getCommitLink (hash, remote) {
   if (!remote) {
     return null
   }
-  if (remote.hostname === 'bitbucket.org') {
+  if (/bitbucket/.test(remote.hostname)) {
     return `${remote.url}/commits/${hash}`
   }
   return `${remote.url}/commit/${hash}`
@@ -169,10 +169,10 @@ function getMergeLink (id, remote) {
   if (!remote) {
     return null
   }
-  if (remote.hostname === 'bitbucket.org') {
+  if (/bitbucket/.test(remote.hostname)) {
     return `${remote.url}/pull-requests/${id}`
   }
-  if (/^gitlab\./.test(remote.hostname)) {
+  if (/gitlab/.test(remote.hostname)) {
     return `${remote.url}/merge_requests/${id}`
   }
   return `${remote.url}/pull/${id}`
