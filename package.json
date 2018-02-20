@@ -61,7 +61,7 @@
     "mocha": "^5.0.0",
     "nyc": "^11.2.1",
     "snazzy": "^7.0.0",
-    "standard": "^10.0.3"
+    "standard": "^11.0.0"
   },
   "babel": {
     "presets": [
