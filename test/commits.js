@@ -225,10 +225,14 @@ describe('getMerge', () => {
 
     it('parses a merge for subgroups', () => {
       const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request user/repo/subgroup!15007'
-      expect(getMerge(message, remotes.gitlab)).to.deep.equal({
+      const remote = {
+        hostname: 'gitlab.com',
+        url: 'https://gitlab.com/user/repo/subgroup'
+      }
+      expect(getMerge(message, remote)).to.deep.equal({
         id: '15007',
         message: 'Memoize GitLab logger to reduce open file descriptors',
-        href: 'https://gitlab.com/user/repo/merge_requests/15007'
+        href: 'https://gitlab.com/user/repo/subgroup/merge_requests/15007'
       })
     })
   })
