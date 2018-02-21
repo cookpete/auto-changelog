@@ -12,7 +12,11 @@ export function parseReleases (commits, remote, latestVersion, options) {
       if (release.tag || options.unreleased) {
         releases.push({
           ...release,
-          href: getCompareLink(commit.tag, release.tag || 'HEAD', remote),
+          href: getCompareLink(
+            `${options.tagPrefix}${commit.tag}`,
+            `${options.tagPrefix}${release.tag}` || 'HEAD',
+            remote
+          ),
           commits: release.commits.sort(sortCommits),
           major: commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
