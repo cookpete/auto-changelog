@@ -14,7 +14,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
           ...release,
           href: getCompareLink(
             `${options.tagPrefix}${commit.tag}`,
-            `${options.tagPrefix}${release.tag}` || 'HEAD',
+            release.tag ? `${options.tagPrefix}${release.tag}` : 'HEAD',
             remote
           ),
           commits: release.commits.sort(sortCommits),

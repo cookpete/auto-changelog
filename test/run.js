@@ -113,7 +113,11 @@ describe('run', () => {
     return run(['', '', '--output', 'should-be-this.md'])
   })
 
-  it('does not error when using unreleased option', () => {
+  it('supports unreleased option', () => {
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('Unreleased')
+      expect(log).to.include('https://github.com/user/repo/compare/v1.0.0...HEAD')
+    })
     return run(['', '', '--unreleased'])
   })
 
