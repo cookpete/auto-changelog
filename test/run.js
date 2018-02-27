@@ -99,6 +99,25 @@ describe('run', () => {
     return run(['', '', '--package'])
   })
 
+  it('uses version from package.json with no prefix', async () => {
+    mock('pathExists', () => true)
+    mock('readJson', () => ({
+      version: '2.0.0'
+    }))
+    mock('fetchCommits', () => commits.map(commit => {
+      return {
+        ...commit,
+        tag: commit.tag ? commit.tag.replace('v', '') : null
+      }
+    }))
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('2.0.0')
+      expect(log).to.not.include('v2.0.0')
+    })
+
+    return run(['', '', '--package'])
+  })
+
   it('command line options override options from package.json', async () => {
     mock('pathExists', () => true)
     mock('readJson', () => ({

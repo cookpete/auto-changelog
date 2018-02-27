@@ -52,7 +52,7 @@ function getOptions (argv, pkg) {
   }
 }
 
-function getLatestVersion (options, pkg) {
+function getLatestVersion (options, pkg, commits) {
   if (options.latestVersion) {
     if (!semver.valid(options.latestVersion)) {
       throw new Error('--latest-version must be a valid semver version')
@@ -60,7 +60,8 @@ function getLatestVersion (options, pkg) {
     return options.latestVersion
   }
   if (options.package) {
-    return `v${pkg.version}`
+    const prefix = commits.some(c => /^v/.test(c.tag)) ? 'v' : ''
+    return `${prefix}${pkg.version}`
   }
   return null
 }
@@ -70,7 +71,7 @@ export default async function run (argv) {
   const options = getOptions(argv, pkg)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
-  const latestVersion = getLatestVersion(options, pkg)
+  const latestVersion = getLatestVersion(options, pkg, commits)
   const releases = parseReleases(commits, remote, latestVersion, options)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
