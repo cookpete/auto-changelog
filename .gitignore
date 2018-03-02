@@ -1,9 +1,6 @@
-# General files
-*~
-.DS_Store
-
-# Build files
 node_modules
 npm-debug.log
 /lib
 /test/coverage
+*~
+.DS_Store
