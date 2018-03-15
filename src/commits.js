@@ -4,8 +4,8 @@ import { cmd, isLink } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
-const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%D%n%aI%n%an%n%ae%n%B' + MESSAGE_SEPARATOR
-const MATCH_COMMIT = /(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
+const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%d%n%ai%n%an%n%ae%n%B' + MESSAGE_SEPARATOR
+const MATCH_COMMIT = /(.*)\n(?:\s\((.*)\))?\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
 const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) deletions?...)?/
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
@@ -54,7 +54,7 @@ function parseCommit (commit, remote, options = {}) {
     shorthash: hash.slice(0, 7),
     author,
     email,
-    date,
+    date: new Date(date).toISOString(),
     tag: getTag(refs, options),
     subject: getSubject(message),
     message: message.trim(),

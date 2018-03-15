@@ -14,10 +14,16 @@ const remote = {
   url: 'https://github.com/user/repo'
 }
 
+const options = {
+  unreleased: false,
+  commitLimit: 3,
+  tagPrefix: ''
+}
+
 async function run () {
   const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'), 'utf-8')
-  const commits = parseCommits(gitLog, remote, { tagPrefix: '' })
-  const releases = parseReleases(commits, remote, null, { unreleased: false, commitLimit: 3 })
+  const commits = parseCommits(gitLog, remote, options)
+  const releases = parseReleases(commits, remote, null, options)
   await writeFile(join(DATA_DIR, 'commits.js'), 'export default ' + JSON.stringify(commits, null, 2))
   await writeFile(join(DATA_DIR, 'commits-no-remote.js'), 'export default ' + JSON.stringify(commitsWithoutLinks(commits), null, 2))
   await writeFile(join(DATA_DIR, 'releases.js'), 'export default ' + JSON.stringify(releases, null, 2))

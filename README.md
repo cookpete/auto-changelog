@@ -94,7 +94,10 @@ You can also set any option in `package.json` under the `auto-changelog` key, us
 
 #### Requirements
 
-`auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. The only absolute requirement is that all versions are tagged using [semver](https://semver.org) tag names. This happens by default when using [`npm version`](https://docs.npmjs.com/cli/version).
+`auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. There are only two absolute requirements:
+
+- You should be using git `1.7.2` or later
+- All versions should be tagged using [semver](https://semver.org) tag names – this happens by default when using [`npm version`](https://docs.npmjs.com/cli/version)
 
 There are some less strict requirements to improve your changelog:
 
