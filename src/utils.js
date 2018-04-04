@@ -17,9 +17,9 @@ export function cmd (string) {
 
 export function niceDate (string) {
   const date = new Date(string)
-  const day = date.getDate()
-  const month = MONTH_NAMES[date.getMonth()]
-  const year = date.getFullYear()
+  const day = date.getUTCDate()
+  const month = MONTH_NAMES[date.getUTCMonth()]
+  const year = date.getUTCFullYear()
   return `${day} ${month} ${year}`
 }
 
