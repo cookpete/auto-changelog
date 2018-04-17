@@ -170,6 +170,33 @@ To see exactly what data is passed in to the templates, you can generate a JSON 
 auto-changelog --template json --output changelog-data.json
 ```
 
+#### `commit-list` helper
+
+Use `{{#commit-list}}` to render a list of commits depending on certain patterns in the commit messages:
+
+```hbs
+{{#each releases}}
+  ### [{{title}}]({{href}})
+
+  {{! List commits with `Breaking change: ` somewhere in the message }}
+  {{#commit-list commits heading='### Breaking Changes' message='Breaking change: '}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+
+  {{! List commits that add new features, but not those already listed above }}
+  {{#commit-list commits heading='### New Features' message='feat: ' exclude='Breaking change: '}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{/commit-list}}
+{{/each}}
+```
+
+| Option    | Description |
+| --------- | ----------- |
+| `heading` | A heading for the list, only renders if at least one commit matches |
+| `message` | A regex pattern to match against the entire commit message |
+| `subject` | A regex pattern to match against the commit subject only |
+| `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
+
 #### Custom issue patterns
 
 By default, `auto-changelog` will parse [GitHub-style issue fixes](https://help.github.com/articles/closing-issues-using-keywords/) in your commit messages. If you use Jira or an alternative pattern in your commits to reference issues, you can pass in a custom regular expression to `--issue-pattern` along with `--issue-url`:
