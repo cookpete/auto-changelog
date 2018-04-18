@@ -43,6 +43,11 @@ Handlebars.registerHelper('commit-list', function (context, options) {
   return `${options.hash.heading}\n${list}`
 })
 
+Handlebars.registerHelper('matches', function (val, pattern, options) {
+  const r = new RegExp(pattern)
+  return r.test(val) ? options.fn(this) : options.inverse(this)
+})
+
 async function getTemplate (template) {
   if (await pathExists(template)) {
     return readFile(template, 'utf-8')
