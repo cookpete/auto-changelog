@@ -44,7 +44,7 @@ Handlebars.registerHelper('commit-list', function (context, options) {
 })
 
 Handlebars.registerHelper('matches', function (val, pattern, options) {
-  const r = new RegExp(pattern)
+  const r = new RegExp(pattern, options.hash.flags || '')
   return r.test(val) ? options.fn(this) : options.inverse(this)
 })
 
