@@ -5,9 +5,7 @@ import { join } from 'path'
 import Handlebars from 'handlebars'
 
 import releases from './data/releases'
-import commits from './data/commits'
 import { compileTemplate } from '../src/template'
-import { removeIndentation } from '../src/utils'
 
 describe('compileTemplate', () => {
   it('compiles using compact template', async () => {
