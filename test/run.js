@@ -140,6 +140,22 @@ describe('run', () => {
     return run(['', '', '--unreleased'])
   })
 
+  it('supports includeBranch option', () => {
+    mock('fetchCommits', (remote, options, branch) => {
+      if (branch === 'another-branch') {
+        return commits.concat({
+          date: '2015-12-15T12:03:09.000Z',
+          tag: 'v0.2.0'
+        })
+      }
+      return commits
+    })
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('v0.2.0')
+    })
+    return run(['', '', '--include-branch', 'another-branch'])
+  })
+
   it('does not error when using latest version option', () => {
     return run(['', '', '--latest-version', '3.0.0'])
   })

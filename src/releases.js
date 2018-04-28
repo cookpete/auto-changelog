@@ -38,6 +38,10 @@ export function parseReleases (commits, remote, latestVersion, options) {
   return releases
 }
 
+export function sortReleases (a, b) {
+  return a.tag && b.tag ? semver.rcompare(a.tag, b.tag) : 0
+}
+
 function newRelease (tag = null, date = new Date().toISOString()) {
   const release = {
     commits: [],

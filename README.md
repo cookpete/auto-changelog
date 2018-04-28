@@ -37,6 +37,7 @@ Options:
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
       --starting-commit [hash]        # starting commit to use for changelog generation
       --tag-prefix [prefix]           # prefix used in version tags, default: v
+      --include-branch [branch]       # one or more branches to include commits from, comma separated
   -V, --version                       # output the version number
   -h, --help                          # output usage information
 

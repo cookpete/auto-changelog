@@ -1,11 +1,12 @@
 import { Command } from 'commander'
 import { readJson, writeFile, pathExists } from 'fs-extra'
 import semver from 'semver'
+import uniqBy from 'lodash.uniqby'
 
 import { version } from '../package.json'
 import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
-import { parseReleases } from './releases'
+import { parseReleases, sortReleases } from './releases'
 import { compileTemplate } from './template'
 import { parseLimit } from './utils'
 
@@ -33,6 +34,7 @@ function getOptions (argv, pkg) {
     .option('--ignore-commit-pattern [regex]', `pattern to ignore when parsing commits`)
     .option('--starting-commit [hash]', `starting commit to use for changelog generation`)
     .option('--tag-prefix [prefix]', `prefix used in version tags`)
+    .option('--include-branch [branch]', `one or more branches to include commits from, comma separated`, str => str.split(','))
     .version(version)
     .parse(argv)
 
@@ -66,13 +68,27 @@ function getLatestVersion (options, pkg, commits) {
   return null
 }
 
+async function getReleases (commits, remote, latestVersion, options) {
+  let releases = parseReleases(commits, remote, latestVersion, options)
+  if (options.includeBranch) {
+    for (const branch of options.includeBranch) {
+      const commits = await fetchCommits(remote, options, branch)
+      releases = [
+        ...releases,
+        ...parseReleases(commits, remote, latestVersion, options)
+      ]
+    }
+  }
+  return uniqBy(releases, 'tag').sort(sortReleases)
+}
+
 export default async function run (argv) {
   const pkg = await pathExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
   const latestVersion = getLatestVersion(options, pkg, commits)
-  const releases = parseReleases(commits, remote, latestVersion, options)
+  const releases = await getReleases(commits, remote, latestVersion, options)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
   return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`
