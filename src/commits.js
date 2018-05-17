@@ -62,6 +62,7 @@ function parseCommit (commit, remote, options = {}) {
     fixes: getFixes(message, remote, options),
     merge: getMerge(message, remote),
     href: getCommitLink(hash, remote),
+    breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats.trim())
   }
 }

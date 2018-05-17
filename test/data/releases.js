@@ -13,6 +13,7 @@ export default [
         "fixes": null,
         "merge": null,
         "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
+        "breaking": false,
         "files": 5,
         "insertions": 10,
         "deletions": 10
@@ -42,6 +43,7 @@ export default [
         "fixes": null,
         "merge": null,
         "href": "https://github.com/user/repo/commit/12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
+        "breaking": false,
         "files": 1,
         "insertions": 2,
         "deletions": 3
@@ -58,6 +60,7 @@ export default [
         "fixes": null,
         "merge": null,
         "href": "https://github.com/user/repo/commit/e9a43b2bf50449fc0d84465308e6008cc1597bb3",
+        "breaking": false,
         "files": 1,
         "insertions": 1,
         "deletions": 1
@@ -100,6 +103,7 @@ export default [
           ],
           "merge": null,
           "href": "https://github.com/user/repo/commit/17fbef87e82889f01d8257900f7edc55b05918a2",
+          "breaking": false,
           "files": 1,
           "insertions": 1,
           "deletions": 0
@@ -135,6 +139,7 @@ export default [
         "fixes": null,
         "merge": null,
         "href": "https://github.com/user/repo/commit/158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
+        "breaking": false,
         "files": 7,
         "insertions": 37,
         "deletions": 22
@@ -173,6 +178,7 @@ export default [
           ],
           "merge": null,
           "href": "https://github.com/user/repo/commit/90ef33485369fc7892d11b2e4da04ffb64df1e99",
+          "breaking": false,
           "files": 8,
           "insertions": 57,
           "deletions": 53

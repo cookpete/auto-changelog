@@ -16,6 +16,7 @@ export default [
     ],
     "merge": null,
     "href": "https://github.com/user/repo/commit/2401ee4706e94629f48830bab9ed5812c032734a",
+    "breaking": false,
     "files": 5,
     "insertions": 10,
     "deletions": 10
@@ -32,6 +33,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/77bb243170408cd18e70ca05bf8b3ca7646ea437",
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -48,6 +50,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "breaking": false,
     "files": 5,
     "insertions": 10,
     "deletions": 10
@@ -64,6 +67,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/db92947e6129cc20cd7777b7ed90b2bd547918c0",
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -80,6 +84,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/e9a43b2bf50449fc0d84465308e6008cc1597bb3",
+    "breaking": false,
     "files": 1,
     "insertions": 1,
     "deletions": 1
@@ -96,6 +101,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
+    "breaking": false,
     "files": 1,
     "insertions": 2,
     "deletions": 3
@@ -112,6 +118,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/ef17dcc732d282f027aa3bddf8f91cbb05998cc8",
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -131,7 +138,8 @@ export default [
       "message": "Should not parse #4 in PR title",
       "href": "https://github.com/user/repo/pull/5"
     },
-    "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672"
+    "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
+    "breaking": false
   },
   {
     "hash": "92839699a6aaea148dcd72ea897321e66cae0c18",
@@ -145,6 +153,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/92839699a6aaea148dcd72ea897321e66cae0c18",
+    "breaking": false,
     "files": 1,
     "insertions": 1,
     "deletions": 0
@@ -166,6 +175,7 @@ export default [
     ],
     "merge": null,
     "href": "https://github.com/user/repo/commit/17fbef87e82889f01d8257900f7edc55b05918a2",
+    "breaking": false,
     "files": 1,
     "insertions": 1,
     "deletions": 0
@@ -182,6 +192,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/796edd129a6aaea148dcd72ea897321e66cae0c1",
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -201,7 +212,8 @@ export default [
       "message": "Third commit with same name as PR",
       "href": "https://github.com/user/repo/pull/3"
     },
-    "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3"
+    "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
+    "breaking": false
   },
   {
     "hash": "1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
@@ -215,6 +227,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
+    "breaking": false,
     "files": 8,
     "insertions": 57,
     "deletions": 53
@@ -240,6 +253,7 @@ export default [
     ],
     "merge": null,
     "href": "https://github.com/user/repo/commit/90ef33485369fc7892d11b2e4da04ffb64df1e99",
+    "breaking": false,
     "files": 8,
     "insertions": 57,
     "deletions": 53
@@ -256,6 +270,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
+    "breaking": false,
     "files": 7,
     "insertions": 37,
     "deletions": 22

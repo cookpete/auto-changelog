@@ -57,6 +57,9 @@ function newRelease (tag = null, date = new Date().toISOString()) {
 }
 
 function filterCommit (commit, release, limit) {
+  if (commit.breaking) {
+    return true
+  }
   if (semver.valid(commit.subject)) {
     // Filter out version commits
     return false
@@ -86,5 +89,7 @@ function getCompareLink (from, to, remote) {
 }
 
 function sortCommits (a, b) {
+  if (!a.breaking && b.breaking) return -1
+  if (a.breaking && !b.breaking) return 1
   return (b.insertions + b.deletions) - (a.insertions + a.deletions)
 }

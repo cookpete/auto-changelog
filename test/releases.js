@@ -32,8 +32,8 @@ describe('parseReleases', () => {
   })
 
   it('supports a version override', () => {
-    const result = parseReleases(commits, remotes.github, 'v3.0.0', options)
-    expect(result).to.be.an('array')
-    expect(result[0]).to.have.property('tag', 'v3.0.0')
+    const releases = parseReleases(commits, remotes.github, 'v3.0.0', options)
+    expect(releases).to.be.an('array')
+    expect(releases[0]).to.have.property('tag', 'v3.0.0')
   })
 })

@@ -62,6 +62,13 @@ describe('parseCommits', () => {
     expect(JSON.stringify(result)).to.not.contain('Second commit')
   })
 
+  it('supports breakingPattern option', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const options = { breakingPattern: 'Some breaking change' }
+    const result = parseCommits(gitLog, remotes.github, options)
+    expect(result.filter(c => c.breaking)).to.have.length(1)
+  })
+
   it('invalid startingCommit throws an error', done => {
     const options = { startingCommit: 'not-a-hash' }
     readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')

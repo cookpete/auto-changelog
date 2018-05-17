@@ -34,6 +34,7 @@ Options:
   -l, --commit-limit [count]          # number of commits to display per release, default: 3
   -i, --issue-url [url]               # override url for issues, use {id} for issue id
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
+      --breaking-pattern [regex]      # regex pattern for breaking change commits
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
       --starting-commit [hash]        # starting commit to use for changelog generation
       --tag-prefix [prefix]           # prefix used in version tags, default: v
@@ -133,6 +134,14 @@ Add `auto-changelog -p && git add CHANGELOG.md` to the `version` scripts in your
 Using `-p` or `--package` uses the `version` from `package.json` as the latest release, so that all commits between the previous release and now become part of that release. Essentially anything that would normally be parsed as `Unreleased` will now come under the `version` from `package.json`
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
+
+#### Breaking changes
+
+If you use a common pattern in your commit messages for breaking changes, use `--breaking-pattern` to highlight those commits as breaking changes in your changelog. Breaking change commits will always be listed as part of a release, regardless of any `--commit-limit` set.
+
+```bash
+auto-changelog --breaking-pattern "BREAKING CHANGE:"
+```
 
 #### Custom templates
 

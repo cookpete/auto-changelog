@@ -156,8 +156,22 @@ describe('run', () => {
     return run(['', '', '--include-branch', 'another-branch'])
   })
 
+  it('supports breakingPattern option', () => {
+    mock('fetchCommits', () => commits.map(commit => {
+      if (/Some breaking change/.test(commit.message)) {
+        return { ...commit, breaking: true }
+      }
+      return commit
+    }))
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('**Breaking change:** Some breaking change')
+    })
+    // No need to actually pass in the option here as we amend the commits
+    return run(['', '', '--commit-limit', '0'])
+  })
+
   it('does not error when using latest version option', () => {
-    return run(['', '', '--latest-version', '3.0.0'])
+    return run(['', '', '--latest-version', 'v3.0.0'])
   })
 
   it('throws an error when no package found', done => {

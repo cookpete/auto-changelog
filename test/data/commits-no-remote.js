@@ -16,6 +16,7 @@ export default [
     ],
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 5,
     "insertions": 10,
     "deletions": 10
@@ -32,6 +33,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -48,6 +50,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 5,
     "insertions": 10,
     "deletions": 10
@@ -64,6 +67,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -80,6 +84,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 1,
     "insertions": 1,
     "deletions": 1
@@ -96,6 +101,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 1,
     "insertions": 2,
     "deletions": 3
@@ -112,6 +118,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -131,7 +138,8 @@ export default [
       "message": "Should not parse #4 in PR title",
       "href": null
     },
-    "href": null
+    "href": null,
+    "breaking": false
   },
   {
     "hash": "92839699a6aaea148dcd72ea897321e66cae0c18",
@@ -145,6 +153,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 1,
     "insertions": 1,
     "deletions": 0
@@ -166,6 +175,7 @@ export default [
     ],
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 1,
     "insertions": 1,
     "deletions": 0
@@ -182,6 +192,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 2,
     "insertions": 8,
     "deletions": 2
@@ -201,7 +212,8 @@ export default [
       "message": "Third commit with same name as PR",
       "href": null
     },
-    "href": null
+    "href": null,
+    "breaking": false
   },
   {
     "hash": "1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
@@ -215,6 +227,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 8,
     "insertions": 57,
     "deletions": 53
@@ -240,6 +253,7 @@ export default [
     ],
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 8,
     "insertions": 57,
     "deletions": 53
@@ -256,6 +270,7 @@ export default [
     "fixes": null,
     "merge": null,
     "href": null,
+    "breaking": false,
     "files": 7,
     "insertions": 37,
     "deletions": 22

@@ -31,6 +31,7 @@ function getOptions (argv, pkg) {
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
+    .option('--breaking-pattern [regex]', `regex pattern for breaking change commits`)
     .option('--ignore-commit-pattern [regex]', `pattern to ignore when parsing commits`)
     .option('--starting-commit [hash]', `starting commit to use for changelog generation`)
     .option('--tag-prefix [prefix]', `prefix used in version tags`)
