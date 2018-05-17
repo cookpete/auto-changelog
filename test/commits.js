@@ -45,7 +45,7 @@ describe('parseCommits', () => {
   it('parses bitbucket commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
     const commits = parseCommits(gitLog, remotes.bitbucket)
-    expect(commits[0].href).to.equal('https://bitbucket.org/user/repo/commits/b0b304049847d9568585bc11399fa6cfa4cab5dc')
+    expect(commits[0].href).to.equal('https://bitbucket.org/user/repo/commits/2401ee4706e94629f48830bab9ed5812c032734a')
   })
 
   it('supports startingCommit option', async () => {
