@@ -1,6 +1,6 @@
 import semver from 'semver'
 
-import { cmd, isLink } from './utils'
+import { cmd, isLink, replaceText } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
@@ -57,10 +57,10 @@ function parseCommit (commit, remote, options = {}) {
     email,
     date: new Date(date).toISOString(),
     tag: getTag(refs, options),
-    subject: getSubject(message),
+    subject: replaceText(getSubject(message), options),
     message: message.trim(),
     fixes: getFixes(message, remote, options),
-    merge: getMerge(message, remote),
+    merge: getMerge(message, remote, options),
     href: getCommitLink(hash, remote),
     breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats.trim())
@@ -128,7 +128,7 @@ function getFixPattern (options) {
   return DEFAULT_FIX_PATTERN
 }
 
-function getMerge (message, remote, mergeUrl) {
+function getMerge (message, remote, options = {}) {
   for (let pattern of MERGE_PATTERNS) {
     const match = message.match(pattern)
     if (match) {
@@ -136,8 +136,8 @@ function getMerge (message, remote, mergeUrl) {
       const message = /^\d+$/.test(match[1]) ? match[2] : match[1]
       return {
         id,
-        message,
-        href: getMergeLink(id, remote, mergeUrl)
+        message: replaceText(message, options),
+        href: getMergeLink(id, remote)
       }
     }
   }

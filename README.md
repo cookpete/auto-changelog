@@ -222,7 +222,7 @@ Or, in your `package.json`:
 {
   "name": "my-awesome-package",
   "auto-changelog": {
-    "issueUrl": "https://issues.apache.org/jira/browse/",
+    "issueUrl": "https://issues.apache.org/jira/browse/{id}",
     "issuePattern": "[A-Z]+-\d+"
   }
 }
@@ -235,6 +235,22 @@ If you use a certain pattern before or after the issue number, like `fixes {id}`
 auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
 ```
 
+#### Replacing text
+
+To insert links or other markup to PR titles and commit messages that appear in the log, use the `replaceText` option in your `package.json`:
+
+```js
+{
+  "name": "my-awesome-package",
+  "auto-changelog": {
+    "replaceText": {
+      "(ABC-\\d+)": "[`$1`](https://issues.apache.org/jira/browse/$1)"
+    }
+  }
+}
+```
+
+Here, any time a pattern like `ABC-123` appears in your log, it will be replaced with a link to the relevant issue in Jira. Each pattern is applied using `string.replace(new RegExp(key, 'g'), value)`.
 
 ### Migrating to `1.x`
 

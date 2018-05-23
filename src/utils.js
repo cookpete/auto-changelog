@@ -36,3 +36,12 @@ export function isLink (string) {
 export function parseLimit (limit) {
   return limit === 'false' ? false : parseInt(limit, 10)
 }
+
+export function replaceText (string, options) {
+  if (!options.replaceText) {
+    return string
+  }
+  return Object.keys(options.replaceText).reduce((string, pattern) => {
+    return string.replace(new RegExp(pattern, 'g'), options.replaceText[pattern])
+  }, string)
+}

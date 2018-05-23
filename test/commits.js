@@ -69,6 +69,17 @@ describe('parseCommits', () => {
     expect(result.filter(c => c.breaking)).to.have.length(1)
   })
 
+  it('supports replaceText option', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const options = {
+      replaceText: {
+        'breaking': '**BREAKING**'
+      }
+    }
+    const result = parseCommits(gitLog, remotes.github, options)
+    expect(result.filter(c => c.subject === 'Some **BREAKING** change')).to.have.length(1)
+  })
+
   it('invalid startingCommit throws an error', done => {
     const options = { startingCommit: 'not-a-hash' }
     readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
@@ -252,6 +263,20 @@ describe('getMerge', () => {
         message: 'fix(component): re-export createSchema from editor-core',
         href: 'https://bitbucket.org/user/repo/pull-requests/4518'
       })
+    })
+  })
+
+  it('supports replaceText option', () => {
+    const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
+    const options = {
+      replaceText: {
+        '(..l)': '_$1_'
+      }
+    }
+    expect(getMerge(message, remotes.github, options)).to.deep.equal({
+      id: '3',
+      message: '_Pul_l request t_itl_e',
+      href: 'https://github.com/user/repo/pull/3'
     })
   })
 })
