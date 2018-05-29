@@ -27,7 +27,7 @@ describe('parseReleases', () => {
   })
 
   it('sorts releases in the correct order', () => {
-    const tags = parseReleases(commits, remotes.bitbucket, null, options).map(item => { return item.tag })
+    const tags = parseReleases(commits, remotes.bitbucket, null, options).map(item => { return item.tag })
     expect(tags).to.deep.equal(['v1.0.0', 'v0.1.0', 'v0.0.2', 'v0.0.1'])
   })
 
