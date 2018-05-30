@@ -26,6 +26,11 @@ describe('parseReleases', () => {
     expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/v1.0.0%0Dv0.1.0')
   })
 
+  it('sorts releases in the correct order', () => {
+    const tags = parseReleases(commits, remotes.bitbucket, null, options).map(item => { return item.tag })
+    expect(tags).to.deep.equal(['v1.0.0', 'v0.1.0', 'v0.0.2', 'v0.0.1'])
+  })
+
   it('includes tag prefix in compare urls', () => {
     const releases = parseReleases(commits, remotes.bitbucket, null, { ...options, tagPrefix: 'prefix-' })
     expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/prefix-v1.0.0%0Dprefix-v0.1.0')
