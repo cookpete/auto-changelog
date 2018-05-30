@@ -39,15 +39,10 @@ export function parseReleases (commits, remote, latestVersion, options) {
 }
 
 export function sortReleases (a, b) {
-  if (a.tag && b.tag) {
-    return semver.rcompare(a.tag, b.tag)
-  } else if (!b.tag) {
-    return -1
-  } else if (!a.tag) {
-    return 1
-  } else {
-    return 0
-  }
+  if (a.tag && b.tag) return semver.rcompare(a.tag, b.tag)
+  if (a.tag) return -1
+  if (b.tag) return 1
+  return 0
 }
 
 function newRelease (tag = null, date = new Date().toISOString()) {
