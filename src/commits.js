@@ -4,7 +4,7 @@ import { cmd, isLink, replaceText } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
-const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%d%n%ai%n%an%n%ae%n%B' + MESSAGE_SEPARATOR
+const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b' + MESSAGE_SEPARATOR
 const MATCH_COMMIT = /(.*)\n(?:\s\((.*)\))?\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
 const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) deletions?...)?/
 
