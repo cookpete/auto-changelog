@@ -1,6 +1,5 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-
 import remotes from './data/remotes'
 import commits from './data/commits'
 import releases from './data/releases'

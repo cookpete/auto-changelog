@@ -1,6 +1,5 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-
 import remotes from './data/remotes'
 import {
   fetchRemote,

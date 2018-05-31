@@ -1,8 +1,7 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { readFile } from 'fs-extra'
 import { join } from 'path'
-
+import { readFile } from '../src/utils'
 import remotes from './data/remotes'
 import commits from './data/commits'
 import commitsNoRemote from './data/commits-no-remote'
@@ -24,7 +23,7 @@ const options = {
 
 describe('fetchCommits', () => {
   it('fetches commits', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     mock('cmd', () => gitLog)
     expect(await fetchCommits(remotes.github, options)).to.deep.equal(commits)
     unmock('cmd')
@@ -33,29 +32,29 @@ describe('fetchCommits', () => {
 
 describe('parseCommits', () => {
   it('parses commits', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     expect(parseCommits(gitLog, remotes.github, options)).to.deep.equal(commits)
   })
 
   it('parses commits without remote', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     expect(parseCommits(gitLog, null, options)).to.deep.equal(commitsNoRemote)
   })
 
   it('parses bitbucket commits', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const commits = parseCommits(gitLog, remotes.bitbucket)
     expect(commits[0].href).to.equal('https://bitbucket.org/user/repo/commits/2401ee4706e94629f48830bab9ed5812c032734a')
   })
 
   it('supports startingCommit option', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const options = { startingCommit: '17fbef87e82889f01d8257900f7edc55b05918a2' }
     expect(parseCommits(gitLog, remotes.github, options)).to.have.length(10)
   })
 
   it('supports ignoreCommitPattern option', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const options = { ignoreCommitPattern: 'Second commit' }
     const result = parseCommits(gitLog, remotes.github, options)
     expect(result).to.have.length(commits.length - 1)
@@ -63,14 +62,14 @@ describe('parseCommits', () => {
   })
 
   it('supports breakingPattern option', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const options = { breakingPattern: 'Some breaking change' }
     const result = parseCommits(gitLog, remotes.github, options)
     expect(result.filter(c => c.breaking)).to.have.length(1)
   })
 
   it('supports replaceText option', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const options = {
       replaceText: {
         'breaking': '**BREAKING**'
@@ -82,7 +81,7 @@ describe('parseCommits', () => {
 
   it('invalid startingCommit throws an error', done => {
     const options = { startingCommit: 'not-a-hash' }
-    readFile(join(__dirname, 'data', 'git-log.txt'), 'utf-8')
+    readFile(join(__dirname, 'data', 'git-log.txt'))
       .then(gitLog => parseCommits(gitLog, remotes.github, options))
       .then(() => done('Should throw an error'))
       .catch(() => done())

@@ -1,5 +1,4 @@
 import semver from 'semver'
-
 import { cmd, isLink, replaceText } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'

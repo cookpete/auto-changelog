@@ -1,8 +1,7 @@
 import { describe, it, beforeEach, afterEach } from 'mocha'
 import { expect } from 'chai'
-import { readFile } from 'fs-extra'
 import { join } from 'path'
-
+import { readFile } from '../src/utils'
 import remotes from './data/remotes'
 import commits from './data/commits'
 import commitsNoRemote from './data/commits-no-remote'
@@ -28,7 +27,7 @@ describe('getOptions', () => {
 
 describe('run', () => {
   beforeEach(() => {
-    mock('pathExists', () => false)
+    mock('fileExists', () => false)
     mock('readJson', () => null)
     mock('fetchRemote', () => remotes.github)
     mock('fetchCommits', () => commits)
@@ -36,7 +35,7 @@ describe('run', () => {
   })
 
   afterEach(() => {
-    unmock('pathExists')
+    unmock('fileExists')
     unmock('readJson')
     unmock('fetchRemote')
     unmock('fetchCommits')
@@ -44,7 +43,7 @@ describe('run', () => {
   })
 
   it('generates a changelog', async () => {
-    const expected = await readFile(join(__dirname, 'data', 'template-compact.md'), 'utf-8')
+    const expected = await readFile(join(__dirname, 'data', 'template-compact.md'))
 
     mock('writeFile', (output, log) => {
       expect(output).to.equal('CHANGELOG.md')
@@ -58,7 +57,7 @@ describe('run', () => {
   })
 
   it('generates a changelog with no remote', async () => {
-    const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'), 'utf-8')
+    const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'))
 
     mock('fetchRemote', () => null)
     mock('fetchCommits', () => commitsNoRemote)
@@ -71,9 +70,9 @@ describe('run', () => {
   })
 
   it('uses options from package.json', async () => {
-    const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'), 'utf-8')
+    const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
 
-    mock('pathExists', () => true)
+    mock('fileExists', () => true)
     mock('readJson', () => ({
       'auto-changelog': {
         template: 'keepachangelog'
@@ -88,7 +87,7 @@ describe('run', () => {
   })
 
   it('uses version from package.json', async () => {
-    mock('pathExists', () => true)
+    mock('fileExists', () => true)
     mock('readJson', () => ({
       version: '2.0.0'
     }))
@@ -100,7 +99,7 @@ describe('run', () => {
   })
 
   it('uses version from package.json with no prefix', async () => {
-    mock('pathExists', () => true)
+    mock('fileExists', () => true)
     mock('readJson', () => ({
       version: '2.0.0'
     }))
@@ -119,7 +118,7 @@ describe('run', () => {
   })
 
   it('command line options override options from package.json', async () => {
-    mock('pathExists', () => true)
+    mock('fileExists', () => true)
     mock('readJson', () => ({
       'auto-changelog': {
         output: 'should-not-be-this.md'

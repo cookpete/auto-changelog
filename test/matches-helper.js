@@ -1,7 +1,6 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import Handlebars from 'handlebars'
-
 import releases from './data/releases'
 
 describe('matches helper', () => {

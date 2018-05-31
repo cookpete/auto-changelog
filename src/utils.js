@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { spawn } from 'child_process'
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -44,4 +45,32 @@ export function replaceText (string, options) {
   return Object.keys(options.replaceText).reduce((string, pattern) => {
     return string.replace(new RegExp(pattern, 'g'), options.replaceText[pattern])
   }, string)
+}
+
+const createCallback = (resolve, reject) => (err, data) => {
+  if (err) reject(err)
+  else resolve(data)
+}
+
+export function readFile (path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf-8', createCallback(resolve, reject))
+  })
+}
+
+export function writeFile (path, data) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(path, data, createCallback(resolve, reject))
+  })
+}
+
+export function fileExists (path) {
+  return new Promise(resolve => {
+    fs.access(path, err => resolve(!err))
+  })
+}
+
+export async function readJson (path) {
+  const json = await readFile(path)
+  return JSON.parse(json)
 }

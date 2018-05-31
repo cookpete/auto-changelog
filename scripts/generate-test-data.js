@@ -1,6 +1,5 @@
-import { readFile, writeFile } from 'fs-extra'
 import { join } from 'path'
-
+import { readFile, writeFile } from '../src/utils'
 import { __get__ } from '../src/commits'
 import { parseReleases } from '../src/releases'
 import { compileTemplate } from '../src/template'
@@ -21,7 +20,7 @@ const options = {
 }
 
 async function run () {
-  const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'), 'utf-8')
+  const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'))
   const commits = parseCommits(gitLog, remote, options)
   const releases = parseReleases(commits, remote, null, options)
   await writeFile(join(DATA_DIR, 'commits.js'), 'export default ' + JSON.stringify(commits, null, 2))

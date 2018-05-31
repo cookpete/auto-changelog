@@ -1,5 +1,4 @@
 import parseRepoURL from 'parse-github-url'
-
 import { cmd } from './utils'
 
 export async function fetchRemote (name) {

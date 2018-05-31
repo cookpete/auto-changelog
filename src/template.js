@@ -1,8 +1,6 @@
 import { join } from 'path'
-import { readFile, pathExists } from 'fs-extra'
 import Handlebars from 'handlebars'
-
-import { removeIndentation } from './utils'
+import { removeIndentation, readFile, fileExists } from './utils'
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
 
@@ -49,14 +47,14 @@ Handlebars.registerHelper('matches', function (val, pattern, options) {
 })
 
 async function getTemplate (template) {
-  if (await pathExists(template)) {
-    return readFile(template, 'utf-8')
+  if (await fileExists(template)) {
+    return readFile(template)
   }
   const path = join(TEMPLATES_DIR, template + '.hbs')
-  if (await pathExists(path) === false) {
+  if (await fileExists(path) === false) {
     throw new Error(`Template '${template}' was not found`)
   }
-  return readFile(path, 'utf-8')
+  return readFile(path)
 }
 
 export async function compileTemplate (template, data) {
