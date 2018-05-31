@@ -1,5 +1,4 @@
 import semver from 'semver'
-
 import { niceDate } from './utils'
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/

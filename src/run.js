@@ -1,14 +1,12 @@
 import { Command } from 'commander'
-import { readJson, writeFile, pathExists } from 'fs-extra'
 import semver from 'semver'
 import uniqBy from 'lodash.uniqby'
-
 import { version } from '../package.json'
 import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
 import { parseReleases, sortReleases } from './releases'
 import { compileTemplate } from './template'
-import { parseLimit } from './utils'
+import { parseLimit, readJson, writeFile, fileExists } from './utils'
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -84,7 +82,7 @@ async function getReleases (commits, remote, latestVersion, options) {
 }
 
 export default async function run (argv) {
-  const pkg = await pathExists('package.json') && await readJson('package.json')
+  const pkg = await fileExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)

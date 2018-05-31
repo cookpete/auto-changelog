@@ -1,6 +1,5 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-
 import { cmd, niceDate, removeIndentation, isLink } from '../src/utils'
 
 describe('cmd', () => {
