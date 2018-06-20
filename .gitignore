@@ -1,4 +1,4 @@
 node_modules
 npm-debug.log
 /lib
-/test/coverage
+/coverage
