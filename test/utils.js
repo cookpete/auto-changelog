@@ -1,6 +1,14 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { cmd, niceDate, removeIndentation, isLink } from '../src/utils'
+import {
+  cmd,
+  niceDate,
+  removeIndentation,
+  isLink,
+  getGitVersion,
+  __Rewire__ as mock,
+  __ResetDependency__ as unmock
+} from '../src/utils'
 
 describe('cmd', () => {
   it('runs a command', async () => {
@@ -36,5 +44,19 @@ describe('isLink', () => {
 
   it('returns false for non-links', () => {
     expect(isLink('not a link')).to.equal(false)
+  })
+})
+
+describe('getGitVersion', () => {
+  it('returns git version', async () => {
+    mock('cmd', () => 'git version 2.15.2 (Apple Git-101.1)')
+    expect(await getGitVersion()).to.equal('2.15.2')
+    unmock('cmd')
+  })
+
+  it('returns null', async () => {
+    mock('cmd', () => 'some sort of random output')
+    expect(await getGitVersion()).to.equal(null)
+    unmock('cmd')
   })
 })

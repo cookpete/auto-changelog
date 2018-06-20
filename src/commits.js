@@ -1,11 +1,12 @@
 import semver from 'semver'
-import { cmd, isLink, replaceText } from './utils'
+import { cmd, isLink, replaceText, getGitVersion } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
-const LOG_FORMAT = COMMIT_SEPARATOR + '%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b' + MESSAGE_SEPARATOR
 const MATCH_COMMIT = /(.*)\n(?:\s\((.*)\))?\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
 const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) deletions?...)?/
+const BODY_FORMAT = '%B'
+const FALLBACK_BODY_FORMAT = '%s%n%n%b'
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
 const DEFAULT_FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/(?:issues|pull|pull-requests|merge_requests)\/(\d+)))/gi
@@ -19,8 +20,15 @@ const MERGE_PATTERNS = [
 
 export async function fetchCommits (remote, options, branch = null) {
   const command = branch ? `git log ${branch}` : 'git log'
-  const log = await cmd(`${command} --shortstat --pretty=format:${LOG_FORMAT}`)
+  const format = await getLogFormat()
+  const log = await cmd(`${command} --shortstat --pretty=format:${format}`)
   return parseCommits(log, remote, options)
+}
+
+async function getLogFormat () {
+  const gitVersion = await getGitVersion()
+  const bodyFormat = gitVersion && semver.gte(gitVersion, '1.7.2') ? BODY_FORMAT : FALLBACK_BODY_FORMAT
+  return `${COMMIT_SEPARATOR}%H%n%d%n%ai%n%an%n%ae%n${bodyFormat}${MESSAGE_SEPARATOR}`
 }
 
 function parseCommits (string, remote, options = {}) {

@@ -16,6 +16,7 @@ const parseCommits = __get__('parseCommits')
 const getFixes = __get__('getFixes')
 const getMerge = __get__('getMerge')
 const getSubject = __get__('getSubject')
+const getLogFormat = __get__('getLogFormat')
 
 const options = {
   tagPrefix: ''
@@ -285,7 +286,28 @@ describe('getSubject', () => {
     const message = 'Commit message\n\nCloses ABC-1234'
     expect(getSubject(message)).to.equal('Commit message')
   })
+
   it('returns no commit message', () => {
     expect(getSubject('')).to.equal('_No commit message_')
+  })
+})
+
+describe('getLogFormat', () => {
+  it('returns modern format', async () => {
+    mock('getGitVersion', () => Promise.resolve('1.7.2'))
+    expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    unmock('cmd')
+  })
+
+  it('returns fallback format', async () => {
+    mock('getGitVersion', () => Promise.resolve('1.7.1'))
+    expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    unmock('cmd')
+  })
+
+  it('returns fallback format when null', async () => {
+    mock('getGitVersion', () => Promise.resolve(null))
+    expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    unmock('cmd')
   })
 })

@@ -16,6 +16,12 @@ export function cmd (string) {
   })
 }
 
+export async function getGitVersion () {
+  const output = await cmd('git --version')
+  const match = output.match(/\d+\.\d+\.\d+/)
+  return match ? match[0] : null
+}
+
 export function niceDate (string) {
   const date = new Date(string)
   const day = date.getUTCDate()
