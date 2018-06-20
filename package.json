@@ -5,6 +5,9 @@
   "bin": {
     "auto-changelog": "./lib/index.js"
   },
+  "engines": {
+    "git": ">=1.6.1"
+  },
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "test": "cross-env NODE_ENV=test nyc mocha test",
