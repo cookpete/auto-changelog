@@ -12,6 +12,7 @@ before_install: yarn global add greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
 script:
   - npm run lint
+  - npm run lint-markdown
   - npm run test
 after_script: greenkeeper-lockfile-upload
 after_success:
