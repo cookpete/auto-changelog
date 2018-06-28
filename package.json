@@ -5,9 +5,6 @@
   "bin": {
     "auto-changelog": "./lib/index.js"
   },
-  "engines": {
-    "git": ">=1.6.1"
-  },
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "lint-markdown": "markdownlint test/data/*.md",
