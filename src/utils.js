@@ -30,12 +30,6 @@ export function niceDate (string) {
   return `${day} ${month} ${year}`
 }
 
-export function removeIndentation (string) {
-  return string
-    .replace(/\n +/g, '\n')
-    .replace(/^ +/, '')
-}
-
 export function isLink (string) {
   return /^http/.test(string)
 }

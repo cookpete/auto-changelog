@@ -1,6 +1,6 @@
 import { join } from 'path'
 import Handlebars from 'handlebars'
-import { removeIndentation, readFile, fileExists } from './utils'
+import { readFile, fileExists } from './utils'
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
 
@@ -38,7 +38,7 @@ Handlebars.registerHelper('commit-list', function (context, options) {
     return ''
   }
 
-  return `${options.hash.heading}\n${list}`
+  return `${options.hash.heading}\n\n${list}`
 })
 
 Handlebars.registerHelper('matches', function (val, pattern, options) {
@@ -57,10 +57,20 @@ async function getTemplate (template) {
   return readFile(path)
 }
 
+function cleanTemplate (template) {
+  return template
+    // Remove indentation
+    .replace(/\n +/g, '\n')
+    .replace(/^ +/, '')
+    // Fix multiple blank lines
+    .replace(/\n\n\n+/g, '\n\n')
+    .replace(/\n\n$/, '\n')
+}
+
 export async function compileTemplate (template, data) {
   const compile = Handlebars.compile(await getTemplate(template))
   if (template === 'json') {
     return compile(data)
   }
-  return removeIndentation(compile(data))
+  return cleanTemplate(compile(data))
 }

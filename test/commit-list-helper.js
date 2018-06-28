@@ -26,7 +26,7 @@ describe('commit-list helper', () => {
       '{{/commit-list}}'
     )
     const expected =
-      '# Heading\n' +
+      '# Heading\n\n' +
       '- Commit 1\n' +
       '- Commit 2\n' +
       '- feat: Commit 3\n'
@@ -40,7 +40,7 @@ describe('commit-list helper', () => {
       '{{/commit-list}}'
     )
     const expected =
-      '# Heading\n' +
+      '# Heading\n\n' +
       '- feat: Commit 3\n'
     expect(compile({ commits })).to.equal(expected)
   })
@@ -52,7 +52,7 @@ describe('commit-list helper', () => {
       '{{/commit-list}}'
     )
     const expected =
-      '# Breaking Changes\n' +
+      '# Breaking Changes\n\n' +
       '- Commit 2\n'
     expect(compile({ commits })).to.equal(expected)
   })
@@ -64,7 +64,7 @@ describe('commit-list helper', () => {
       '{{/commit-list}}'
     )
     const expected =
-      '# Heading\n' +
+      '# Heading\n\n' +
       '- Commit 1\n' +
       '- feat: Commit 3\n'
     expect(compile({ commits })).to.equal(expected)

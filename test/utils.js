@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import {
   cmd,
   niceDate,
-  removeIndentation,
   isLink,
   getGitVersion,
   __Rewire__ as mock,
@@ -26,14 +25,6 @@ describe('niceDate', () => {
   it('formats date into nice date', () => {
     expect(niceDate(new Date(2016, 8, 2))).to.match(/^\d September 2016$/)
     expect(niceDate(new Date('2015-10-03'))).to.match(/^\d October 2015$/)
-  })
-})
-
-describe('removeIndentation', () => {
-  it('removes indentation', () => {
-    const input = '  some\n    indented\n       text'
-    const expected = 'some\nindented\ntext'
-    expect(removeIndentation(input)).to.equal(expected)
   })
 })
 
