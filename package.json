@@ -64,7 +64,7 @@
     "cross-env": "^5.1.0",
     "markdownlint-cli": "^0.10.0",
     "mocha": "^5.0.0",
-    "nyc": "^11.2.1",
+    "nyc": "^12.0.2",
     "snazzy": "^7.0.0",
     "standard": "^11.0.0"
   },
