@@ -1,5 +1,4 @@
-auto-changelog
-==============
+# auto-changelog
 
 Command line tool for generating a changelog from git tags and commit history
 
@@ -8,13 +7,11 @@ Command line tool for generating a changelog from git tags and commit history
 [![Greenkeeper](https://img.shields.io/badge/greenkeeper-enabled-brightgreen.svg)](https://greenkeeper.io)
 [![Test Coverage](https://img.shields.io/codecov/c/github/cookpete/auto-changelog.svg)](https://codecov.io/gh/CookPete/auto-changelog)
 
-
 ### Installation
 
 ```bash
 npm install -g auto-changelog
 ```
-
 
 ### Usage
 
@@ -265,14 +262,16 @@ If you are upgrading from `0.x`, the same options are still supported out of the
 
 If anything isn’t working correctly, [open an issue](https://github.com/CookPete/auto-changelog/issues).
 
-
 ### FAQ
 
 #### What’s a changelog?
+
 See [keepachangelog.com](http://keepachangelog.com).
 
 #### What does this do?
+
 The command parses your git commit history and generates a changelog based on tagged versions, merged pull requests and closed issues. See a simple example in [this very repo](CHANGELOG.md).
 
 #### Why do I need it?
+
 Because keeping a changelog can be tedious and difficult to get right. If you don’t have the patience for a hand-crafted, bespoke changelog then this makes keeping one rather easy. It also can be [automated if you’re feeling extra lazy](#what-you-might-do-if-youre-clever).
