@@ -94,7 +94,7 @@ You can also set any option in `package.json` under the `auto-changelog` key, us
 }
 ```
 
-#### Requirements
+### Requirements
 
 `auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. There are only two absolute requirements:
 
@@ -106,7 +106,7 @@ There are some less strict requirements to improve your changelog:
 - [Close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords)
 - Merge pull requests using the standard merge commit message for your platform
 
-#### What you might do if you’re clever
+### What you might do if you’re clever
 
 Install `auto-changelog` to dev dependencies:
 
@@ -135,7 +135,7 @@ Using `-p` or `--package` uses the `version` from `package.json` as the latest r
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
 
-#### Breaking changes
+### Breaking changes
 
 If you use a common pattern in your commit messages for breaking changes, use `--breaking-pattern` to highlight those commits as breaking changes in your changelog. Breaking change commits will always be listed as part of a release, regardless of any `--commit-limit` set.
 
@@ -143,7 +143,7 @@ If you use a common pattern in your commit messages for breaking changes, use `-
 auto-changelog --breaking-pattern "BREAKING CHANGE:"
 ```
 
-#### Custom templates
+### Custom templates
 
 If you aren’t happy with the default templates or want to tweak something, you can point to a [handlebars](http://handlebarsjs.com) template in your local repo. Check out the [existing templates](templates) to see what is possible.
 
@@ -180,7 +180,7 @@ To see exactly what data is passed in to the templates, you can generate a JSON 
 auto-changelog --template json --output changelog-data.json
 ```
 
-#### `commit-list` helper
+### `commit-list` helper
 
 Use `{{#commit-list}}` to render a list of commits depending on certain patterns in the commit messages:
 
@@ -207,7 +207,7 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
 | `subject` | A regex pattern to match against the commit subject only |
 | `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
 
-#### Custom issue patterns
+### Custom issue patterns
 
 By default, `auto-changelog` will parse [GitHub-style issue fixes](https://help.github.com/articles/closing-issues-using-keywords/) in your commit messages. If you use Jira or an alternative pattern in your commits to reference issues, you can pass in a custom regular expression to `--issue-pattern` along with `--issue-url`:
 
@@ -235,7 +235,7 @@ If you use a certain pattern before or after the issue number, like `fixes {id}`
 auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
 ```
 
-#### Replacing text
+### Replacing text
 
 To insert links or other markup to PR titles and commit messages that appear in the log, use the `replaceText` option in your `package.json`:
 
