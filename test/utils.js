@@ -4,10 +4,12 @@ import {
   cmd,
   niceDate,
   isLink,
+  parseUrl,
   getGitVersion,
   __Rewire__ as mock,
   __ResetDependency__ as unmock
 } from '../src/utils'
+import { URL } from 'url'
 
 describe('cmd', () => {
   it('runs a command', async () => {
@@ -49,5 +51,21 @@ describe('getGitVersion', () => {
     mock('cmd', () => 'some sort of random output')
     expect(await getGitVersion()).to.equal(null)
     unmock('cmd')
+  })
+})
+
+describe('readFile', () => {
+  it('using valid url', () => {
+    expect(parseUrl('https://github.com/CookPete/auto-changelog')).to.be.instanceof(URL)
+  })
+
+  it('using not existing domain in url', () => {
+    const parsed = parseUrl('http://gergegegeget2gargagr.com/')
+    expect(parsed).to.be.instanceof(URL)
+  })
+
+  it('using string', () => {
+    const parsed = parseUrl('compact.hbs')
+    expect(parsed).not.to.be.instanceof(URL)
   })
 })
