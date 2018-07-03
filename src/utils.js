@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { spawn } from 'child_process'
+import { URL } from 'url'
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
@@ -54,20 +55,33 @@ const createCallback = (resolve, reject) => (err, data) => {
 
 export function readFile (path) {
   return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf-8', createCallback(resolve, reject))
+    const mypath = parseUrl(path)
+    fs.readFile(mypath, 'utf-8', createCallback(resolve, reject))
   })
 }
 
 export function writeFile (path, data) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(path, data, createCallback(resolve, reject))
+    const mypath = parseUrl(path)
+    fs.writeFile(mypath, data, createCallback(resolve, reject))
   })
 }
 
 export function fileExists (path) {
   return new Promise(resolve => {
-    fs.access(path, err => resolve(!err))
+    const mypath = parseUrl(path)
+    fs.access(mypath, err => resolve(!err))
   })
+}
+
+export function parseUrl (path) {
+  let url
+  try {
+    url = new URL(path)
+  } catch (e) {
+    url = path
+  }
+  return url
 }
 
 export async function readJson (path) {
