@@ -171,6 +171,12 @@ Then just use `--template` to point to your template:
 auto-changelog --template changelog-template.hbs
 ```
 
+You can also point to an external template by passing in a URL:
+
+```bash
+auto-changelog --template https://example.com/templates/compact.hbs
+```
+
 To see exactly what data is passed in to the templates, you can generate a JSON version of the changelog:
 
 ```bash

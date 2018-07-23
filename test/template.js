@@ -27,6 +27,12 @@ describe('compileTemplate', () => {
     expect(await compileTemplate(path, { releases })).to.equal(expected)
   })
 
+  it('compiles using url path', async () => {
+    const path = 'https://raw.githubusercontent.com/CookPete/auto-changelog/master/templates/compact.hbs'
+    const expected = await readFile(join(__dirname, 'data', 'template-compact.md'))
+    expect(await compileTemplate(path, { releases })).to.equal(expected)
+  })
+
   it('throws an error when no template found', done => {
     compileTemplate('not-found', { releases })
       .then(() => done('Should throw an error'))
