@@ -1,8 +1,10 @@
 import { join } from 'path'
 import Handlebars from 'handlebars'
+import fetch from 'node-fetch'
 import { readFile, fileExists } from './utils'
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
+const MATCH_URL = /^https?:\/\/.+/
 
 Handlebars.registerHelper('json', function (object) {
   return new Handlebars.SafeString(JSON.stringify(object, null, 2))
@@ -47,6 +49,10 @@ Handlebars.registerHelper('matches', function (val, pattern, options) {
 })
 
 async function getTemplate (template) {
+  if (MATCH_URL.test(template)) {
+    const response = await fetch(template)
+    return response.text()
+  }
   if (await fileExists(template)) {
     return readFile(template)
   }
