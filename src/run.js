@@ -85,7 +85,6 @@ async function getReleases (commits, remote, latestVersion, options) {
 export default async function run (argv) {
   const pkg = await fileExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
-  console.log(options.includeScope)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
   const latestVersion = getLatestVersion(options, pkg, commits)

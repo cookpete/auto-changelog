@@ -5,6 +5,7 @@ import { readFile } from '../src/utils'
 import remotes from './data/remotes'
 import commits from './data/commits'
 import commitsNoRemote from './data/commits-no-remote'
+import commitsConventional from './data/commits-conventional'
 import run, {
   __get__,
   __Rewire__ as mock,
@@ -40,6 +41,7 @@ describe('run', () => {
     unmock('fetchRemote')
     unmock('fetchCommits')
     unmock('writeFile')
+    unmock('parseCommits')
   })
 
   it('generates a changelog', async () => {
@@ -153,6 +155,64 @@ describe('run', () => {
       expect(log).to.include('v0.2.0')
     })
     return run(['', '', '--include-branch', 'another-branch'])
+  })
+
+  it('supports includeScope option for single scope', () => {
+    mock('fetchCommits', (remote, options, branch) => {
+      return commitsConventional
+    })
+    mock('writeFile', (output, log) => {
+      expect(log).to.not.include('docs(all): add npm, circleci badge')
+      expect(log).to.not.include('docs(all): add missing link')
+      expect(log).to.include('fix(demo): add og:title meta tag')
+      expect(log).to.include('chore(component,demo): bump')
+      expect(log).to.not.include('ci(all): fix circleci persist workspace bug')
+      expect(log).to.include('chore(component,demo): release')
+      expect(log).to.not.include('Merge pull request #3 from b6pzeusbc54tvhw5jgpyw8pwz2x6gs/docs/update-readme')
+      expect(log).to.not.include('dx(all): update yarn.lock')
+      expect(log).to.include('chore(demo): update README')
+      expect(log).to.include('chore(demo,component): allow multiple scopes at commitlint')
+      expect(log).to.not.include('Merge pull request #2 from b6pzeusbc54tvhw5jgpyw8pwz2x6gs/ci/apply-circleci')
+      expect(log).to.not.include('ci(component): fix job name, regex, parameterize npm tag name')
+      expect(log).to.not.include('ci(all): support test tag publish')
+      expect(log).to.not.include('ci(all): workflows split into tagged_jobs, untagged_jobs')
+      expect(log).to.include('ci(demo): circleci add workflows')
+      expect(log).to.not.include('ci(component): change node 8 image with just test code')
+      expect(log).to.not.include('ci(component): add basic .circleci/config.yml')
+      expect(log).to.not.include('chore(all): bump demo@0.10.2')
+      expect(log).to.not.include('chore(all): update yarn.lock')
+      expect(log).to.not.include('dx(all): add commitlint, husky')
+    })
+    return run(['', '', '--include-scope', 'demo','--commit-limit','100'])
+  })
+
+  it('supports includeScope option for multiple scope', () => {
+    mock('fetchCommits', (remote, options, branch) => {
+      return commitsConventional
+    })
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('docs(all): add npm, circleci badge')
+      expect(log).to.include('docs(all): add missing link')
+      expect(log).to.include('fix(demo): add og:title meta tag')
+      expect(log).to.include('chore(component,demo): bump')
+      expect(log).to.include('ci(all): fix circleci persist workspace bug')
+      expect(log).to.include('chore(component,demo): release')
+      expect(log).to.not.include('Merge pull request #3 from b6pzeusbc54tvhw5jgpyw8pwz2x6gs/docs/update-readme')
+      expect(log).to.include('dx(all): update yarn.lock')
+      expect(log).to.include('chore(demo): update README')
+      expect(log).to.include('chore(demo,component): allow multiple scopes at commitlint')
+      expect(log).to.not.include('Merge pull request #2 from b6pzeusbc54tvhw5jgpyw8pwz2x6gs/ci/apply-circleci')
+      expect(log).to.not.include('ci(component): fix job name, regex, parameterize npm tag name')
+      expect(log).to.include('ci(all): support test tag publish')
+      expect(log).to.include('ci(all): workflows split into tagged_jobs, untagged_jobs')
+      expect(log).to.include('ci(demo): circleci add workflows')
+      expect(log).to.not.include('ci(component): change node 8 image with just test code')
+      expect(log).to.not.include('ci(component): add basic .circleci/config.yml')
+      expect(log).to.include('chore(all): bump demo@0.10.2')
+      expect(log).to.include('chore(all): update yarn.lock')
+      expect(log).to.include('dx(all): add commitlint, husky')
+    })
+    return run(['', '', '--include-scope', 'demo,all','--commit-limit','100'])
   })
 
   it('supports breakingPattern option', () => {

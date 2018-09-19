@@ -29,7 +29,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
         fixes: commit.fixes,
         commit
       })
-    } else if (filterCommit(commit, release, options.commitLimit)) {
+    } else if (filterCommit(commit, release, options.commitLimit, options.includeScope)) {
       release.commits.push(commit)
     }
   }
@@ -58,7 +58,16 @@ function newRelease (tag = null, date = new Date().toISOString()) {
   return release
 }
 
-function filterCommit (commit, release, limit) {
+function filterCommit (commit, release, limit, includeScope=[]) {
+  if( includeScope.length > 0) {
+    const scopeMatcher = /\w+?\(([\w,]+?)\): .*/
+    const matched = commit.subject.match(scopeMatcher)
+    const scopes = ((matched || [])[1] || '').split(',')
+    if( scopes.every( scope => includeScope.indexOf(scope) < 0)) {
+      return false
+    }
+  }
+
   if (commit.breaking) {
     return true
   }
