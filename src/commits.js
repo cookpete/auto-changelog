@@ -22,7 +22,21 @@ export async function fetchCommits (remote, options, branch = null) {
   const command = branch ? `git log ${branch}` : 'git log'
   const format = await getLogFormat()
   const log = await cmd(`${command} --shortstat --pretty=format:${format}`)
-  return parseCommits(log, remote, options)
+
+  let parsed = parseCommits(log, remote, options)
+  const includeScope = options.includeScope || []
+  if( includeScope.length > 0) {
+    const scopeMatcher = /\w+?\((\w+?)\): .*/
+    const isAcceptScope = scope => includeScope.indexOf(scope) > -1
+    parsed = parsed.filter( commit => {
+      const matched = commit.subject.match(scopeMatcher)
+      const scopes = ((matched || [])[1] || '').split(',')
+      return scopes.some( isAcceptScope )
+    })
+  }
+
+  console.log( JSON.stringify(parsed,null,2))
+  return parsed
 }
 
 async function getLogFormat () {

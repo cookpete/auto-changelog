@@ -34,6 +34,7 @@ function getOptions (argv, pkg) {
     .option('--starting-commit [hash]', `starting commit to use for changelog generation`)
     .option('--tag-prefix [prefix]', `prefix used in version tags`)
     .option('--include-branch [branch]', `one or more branches to include commits from, comma separated`, str => str.split(','))
+    .option('--include-scope [scope]', `one or more scopes to inculde commits from, comma separated`, str => str.split(','))
     .version(version)
     .parse(argv)
 
@@ -84,6 +85,7 @@ async function getReleases (commits, remote, latestVersion, options) {
 export default async function run (argv) {
   const pkg = await fileExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
+  console.log(options.includeScope)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
   const latestVersion = getLatestVersion(options, pkg, commits)

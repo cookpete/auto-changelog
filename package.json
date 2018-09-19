@@ -45,6 +45,7 @@
     "commander": "^2.9.0",
     "handlebars": "^4.0.11",
     "lodash.uniqby": "^4.7.0",
+    "lodash.intersection": "^4.4.0",
     "node-fetch": "^2.2.0",
     "parse-github-url": "^1.0.1",
     "semver": "^5.1.0"
