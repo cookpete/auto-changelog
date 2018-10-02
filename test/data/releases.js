@@ -83,7 +83,8 @@ export default [
         "fixes": [
           {
             "id": "4",
-            "href": "https://github.com/user/repo/issues/4"
+            "href": "https://github.com/user/repo/issues/4",
+            "author": "Pete Cook"
           }
         ],
         "commit": {
@@ -98,7 +99,8 @@ export default [
           "fixes": [
             {
               "id": "4",
-              "href": "https://github.com/user/repo/issues/4"
+              "href": "https://github.com/user/repo/issues/4",
+              "author": "Pete Cook"
             }
           ],
           "merge": null,
@@ -114,7 +116,8 @@ export default [
       {
         "id": "5",
         "message": "Should not parse #4 in PR title",
-        "href": "https://github.com/user/repo/pull/5"
+        "href": "https://github.com/user/repo/pull/5",
+        "author": "Pete Cook"
       }
     ],
     "tag": "v0.0.2",
@@ -150,11 +153,13 @@ export default [
         "fixes": [
           {
             "id": "1",
-            "href": "https://github.com/user/repo/issues/1"
+            "href": "https://github.com/user/repo/issues/1",
+            "author": "Pete Cook"
           },
           {
             "id": "2",
-            "href": "https://github.com/user/repo/issues/2"
+            "href": "https://github.com/user/repo/issues/2",
+            "author": "Pete Cook"
           }
         ],
         "commit": {
@@ -169,11 +174,13 @@ export default [
           "fixes": [
             {
               "id": "1",
-              "href": "https://github.com/user/repo/issues/1"
+              "href": "https://github.com/user/repo/issues/1",
+              "author": "Pete Cook"
             },
             {
               "id": "2",
-              "href": "https://github.com/user/repo/issues/2"
+              "href": "https://github.com/user/repo/issues/2",
+              "author": "Pete Cook"
             }
           ],
           "merge": null,
@@ -189,7 +196,8 @@ export default [
       {
         "id": "3",
         "message": "Third commit with same name as PR",
-        "href": "https://github.com/user/repo/pull/3"
+        "href": "https://github.com/user/repo/pull/3",
+        "author": "Pete Cook"
       }
     ],
     "tag": "v0.0.1",

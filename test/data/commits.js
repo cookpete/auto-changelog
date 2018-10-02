@@ -11,7 +11,8 @@ export default [
     "fixes": [
       {
         "id": "6",
-        "href": "https://github.com/user/repo/issues/6"
+        "href": "https://github.com/user/repo/issues/6",
+        "author": "Pete Cook"
       }
     ],
     "merge": null,
@@ -136,7 +137,8 @@ export default [
     "merge": {
       "id": "5",
       "message": "Should not parse #4 in PR title",
-      "href": "https://github.com/user/repo/pull/5"
+      "href": "https://github.com/user/repo/pull/5",
+      "author": "Pete Cook"
     },
     "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
     "breaking": false
@@ -170,7 +172,8 @@ export default [
     "fixes": [
       {
         "id": "4",
-        "href": "https://github.com/user/repo/issues/4"
+        "href": "https://github.com/user/repo/issues/4",
+        "author": "Pete Cook"
       }
     ],
     "merge": null,
@@ -210,7 +213,8 @@ export default [
     "merge": {
       "id": "3",
       "message": "Third commit with same name as PR",
-      "href": "https://github.com/user/repo/pull/3"
+      "href": "https://github.com/user/repo/pull/3",
+      "author": "Pete Cook"
     },
     "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
     "breaking": false
@@ -244,11 +248,13 @@ export default [
     "fixes": [
       {
         "id": "1",
-        "href": "https://github.com/user/repo/issues/1"
+        "href": "https://github.com/user/repo/issues/1",
+        "author": "Pete Cook"
       },
       {
         "id": "2",
-        "href": "https://github.com/user/repo/issues/2"
+        "href": "https://github.com/user/repo/issues/2",
+        "author": "Pete Cook"
       }
     ],
     "merge": null,

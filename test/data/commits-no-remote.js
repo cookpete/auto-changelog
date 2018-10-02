@@ -11,7 +11,8 @@ export default [
     "fixes": [
       {
         "id": "6",
-        "href": null
+        "href": null,
+        "author": "Pete Cook"
       }
     ],
     "merge": null,
@@ -136,7 +137,8 @@ export default [
     "merge": {
       "id": "5",
       "message": "Should not parse #4 in PR title",
-      "href": null
+      "href": null,
+      "author": "Pete Cook"
     },
     "href": null,
     "breaking": false
@@ -170,7 +172,8 @@ export default [
     "fixes": [
       {
         "id": "4",
-        "href": null
+        "href": null,
+        "author": "Pete Cook"
       }
     ],
     "merge": null,
@@ -210,7 +213,8 @@ export default [
     "merge": {
       "id": "3",
       "message": "Third commit with same name as PR",
-      "href": null
+      "href": null,
+      "author": "Pete Cook"
     },
     "href": null,
     "breaking": false
@@ -244,11 +248,13 @@ export default [
     "fixes": [
       {
         "id": "1",
-        "href": null
+        "href": null,
+        "author": "Pete Cook"
       },
       {
         "id": "2",
-        "href": null
+        "href": null,
+        "author": "Pete Cook"
       }
     ],
     "merge": null,

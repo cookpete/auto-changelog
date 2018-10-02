@@ -66,8 +66,8 @@ function parseCommit (commit, remote, options = {}) {
     tag: getTag(refs, options),
     subject: replaceText(getSubject(message), options),
     message: message.trim(),
-    fixes: getFixes(message, remote, options),
-    merge: getMerge(message, remote, options),
+    fixes: getFixes(message, author, remote, options),
+    merge: getMerge(message, author, remote, options),
     href: getCommitLink(hash, remote),
     breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats.trim())
@@ -105,7 +105,7 @@ function getStats (stats) {
   }
 }
 
-function getFixes (message, remote, options = {}) {
+function getFixes (message, author, remote, options = {}) {
   const pattern = getFixPattern(options)
   let fixes = []
   let match = pattern.exec(message)
@@ -113,7 +113,7 @@ function getFixes (message, remote, options = {}) {
   while (match) {
     const id = getFixID(match)
     const href = getIssueLink(match, id, remote, options.issueUrl)
-    fixes.push({ id, href })
+    fixes.push({ id, href, author })
     match = pattern.exec(message)
   }
   return fixes
@@ -135,7 +135,7 @@ function getFixPattern (options) {
   return DEFAULT_FIX_PATTERN
 }
 
-function getMerge (message, remote, options = {}) {
+function getMerge (message, author, remote, options = {}) {
   for (let pattern of MERGE_PATTERNS) {
     const match = message.match(pattern)
     if (match) {
@@ -144,7 +144,8 @@ function getMerge (message, remote, options = {}) {
       return {
         id,
         message: replaceText(message, options),
-        href: getMergeLink(id, remote)
+        href: getMergeLink(id, remote),
+        author
       }
     }
   }
