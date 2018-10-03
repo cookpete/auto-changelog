@@ -2,9 +2,7 @@ language: node_js
 node_js:
   - node
   - 8
-  - 7
   - 6
-  - 6.0
 cache:
   yarn: true
   directories:
