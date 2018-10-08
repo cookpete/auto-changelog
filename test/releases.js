@@ -22,7 +22,7 @@ describe('parseReleases', () => {
 
   it('parses bitbucket releases', () => {
     const releases = parseReleases(commits, remotes.bitbucket, null, options)
-    expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/v1.0.0%0Dv0.1.0')
+    expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/v1.0.0..v0.1.0')
   })
 
   it('sorts releases in the correct order', () => {
@@ -33,7 +33,7 @@ describe('parseReleases', () => {
 
   it('includes tag prefix in compare urls', () => {
     const releases = parseReleases(commits, remotes.bitbucket, null, { ...options, tagPrefix: 'prefix-' })
-    expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/prefix-v1.0.0%0Dprefix-v0.1.0')
+    expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/prefix-v1.0.0..prefix-v0.1.0')
   })
 
   it('supports a version override', () => {
