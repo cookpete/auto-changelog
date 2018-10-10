@@ -134,10 +134,10 @@ describe('run', () => {
   it('uses options from .auto-changelog', async () => {
     const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
     mock('fileExists', (fileName) => {
-      return fileName == '.auto-changelog'
+      return fileName === '.auto-changelog'
     })
     mock('readJson', (fileName) => {
-      return fileName == '.auto-changelog' ? {template: 'keepachangelog'} : null
+      return fileName === '.auto-changelog' ? {template: 'keepachangelog'} : null
     })
     mock('writeFile', (output, log) => {
       expect(output).to.equal('CHANGELOG.md')
@@ -149,10 +149,10 @@ describe('run', () => {
 
   it('command line options override options from .auto-changelog', async () => {
     mock('fileExists', (fileName) => {
-      return fileName == '.auto-changelog'
+      return fileName === '.auto-changelog'
     })
     mock('readJson', (fileName) => {
-      return fileName == '.auto-changelog' ? {output: 'should-not-be-this.md'} : null
+      return fileName === '.auto-changelog' ? {output: 'should-not-be-this.md'} : null
     })
     mock('writeFile', (output, log) => {
       expect(output).to.equal('should-be-this.md')
