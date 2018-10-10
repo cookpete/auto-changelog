@@ -131,6 +131,31 @@ describe('run', () => {
     return run(['', '', '--output', 'should-be-this.md'])
   })
 
+  it('uses options from .auto-changelog', async () => {
+    const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
+    mock('fileExists', path => path === '.auto-changelog')
+    mock('readJson', path => {
+      return path === '.auto-changelog' ? { template: 'keepachangelog' } : null
+    })
+    mock('writeFile', (output, log) => {
+      expect(log).to.equal(expected)
+    })
+
+    return run(['', ''])
+  })
+
+  it('command line options override options from .auto-changelog', async () => {
+    mock('fileExists', () => true)
+    mock('readJson', (path) => {
+      return path === '.auto-changelog' ? { output: 'should-not-be-this.md' } : null
+    })
+    mock('writeFile', (output, log) => {
+      expect(output).to.equal('should-be-this.md')
+    })
+
+    return run(['', '', '--output', 'should-be-this.md'])
+  })
+
   it('supports unreleased option', () => {
     mock('writeFile', (output, log) => {
       expect(log).to.include('Unreleased')
