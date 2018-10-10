@@ -14,13 +14,13 @@ import run, {
 const getOptions = __get__('getOptions')
 
 describe('getOptions', () => {
-  it('parses commit limit correctly', () => {
-    const options = getOptions(['', '', '--commit-limit', '10'])
+  it('parses commit limit correctly', async () => {
+    const options = await getOptions(['', '', '--commit-limit', '10'])
     expect(options.commitLimit).to.equal(10)
   })
 
-  it('parses false commit limit correctly', () => {
-    const options = getOptions(['', '', '--commit-limit', 'false'])
+  it('parses false commit limit correctly', async () => {
+    const options = await getOptions(['', '', '--commit-limit', 'false'])
     expect(options.commitLimit).to.equal(false)
   })
 })
