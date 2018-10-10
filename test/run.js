@@ -131,6 +131,50 @@ describe('run', () => {
     return run(['', '', '--output', 'should-be-this.md'])
   })
 
+  it('uses options from .auto-changelog', async () => {
+    const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
+    mock('fileExists', (fileName) => {
+      return fileName == '.auto-changelog'
+    })
+    mock('readJson', (fileName) => {
+      return fileName == '.auto-changelog' ? {template: 'keepachangelog'} : null
+    })
+    mock('writeFile', (output, log) => {
+      expect(output).to.equal('CHANGELOG.md')
+      expect(log).to.equal(expected)
+    })
+
+    return run(['', ''])
+  })
+
+  it('command line options override options from .auto-changelog', async () => {
+    mock('fileExists', (fileName) => {
+      return fileName == '.auto-changelog'
+    })
+    mock('readJson', (fileName) => {
+      return fileName == '.auto-changelog' ? {output: 'should-not-be-this.md'} : null
+    })
+    mock('writeFile', (output, log) => {
+      expect(output).to.equal('should-be-this.md')
+    })
+
+    return run(['', '', '--output', 'should-be-this.md'])
+  })
+
+  it('.auto-changelog is ignored if package.json options are set', async () => {
+    mock('fileExists', () => true)
+    mock('readJson', () => ({
+      'auto-changelog': {
+        output: 'should-be-this.md'
+      }
+    }))
+    mock('writeFile', (output, log) => {
+      expect(output).to.equal('should-be-this.md')
+    })
+
+    return run(['', ''])
+  })
+
   it('supports unreleased option', () => {
     mock('writeFile', (output, log) => {
       expect(log).to.include('Unreleased')
