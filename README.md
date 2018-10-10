@@ -91,6 +91,19 @@ You can also set any option in `package.json` under the `auto-changelog` key, us
 }
 ```
 
+If you'd like to use a global installation of `auto-changelog` in a non-NodeJS project that wouldn't otherwise have a `package.json` file, you can include a `.auto-changelog` file in your project root with your defaults in order to avoid needing to specify command-line options for every run:
+
+```js
+{
+  "output": "HISTORY.md",
+  "template": "keepachangelog",
+  "unreleased": true,
+  "commitLimit": false
+}
+```
+
+**Note:** You cannot use the `.auto-changelog` convention if you have already defined defaults in `package.json`.
+
 ### Requirements
 
 `auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. There are only two absolute requirements:
