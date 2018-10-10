@@ -18,15 +18,30 @@ const DEFAULT_OPTIONS = {
 
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 
-function getOptions (argv, pkg) {
+async function getConfigOptions (pkg) {
+  if (!await fileExists('.auto-changelog')) {
+    return {}
+  }
+
+  if (pkg) {
+    console.warn('Ignoring detected `.auto-changelog` config file due to presence of "auto-changelog" settings in `package.json`')
+    return {}
+  }
+
+  return await readJson('.auto-changelog') || {}
+}
+
+async function getOptions (argv, pkg) {
+  const configOptions = await getConfigOptions(pkg)
+  const resolvedOptions = Object.assign(DEFAULT_OPTIONS, configOptions)
   const options = new Command()
-    .option('-o, --output [file]', `output file, default: ${DEFAULT_OPTIONS.output}`)
-    .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
-    .option('-r, --remote [remote]', `specify git remote to use for links, default: ${DEFAULT_OPTIONS.remote}`)
+    .option('-o, --output [file]', `output file, default: ${resolvedOptions.output}`)
+    .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${resolvedOptions.template}`)
+    .option('-r, --remote [remote]', `specify git remote to use for links, default: ${resolvedOptions.remote}`)
     .option('-p, --package', 'use version from package.json as latest release')
     .option('-v, --latest-version [version]', 'use specified version as latest release')
     .option('-u, --unreleased', 'include section for unreleased changes')
-    .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
+    .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${resolvedOptions.commitLimit}`, parseLimit)
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
     .option('--breaking-pattern [regex]', `regex pattern for breaking change commits`)
@@ -42,12 +57,12 @@ function getOptions (argv, pkg) {
       throw new Error('package.json could not be found')
     }
     return {
-      ...DEFAULT_OPTIONS,
+      ...resolvedOptions,
       ...options
     }
   }
   return {
-    ...DEFAULT_OPTIONS,
+    ...resolvedOptions,
     ...pkg[PACKAGE_OPTIONS_KEY],
     ...options
   }
@@ -83,7 +98,7 @@ async function getReleases (commits, remote, latestVersion, options) {
 
 export default async function run (argv) {
   const pkg = await fileExists('package.json') && await readJson('package.json')
-  const options = getOptions(argv, pkg)
+  const options = await getOptions(argv, pkg)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
   const latestVersion = getLatestVersion(options, pkg, commits)
