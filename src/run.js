@@ -3,7 +3,7 @@ import semver from 'semver'
 import uniqBy from 'lodash.uniqby'
 import { version } from '../package.json'
 import { fetchRemote } from './remote'
-import { fetchCommits } from './commits'
+import { fetchCommits, ParseStats } from './commits'
 import { parseReleases, sortReleasesBySemver, sortReleasesByStr } from './releases'
 import { compileTemplate } from './template'
 import { parseLimit, readJson, writeFile, fileExists } from './utils'
@@ -84,13 +84,19 @@ async function getReleases (commits, remote, latestVersion, options) {
 }
 
 export default async function run (argv) {
+  let warnings = []
   const pkg = await fileExists('package.json') && await readJson('package.json')
   const options = getOptions(argv, pkg)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
+  if (ParseStats.ignoredTags) {
+    warnings.push(`(${ParseStats.ignoredTags} invalid semver tags)`)
+  }
+  console.log(ParseStats)
+
   const latestVersion = getLatestVersion(options, pkg, commits)
   const releases = await getReleases(commits, remote, latestVersion, options)
   const log = await compileTemplate(options.template, { releases })
   await writeFile(options.output, log)
-  return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`
+  return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}${warnings.length ? '. ' + warnings.join(', ') : ''}`
 }

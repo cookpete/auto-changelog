@@ -18,6 +18,10 @@ const MERGE_PATTERNS = [
   /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
 ]
 
+export const ParseStats = {
+  ignoredTags: 0
+}
+
 export async function fetchCommits (remote, options, branch = null) {
   const command = branch ? `git log ${branch}` : 'git log'
   const format = await getLogFormat()
@@ -80,8 +84,14 @@ function getTag (refs, options) {
     const prefix = `tag: ${options.tagPrefix}`
     if (ref.indexOf(prefix) === 0) {
       const version = ref.replace(prefix, '')
-      if (options.disableSemver || semver.valid(version)) {
+      if (options.disableSemver) {
         return version
+      } else {
+        if (semver.valid(version)) {
+          return version
+        } else {
+          ParseStats.ignoredTags++
+        }
       }
     }
   }
