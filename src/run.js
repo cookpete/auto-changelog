@@ -92,8 +92,6 @@ export default async function run (argv) {
   if (ParseStats.ignoredTags) {
     warnings.push(`(${ParseStats.ignoredTags} invalid semver tags)`)
   }
-  console.log(ParseStats)
-
   const latestVersion = getLatestVersion(options, pkg, commits)
   const releases = await getReleases(commits, remote, latestVersion, options)
   const log = await compileTemplate(options.template, { releases })
