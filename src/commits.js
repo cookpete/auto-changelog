@@ -80,7 +80,7 @@ function getTag (refs, options) {
     const prefix = `tag: ${options.tagPrefix}`
     if (ref.indexOf(prefix) === 0) {
       const version = ref.replace(prefix, '')
-      if (semver.valid(version)) {
+      if (options.disableSemver || semver.valid(version)) {
         return version
       }
     }

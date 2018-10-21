@@ -17,7 +17,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
             remote
           ),
           commits: release.commits.sort(sortCommits),
-          major: commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
+          major: !options.disableSemver && commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
       }
       release = newRelease(commit.tag, commit.date)
@@ -37,8 +37,15 @@ export function parseReleases (commits, remote, latestVersion, options) {
   return releases
 }
 
-export function sortReleases (a, b) {
+export function sortReleasesBySemver (a, b) {
   if (a.tag && b.tag) return semver.rcompare(a.tag, b.tag)
+  if (a.tag) return 1
+  if (b.tag) return -1
+  return 0
+}
+
+export function sortReleasesByStr (a, b) {
+  if (a.tag && b.tag) return b.tag.localeCompare(a.tag)
   if (a.tag) return 1
   if (b.tag) return -1
   return 0

@@ -4,7 +4,7 @@ import uniqBy from 'lodash.uniqby'
 import { version } from '../package.json'
 import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
-import { parseReleases, sortReleases } from './releases'
+import { parseReleases, sortReleasesBySemver, sortReleasesByStr } from './releases'
 import { compileTemplate } from './template'
 import { parseLimit, readJson, writeFile, fileExists } from './utils'
 
@@ -13,7 +13,8 @@ const DEFAULT_OPTIONS = {
   template: 'compact',
   remote: 'origin',
   commitLimit: 3,
-  tagPrefix: ''
+  tagPrefix: '',
+  disableSemver: false
 }
 
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
@@ -28,6 +29,7 @@ function getOptions (argv, pkg) {
     .option('-u, --unreleased', 'include section for unreleased changes')
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-i, --issue-url [url]', `override url for issues, use {id} for issue id`)
+    .option('-d, --disable-semver', `disable semantic versioning (semver), uses raw tags`)
     .option('--issue-pattern [regex]', `override regex pattern for issues in commit messages`)
     .option('--breaking-pattern [regex]', `regex pattern for breaking change commits`)
     .option('--ignore-commit-pattern [regex]', `pattern to ignore when parsing commits`)
@@ -78,7 +80,7 @@ async function getReleases (commits, remote, latestVersion, options) {
       ]
     }
   }
-  return uniqBy(releases, 'tag').sort(sortReleases)
+  return uniqBy(releases, 'tag').sort(options.disableSemver ? sortReleasesByStr : sortReleasesBySemver)
 }
 
 export default async function run (argv) {
