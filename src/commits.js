@@ -172,6 +172,9 @@ function getIssueLink (match, id, remote, issueUrl) {
   if (issueUrl) {
     return issueUrl.replace('{id}', id)
   }
+  if (/dev.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
+    return `${remote.project}/_workitems/edit/${id}`
+  }
   return `${remote.url}/issues/${id}`
 }
 
@@ -184,6 +187,9 @@ function getMergeLink (id, remote) {
   }
   if (/gitlab/.test(remote.hostname)) {
     return `${remote.url}/merge_requests/${id}`
+  }
+  if (/dev.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
+    return `${remote.url}/pullrequest/${id}`
   }
   return `${remote.url}/pull/${id}`
 }

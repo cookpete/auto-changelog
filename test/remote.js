@@ -49,6 +49,14 @@ const TEST_DATA = [
   {
     remote: 'git@bitbucket.org:user/repo.git',
     expected: remotes.bitbucket
+  },
+  {
+    remote: 'https://dev.azure.com/organization/project/_git/repo',
+    expected: remotes.azure
+  },
+  {
+    remote: 'https://organization.visualstudio.com/project/_git/repo',
+    expected: remotes.visualstudio
   }
 ]
 
