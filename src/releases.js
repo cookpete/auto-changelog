@@ -88,12 +88,7 @@ function getCompareLink (from, to, remote) {
     return `${remote.url}/compare/${to}..${from}`
   }
   if (/dev.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
-    // Azure prefixes branches with 'GB' and tags with 'GT', this is not the best way to handle it, but its something
-    // If string starts with 'v' or number, then is a Tag, else, is a branch
-    to = to.substring(0, 1) === 'v' || Number(to) ? `GT${to}` : `GB${to}`
-    from = from.substring(0, 1) === 'v' ? `GT${from}` : `GB${from}`
-
-    return `${remote.url}/branches?baseVersion=${to}&targetVersion=${from}&_a=commits`
+    return `${remote.url}/branches?baseVersion=GT${to}&targetVersion=GT${from}&_a=commits`
   }
   return `${remote.url}/compare/${from}...${to}`
 }
