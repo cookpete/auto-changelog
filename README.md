@@ -36,6 +36,7 @@ Options:
       --starting-commit [hash]        # starting commit to use for changelog generation
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --include-branch [branch]       # one or more branches to include commits from, comma separated
+      --release-summary               # display tagged commit message body as release summary
   -V, --version                       # output the version number
   -h, --help                          # output usage information
 

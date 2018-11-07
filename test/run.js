@@ -169,6 +169,13 @@ describe('run', () => {
     return run(['', '', '--commit-limit', '0'])
   })
 
+  it('supports releaseSummary option', () => {
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('This is my major release description.\n\n- And a bullet point')
+    })
+    return run(['', '', '--release-summary'])
+  })
+
   it('does not error when using latest version option', () => {
     return run(['', '', '--latest-version', 'v3.0.0'])
   })

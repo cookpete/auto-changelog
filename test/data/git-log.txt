@@ -15,6 +15,10 @@ __AUTO_CHANGELOG_COMMIT_SEPARATOR__77bb243170408cd18e70ca05bf8b3ca7646ea437
 Pete Cook
 email@example.com
 1.0.0
+
+This is my major release description.
+
+- And a bullet point
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
  2 files changed, 8 insertions(+), 2 deletions(-)
 

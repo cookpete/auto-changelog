@@ -20,6 +20,11 @@ describe('parseReleases', () => {
     expect(parseReleases(commits, remotes.github, null, { ...options, commitLimit: false })).to.deep.equal(releases)
   })
 
+  it('parses releases with summary', () => {
+    const releases = parseReleases(commits, remotes.bitbucket, null, { ...options, releaseSummary: true })
+    expect(releases[0].summary).to.equal('This is my major release description.\n\n- And a bullet point')
+  })
+
   it('parses bitbucket releases', () => {
     const releases = parseReleases(commits, remotes.bitbucket, null, options)
     expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/v1.0.0..v0.1.0')

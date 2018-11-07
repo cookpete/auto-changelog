@@ -30,7 +30,7 @@ export default [
     "date": "2015-12-15T12:03:09.000Z",
     "tag": "v1.0.0",
     "subject": "1.0.0",
-    "message": "1.0.0",
+    "message": "1.0.0\n\nThis is my major release description.\n\n- And a bullet point",
     "fixes": null,
     "merge": null,
     "href": "https://github.com/user/repo/commit/77bb243170408cd18e70ca05bf8b3ca7646ea437",

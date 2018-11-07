@@ -30,7 +30,7 @@ export default [
     "date": "2015-12-15T12:03:09.000Z",
     "tag": "v1.0.0",
     "subject": "1.0.0",
-    "message": "1.0.0",
+    "message": "1.0.0\n\nThis is my major release description.\n\n- And a bullet point",
     "fixes": null,
     "merge": null,
     "href": null,
