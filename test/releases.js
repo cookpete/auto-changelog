@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import remotes from './data/remotes'
 import commits from './data/commits'
 import releases from './data/releases'
-import { parseReleases } from '../src/releases'
+import { parseReleases, sortReleases } from '../src/releases'
 
 const options = {
   unreleased: false,
@@ -45,5 +45,19 @@ describe('parseReleases', () => {
     const releases = parseReleases(commits, remotes.github, 'v3.0.0', options)
     expect(releases).to.be.an('array')
     expect(releases[0]).to.have.property('tag', 'v3.0.0')
+  })
+})
+
+describe('sortReleases', () => {
+  it('compares semver tags', () => {
+    expect(sortReleases({ tag: '1.0.0' }, { tag: '0.1.0' })).to.equal(-1)
+    expect(sortReleases({ tag: '0.1.0' }, { tag: '1.0.0' })).to.equal(1)
+    expect(sortReleases({ tag: '0.1.0' }, { tag: '0.1.0' })).to.equal(0)
+  })
+
+  it('supports null tags', () => {
+    expect(sortReleases({ tag: '0.1.0' }, { tag: null })).to.equal(1)
+    expect(sortReleases({ tag: null }, { tag: '0.1.0' })).to.equal(-1)
+    expect(sortReleases({ tag: null }, { tag: null })).to.equal(-0)
   })
 })
