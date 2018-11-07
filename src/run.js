@@ -16,9 +16,11 @@ const DEFAULT_OPTIONS = {
   tagPrefix: ''
 }
 
+const PACKAGE_FILE = 'package.json'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
+const OPTIONS_DOTFILE = '.auto-changelog'
 
-function getOptions (argv, pkg) {
+function getOptions (argv, pkg, dotOptions) {
   const options = new Command()
     .option('-o, --output [file]', `output file, default: ${DEFAULT_OPTIONS.output}`)
     .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
@@ -44,11 +46,13 @@ function getOptions (argv, pkg) {
     }
     return {
       ...DEFAULT_OPTIONS,
+      ...dotOptions,
       ...options
     }
   }
   return {
     ...DEFAULT_OPTIONS,
+    ...dotOptions,
     ...pkg[PACKAGE_OPTIONS_KEY],
     ...options
   }
@@ -83,8 +87,9 @@ async function getReleases (commits, remote, latestVersion, options) {
 }
 
 export default async function run (argv) {
-  const pkg = await fileExists('package.json') && await readJson('package.json')
-  const options = getOptions(argv, pkg)
+  const pkg = await fileExists(PACKAGE_FILE) && await readJson(PACKAGE_FILE)
+  const dotOptions = await fileExists(OPTIONS_DOTFILE) && await readJson(OPTIONS_DOTFILE)
+  const options = getOptions(argv, pkg, dotOptions)
   const remote = await fetchRemote(options.remote)
   const commits = await fetchCommits(remote, options)
   const latestVersion = getLatestVersion(options, pkg, commits)

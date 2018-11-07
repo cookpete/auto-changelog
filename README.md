@@ -92,6 +92,19 @@ You can also set any option in `package.json` under the `auto-changelog` key, us
 }
 ```
 
+You can also store config options in an `.auto-changelog` file in your project root:
+
+```js
+{
+  "output": "HISTORY.md",
+  "template": "keepachangelog",
+  "unreleased": true,
+  "commitLimit": false
+}
+```
+
+Note that any options set in `package.json` will take precedence over any set in `.auto-changelog`.
+
 ### Requirements
 
 `auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. There are only two absolute requirements:
