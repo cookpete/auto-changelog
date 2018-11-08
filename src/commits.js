@@ -79,9 +79,15 @@ function getTag (refs, options) {
   for (let ref of refs.split(', ')) {
     const prefix = `tag: ${options.tagPrefix}`
     if (ref.indexOf(prefix) === 0) {
-      const version = ref.replace(prefix, '')
-      if (semver.valid(version)) {
-        return version
+      const tag = ref.replace(prefix, '')
+      if (options.tagPattern) {
+        if (new RegExp(options.tagPattern).test(tag)) {
+          return tag
+        }
+        return null
+      }
+      if (semver.valid(tag)) {
+        return tag
       }
     }
   }

@@ -18,7 +18,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
             remote
           ),
           commits: release.commits.sort(sortCommits),
-          major: commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
+          major: !options.tagPattern && commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
       }
       const summary = getSummary(commit.message, options.releaseSummary)

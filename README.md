@@ -33,8 +33,9 @@ Options:
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
-      --starting-commit [hash]        # starting commit to use for changelog generation
+      --tag-pattern [regex]           # override regex pattern for release tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
+      --starting-commit [hash]        # starting commit to use for changelog generation
       --include-branch [branch]       # one or more branches to include commits from, comma separated
       --release-summary               # display tagged commit message body as release summary
   -V, --version                       # output the version number
@@ -72,6 +73,16 @@ Use `--tag-prefix [prefix]` if you prefix your version tags with a certain strin
 ```bash
 # When all versions are tagged like my-package/1.2.3
 auto-changelog --tag-prefix my-package/
+```
+
+By default, `auto-changelog` looks for valid semver tags to build a list of releases. If you are using another format (or want to include all tags), use `--tag-pattern [regex]`:
+
+```bash
+# When all versions are tagged like build-12345
+auto-changelog --tag-pattern build-\d+
+
+# Include any tag as a release
+auto-changelog --tag-pattern .+
 ```
 
 You can also set any option in `package.json` under the `auto-changelog` key, using camelCase options:
