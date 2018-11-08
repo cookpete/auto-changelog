@@ -20,7 +20,7 @@ export async function fetchRemote (name) {
   }
 
   if (/dev.azure/.test(hostname)) {
-    repo = `${remote.path}`
+    repo = remote.path
     project = remote.repo
   }
 
