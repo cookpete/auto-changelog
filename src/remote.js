@@ -11,27 +11,33 @@ export async function fetchRemote (name) {
   const remote = parseRepoURL(remoteURL)
   const protocol = remote.protocol === 'http:' ? 'http:' : 'https:'
   const hostname = remote.hostname || remote.host
-  let repo = remote.repo
-  let project = remote.repo
 
   if (/gitlab/.test(hostname) && /\.git$/.test(remote.branch)) {
     // Support gitlab subgroups
-    repo = `${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
+    return {
+      hostname,
+      url: `${protocol}//${hostname}/${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
+    }
   }
 
-  if (/dev.azure/.test(hostname)) {
-    repo = remote.path
-    project = remote.repo
+  if (/dev\.azure/.test(hostname)) {
+    return {
+      hostname,
+      url: `${protocol}//${hostname}/${remote.path}`,
+      projectUrl: `${protocol}//${hostname}/${remote.repo}`
+    }
   }
 
   if (/visualstudio/.test(hostname)) {
-    repo = `${remote.repo}/${remote.branch}`
-    project = remote.owner
+    return {
+      hostname,
+      url: `${protocol}//${hostname}/${remote.repo}/${remote.branch}`,
+      projectUrl: `${protocol}//${hostname}/${remote.owner}`
+    }
   }
 
   return {
     hostname,
-    url: `${protocol}//${hostname}/${repo}`,
-    project: `${protocol}//${hostname}/${project}`
+    url: `${protocol}//${hostname}/${remote.repo}`
   }
 }

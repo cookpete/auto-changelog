@@ -59,7 +59,7 @@ auto-changelog --commit-limit 5
 auto-changelog --commit-limit false
 ```
 
-By default, changelogs will link to the appropriate pages for commits, issues and merge requests based on the `origin` remote of your repo. GitHub, BitBucket and GitLab are all supported. If you [close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords) but refer to issues outside of your repository, you can use `--issue-url` to link somewhere else:
+By default, changelogs will link to the appropriate pages for commits, issues and merge requests based on the `origin` remote of your repo. GitHub, GitLab, BitBucket and Azure DevOps are all supported. If you [close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords) but refer to issues outside of your repository, you can use `--issue-url` to link somewhere else:
 
 ```bash
 # Link all issues to redmine

@@ -14,11 +14,11 @@ export default {
   azure: {
     hostname: 'dev.azure.com',
     url: 'https://dev.azure.com/user/project/_git/repo',
-    project: 'https://dev.azure.com/user/project'
+    projectUrl: 'https://dev.azure.com/user/project'
   },
   visualstudio: {
     hostname: 'user.visualstudio.com',
     url: 'https://user.visualstudio.com/project/_git/repo',
-    project: 'https://user.visualstudio.com/project'
+    projectUrl: 'https://user.visualstudio.com/project'
   }
 }

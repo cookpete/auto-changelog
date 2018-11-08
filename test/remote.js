@@ -64,7 +64,7 @@ describe('fetchRemote', () => {
   for (let test of TEST_DATA) {
     it(`parses ${test.remote}`, async () => {
       mock('cmd', () => test.remote)
-      expect(await fetchRemote('origin')).to.include(test.expected)
+      expect(await fetchRemote('origin')).to.deep.equal(test.expected)
       unmock('cmd')
     })
   }
