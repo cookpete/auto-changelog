@@ -87,6 +87,9 @@ function getCompareLink (from, to, remote) {
   if (/bitbucket/.test(remote.hostname)) {
     return `${remote.url}/compare/${to}..${from}`
   }
+  if (/dev\.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
+    return `${remote.url}/branches?baseVersion=GT${to}&targetVersion=GT${from}&_a=commits`
+  }
   return `${remote.url}/compare/${from}...${to}`
 }
 
