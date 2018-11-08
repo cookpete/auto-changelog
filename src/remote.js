@@ -17,7 +17,6 @@ export async function fetchRemote (name) {
   if (/gitlab/.test(hostname) && /\.git$/.test(remote.branch)) {
     // Support gitlab subgroups
     repo = `${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
-    project = `${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
   }
 
   if (/dev.azure/.test(hostname)) {
