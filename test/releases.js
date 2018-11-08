@@ -8,6 +8,7 @@ import { parseReleases, sortReleases } from '../src/releases'
 const options = {
   unreleased: false,
   commitLimit: 3,
+  backfillLimit: 3,
   tagPrefix: ''
 }
 
@@ -18,6 +19,19 @@ describe('parseReleases', () => {
 
   it('parses releases with no commit limit', () => {
     expect(parseReleases(commits, remotes.github, null, { ...options, commitLimit: false })).to.deep.equal(releases)
+  })
+
+  it('parses releases with backfill limit', () => {
+    const releases = parseReleases(commits, remotes.github, null, {
+      ...options,
+      commitLimit: 0,
+      backfillLimit: 1
+    })
+    for (const release of releases) {
+      if (release.fixes.length === 0 && release.merges.length === 0) {
+        expect(release.commits.length).to.equal(1)
+      }
+    }
   })
 
   it('parses releases with summary', () => {

@@ -17,7 +17,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
             release.tag ? `${options.tagPrefix}${release.tag}` : 'HEAD',
             remote
           ),
-          commits: release.commits.sort(sortCommits),
+          commits: sliceCommits(release.commits.sort(sortCommits), options, release),
           major: !options.tagPattern && commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
       }
@@ -76,10 +76,7 @@ function filterCommit (commit, release, limit) {
     // Filter out commits with the same message as an existing merge
     return false
   }
-  if (limit === false) {
-    return true
-  }
-  return release.commits.length < limit
+  return true
 }
 
 function getCompareLink (from, to, remote) {
@@ -109,4 +106,13 @@ function sortCommits (a, b) {
   if (!a.breaking && b.breaking) return -1
   if (a.breaking && !b.breaking) return 1
   return (b.insertions + b.deletions) - (a.insertions + a.deletions)
+}
+
+function sliceCommits (commits, options, release) {
+  if (options.commitLimit === false) {
+    return commits
+  }
+  const emptyRelease = release.fixes.length === 0 && release.merges.length === 0
+  const limit = emptyRelease ? options.backfillLimit : options.commitLimit
+  return commits.slice(0, limit)
 }

@@ -29,6 +29,7 @@ Options:
   -v, --latest-version [version]      # use specified version as latest release
   -u, --unreleased                    # include section for unreleased changes
   -l, --commit-limit [count]          # number of commits to display per release, default: 3
+  -b, --backfill-limit [count]        # number of commits to backfill empty releases with, default: 3
   -i, --issue-url [url]               # override url for issues, use {id} for issue id
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
       --breaking-pattern [regex]      # regex pattern for breaking change commits
