@@ -13,10 +13,12 @@ export default {
   },
   azure: {
     hostname: 'dev.azure.com',
-    url: 'https://dev.azure.com/organization/project/_git/repo'
+    url: 'https://dev.azure.com/user/project/_git/repo',
+    project: 'https://dev.azure.com/user/project'
   },
   visualstudio: {
-    hostname: 'organization.visualstudio.com',
-    url: 'https://organization.visualstudio.com/project/_git/repo'
+    hostname: 'user.visualstudio.com',
+    url: 'https://user.visualstudio.com/project/_git/repo',
+    project: 'https://user.visualstudio.com/project'
   }
 }
