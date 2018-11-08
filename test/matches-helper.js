@@ -59,7 +59,7 @@ describe('matches helper', () => {
         shorthash: '12cd728',
         message: 'Nope'
       }
-    ]}]
+    ] }]
     const matches =
       '{{#matches message "BREAKING CHANGE"}}\n' +
         '- {{shorthash}}\n' +
