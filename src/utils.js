@@ -3,14 +3,31 @@ import { spawn } from 'child_process'
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+export function log (string, clearLine = true) {
+  if (clearLine) {
+    process.stdout.clearLine()
+    process.stdout.cursorTo(0)
+  }
+  process.stdout.write(`auto-changelog: ${string}`)
+}
+
+export function formatBytes (bytes) {
+  return `${Math.max(1, Math.round(bytes / 1024))} kB`
+}
+
 // Simple util for calling a child process
-export function cmd (string) {
+export function cmd (string, onProgress) {
   const [ cmd, ...args ] = string.split(' ')
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, args)
     let data = ''
 
-    child.stdout.on('data', buffer => { data += buffer.toString() })
+    child.stdout.on('data', buffer => {
+      data += buffer.toString()
+      if (onProgress) {
+        onProgress(data.length)
+      }
+    })
     child.stdout.on('end', () => resolve(data))
     child.on('error', reject)
   })

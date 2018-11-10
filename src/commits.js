@@ -18,10 +18,10 @@ const MERGE_PATTERNS = [
   /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
 ]
 
-export async function fetchCommits (remote, options, branch = null) {
+export async function fetchCommits (remote, options, branch = null, onProgress) {
   const command = branch ? `git log ${branch}` : 'git log'
   const format = await getLogFormat()
-  const log = await cmd(`${command} --shortstat --pretty=format:${format}`)
+  const log = await cmd(`${command} --shortstat --pretty=format:${format}`, onProgress)
   return parseCommits(log, remote, options)
 }
 

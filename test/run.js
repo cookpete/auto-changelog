@@ -32,6 +32,7 @@ describe('run', () => {
     mock('fetchRemote', () => remotes.github)
     mock('fetchCommits', () => commits)
     mock('writeFile', () => {})
+    mock('log', () => {})
   })
 
   afterEach(() => {
@@ -40,6 +41,7 @@ describe('run', () => {
     unmock('fetchRemote')
     unmock('fetchCommits')
     unmock('writeFile')
+    unmock('log')
   })
 
   it('generates a changelog', async () => {
@@ -50,10 +52,7 @@ describe('run', () => {
       expect(log).to.equal(expected)
     })
 
-    return run(['', '']).then(message => {
-      expect(message).to.be.a('string')
-      expect(message).to.have.string('bytes written to')
-    })
+    return run(['', ''])
   })
 
   it('generates a changelog with no remote', async () => {

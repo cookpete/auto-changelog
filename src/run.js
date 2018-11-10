@@ -6,7 +6,7 @@ import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
 import { parseReleases, sortReleases } from './releases'
 import { compileTemplate } from './template'
-import { parseLimit, readJson, writeFile, fileExists } from './utils'
+import { parseLimit, readJson, writeFile, fileExists, log, formatBytes } from './utils'
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -90,14 +90,19 @@ async function getReleases (commits, remote, latestVersion, options) {
 }
 
 export default async function run (argv) {
+  log('Fetching config…')
   const pkg = await fileExists(PACKAGE_FILE) && await readJson(PACKAGE_FILE)
   const dotOptions = await fileExists(OPTIONS_DOTFILE) && await readJson(OPTIONS_DOTFILE)
   const options = getOptions(argv, pkg, dotOptions)
+  log('Fetching remote…')
   const remote = await fetchRemote(options.remote)
-  const commits = await fetchCommits(remote, options)
+  const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
+  const commits = await fetchCommits(remote, options, null, commitProgress)
+  log('Generating changelog…')
   const latestVersion = getLatestVersion(options, pkg, commits)
   const releases = await getReleases(commits, remote, latestVersion, options)
-  const log = await compileTemplate(options.template, { releases })
-  await writeFile(options.output, log)
-  return `${Buffer.byteLength(log, 'utf8')} bytes written to ${options.output}`
+  const changelog = await compileTemplate(options.template, { releases })
+  await writeFile(options.output, changelog)
+  const bytes = Buffer.byteLength(changelog, 'utf8')
+  log(`${formatBytes(bytes)} written to ${options.output}\n`)
 }
