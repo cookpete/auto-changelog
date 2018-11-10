@@ -1,17 +1,34 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import {
+  log,
   cmd,
   niceDate,
   isLink,
   getGitVersion,
+  readFile,
+  writeFile,
+  fileExists,
+  readJson,
   __Rewire__ as mock,
   __ResetDependency__ as unmock
 } from '../src/utils'
 
+describe('log', () => {
+  it('doesn\'t error', async () => {
+    log('Test', false)
+    log('Test')
+  })
+})
+
 describe('cmd', () => {
   it('runs a command', async () => {
     const result = await cmd('node --version')
+    expect(result).to.be.a('string')
+  })
+
+  it('runs onProgress', async () => {
+    const result = await cmd('node --version', bytes => expect(bytes).to.be.a('number'))
     expect(result).to.be.a('string')
   })
 })
@@ -48,6 +65,38 @@ describe('getGitVersion', () => {
   it('returns null', async () => {
     mock('cmd', () => 'some sort of random output')
     expect(await getGitVersion()).to.equal(null)
+    unmock('cmd')
+  })
+})
+
+describe('readFile', () => {
+  it('reads file', async () => {
+    mock('fs', { readFile: (path, type, cb) => cb(null, 'abc') })
+    expect(await readFile()).to.equal('abc')
+    unmock('cmd')
+  })
+})
+
+describe('writeFile', () => {
+  it('reads file', async () => {
+    mock('fs', { writeFile: (path, data, cb) => cb(null, 'abc') })
+    expect(await writeFile()).to.equal('abc')
+    unmock('fs')
+  })
+})
+
+describe('fileExists', () => {
+  it('reads file', async () => {
+    mock('fs', { access: (path, cb) => cb(null) })
+    expect(await fileExists()).to.equal(true)
+    unmock('fs')
+  })
+})
+
+describe('readJson', () => {
+  it('reads file', async () => {
+    mock('fs', { readFile: (path, type, cb) => cb(null, '{"abc":123}') })
+    expect(await readJson()).to.deep.equal({ abc: 123 })
     unmock('cmd')
   })
 })

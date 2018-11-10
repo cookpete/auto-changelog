@@ -44,6 +44,16 @@ describe('parseReleases', () => {
     expect(releases[0].href).to.equal('https://bitbucket.org/user/repo/compare/v1.0.0..v0.1.0')
   })
 
+  it('parses azure devops releases', () => {
+    const releases = parseReleases(commits, remotes.azure, null, options)
+    expect(releases[0].href).to.equal('https://dev.azure.com/user/project/_git/repo/branches?baseVersion=GTv1.0.0&targetVersion=GTv0.1.0&_a=commits')
+  })
+
+  it('parses visual studio releases', () => {
+    const releases = parseReleases(commits, remotes.visualstudio, null, options)
+    expect(releases[0].href).to.equal('https://user.visualstudio.com/project/_git/repo/branches?baseVersion=GTv1.0.0&targetVersion=GTv0.1.0&_a=commits')
+  })
+
   it('sorts releases in the correct order', () => {
     const releases = parseReleases(commits, remotes.bitbucket, null, { ...options, unreleased: true })
     const tags = releases.map(item => item.tag)

@@ -132,20 +132,6 @@ describe('getFixes', () => {
     ])
   })
 
-  it('parses a commit that closes a bitbucket pull request', () => {
-    const message = 'Commit message\n\nCloses https://github.com/user/repo/pull-requests/14'
-    expect(getFixes(message, 'Commit Author', remotes.github)).to.deep.equal([
-      { id: '14', href: 'https://github.com/user/repo/pull-requests/14', author: 'Commit Author' }
-    ])
-  })
-
-  it('parses a commit that closes a gitlab pull request', () => {
-    const message = 'Commit message\n\nCloses https://github.com/user/repo/merge_requests/14'
-    expect(getFixes(message, 'Commit Author', remotes.github)).to.deep.equal([
-      { id: '14', href: 'https://github.com/user/repo/merge_requests/14', author: 'Commit Author' }
-    ])
-  })
-
   it('parses multiple fixes', () => {
     const message = 'Commit message\n\nFixes #1, fix #2, resolved #3, closes #4'
     expect(getFixes(message, 'Commit Author', remotes.github)).to.deep.equal([
@@ -175,6 +161,20 @@ describe('getFixes', () => {
     const message = 'Commit message\n\nFixes https://github.com/other-user/external-repo/issues/1'
     expect(getFixes(message, 'Commit Author', remotes.github)).to.deep.equal([
       { id: '1', href: 'https://github.com/other-user/external-repo/issues/1', author: 'Commit Author' }
+    ])
+  })
+
+  it('parses azure devops fix', () => {
+    const message = 'Commit message\n\nCloses #123'
+    expect(getFixes(message, 'Commit Author', remotes.azure)).to.deep.equal([
+      { id: '123', href: 'https://dev.azure.com/user/project/_workitems/edit/123', author: 'Commit Author' }
+    ])
+  })
+
+  it('parses visual studio fix', () => {
+    const message = 'Commit message\n\nCloses #123'
+    expect(getFixes(message, 'Commit Author', remotes.visualstudio)).to.deep.equal([
+      { id: '123', href: 'https://user.visualstudio.com/project/_workitems/edit/123', author: 'Commit Author' }
     ])
   })
 
@@ -218,7 +218,7 @@ describe('getMerge', () => {
     expect(getMerge(message, 'Commit Author', remotes.github)).to.equal(null)
   })
 
-  describe('GitHub', () => {
+  describe('github', () => {
     it('parses a merge', () => {
       const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
       expect(getMerge(message, 'Commit Author', remotes.github)).to.deep.equal({
@@ -250,7 +250,7 @@ describe('getMerge', () => {
     })
   })
 
-  describe('GitLab', () => {
+  describe('gitlab', () => {
     it('parses a merge', () => {
       const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007'
       expect(getMerge(message, 'Commit Author', remotes.gitlab)).to.deep.equal({
@@ -276,13 +276,39 @@ describe('getMerge', () => {
     })
   })
 
-  describe('BitBucket', () => {
+  describe('bitbucket', () => {
     it('parses a merge', () => {
       const message = 'Merged in eshvedai/fix-schema-issue (pull request #4518)\n\nfix(component): re-export createSchema from editor-core\n\nApproved-by: Scott Sidwell <ssidwell@atlassian.com>'
       expect(getMerge(message, 'Commit Author', remotes.bitbucket)).to.deep.equal({
         id: '4518',
         message: 'fix(component): re-export createSchema from editor-core',
         href: 'https://bitbucket.org/user/repo/pull-requests/4518',
+        author: 'Commit Author'
+      })
+    })
+  })
+
+  describe('azure devops', () => {
+    it('parses a merge', () => {
+      // Use github merge message until we can find out what an azure devops one looks like
+      const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
+      expect(getMerge(message, 'Commit Author', remotes.azure)).to.deep.equal({
+        id: '3',
+        message: 'Pull request title',
+        href: 'https://dev.azure.com/user/project/_git/repo/pullrequest/3',
+        author: 'Commit Author'
+      })
+    })
+  })
+
+  describe('visual studio', () => {
+    it('parses a merge', () => {
+      // Use github merge message until we can find out what a visual studio one looks like
+      const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
+      expect(getMerge(message, 'Commit Author', remotes.visualstudio)).to.deep.equal({
+        id: '3',
+        message: 'Pull request title',
+        href: 'https://user.visualstudio.com/project/_git/repo/pullrequest/3',
         author: 'Commit Author'
       })
     })
