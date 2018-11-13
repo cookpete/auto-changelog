@@ -1,3 +1,4 @@
+import readline from 'readline'
 import fs from 'fs'
 import { spawn } from 'child_process'
 
@@ -5,8 +6,8 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'Ju
 
 export function log (string, clearLine = true) {
   if (clearLine) {
-    process.stdout.clearLine()
-    process.stdout.cursorTo(0)
+    readline.clearLine(process.stdout)
+    readline.cursorTo(process.stdout, 0)
   }
   process.stdout.write(`auto-changelog: ${string}`)
 }
