@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import 'babel-polyfill'
+import '@babel/polyfill'
 import run from './run'
 
 run(process.argv)
