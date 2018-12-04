@@ -86,7 +86,7 @@ auto-changelog --tag-pattern build-\d+
 auto-changelog --tag-pattern .+
 ```
 
-You can also set any option in `package.json` under the `auto-changelog` key, using camelCase options:
+You can also set any option in `package.json` under the `auto-changelog` key, using camelCase options. Note that `includeBranch` should be an array here, not a comma separated list:
 
 ```js
 {
@@ -99,7 +99,11 @@ You can also set any option in `package.json` under the `auto-changelog` key, us
     "output": "HISTORY.md",
     "template": "keepachangelog",
     "unreleased": true,
-    "commitLimit": false
+    "commitLimit": false,
+    "includeBranch": [
+      "release-v2",
+      "release-v3"
+    ]
   }
 }
 ```
