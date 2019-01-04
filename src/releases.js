@@ -35,7 +35,10 @@ export function parseReleases (commits, remote, latestVersion, options) {
       release.commits.push(commit)
     }
   }
-  releases.push(release)
+  releases.push({
+    ...release,
+    commits: sliceCommits(release.commits.sort(sortCommits), options, release)
+  })
   return releases
 }
 
