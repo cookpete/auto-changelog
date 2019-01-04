@@ -117,5 +117,6 @@ function sliceCommits (commits, options, release) {
   }
   const emptyRelease = release.fixes.length === 0 && release.merges.length === 0
   const limit = emptyRelease ? options.backfillLimit : options.commitLimit
-  return commits.slice(0, limit)
+  const minLimit = commits.filter(c => c.breaking).length
+  return commits.slice(0, Math.max(minLimit, limit))
 }
