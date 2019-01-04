@@ -106,8 +106,8 @@ function getSummary (message, releaseSummary) {
 }
 
 function sortCommits (a, b) {
-  if (!a.breaking && b.breaking) return -1
-  if (a.breaking && !b.breaking) return 1
+  if (!a.breaking && b.breaking) return 1
+  if (a.breaking && !b.breaking) return -1
   return (b.insertions + b.deletions) - (a.insertions + a.deletions)
 }
 
