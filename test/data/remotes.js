@@ -20,5 +20,9 @@ export default {
     hostname: 'user.visualstudio.com',
     url: 'https://user.visualstudio.com/project/_git/repo',
     projectUrl: 'https://user.visualstudio.com/project'
+  },
+  self_managed: {
+    hostname: 'git.example.com',
+    url: 'https://git.example.com/user/repo'
   }
 }

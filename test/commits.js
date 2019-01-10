@@ -328,6 +328,36 @@ describe('getMerge', () => {
       author: 'Commit Author'
     })
   })
+
+  describe('self managed', () => {
+    it('parses a bitbucket merge', () => {
+      const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007'
+      expect(getMerge(message, 'Commit Author', remotes.self_managed, { platform: 'bitbucket' })).to.deep.equal({
+        id: '15007',
+        message: 'Memoize GitLab logger to reduce open file descriptors',
+        href: 'https://git.example.com/user/repo/pull-requests/15007',
+        author: 'Commit Author'
+      })
+    })
+    it('parses a gitlab merge', () => {
+      const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007'
+      expect(getMerge(message, 'Commit Author', remotes.self_managed, { platform: 'gitlab' })).to.deep.equal({
+        id: '15007',
+        message: 'Memoize GitLab logger to reduce open file descriptors',
+        href: 'https://git.example.com/user/repo/merge_requests/15007',
+        author: 'Commit Author'
+      })
+    })
+    it('parses a azure merge', () => {
+      const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007'
+      expect(getMerge(message, 'Commit Author', remotes.self_managed, { platform: 'azure' })).to.deep.equal({
+        id: '15007',
+        message: 'Memoize GitLab logger to reduce open file descriptors',
+        href: 'https://git.example.com/user/repo/pullrequest/15007',
+        author: 'Commit Author'
+      })
+    })
+  })
 })
 
 describe('getSubject', () => {

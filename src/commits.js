@@ -150,7 +150,7 @@ function getMerge (message, author, remote, options = {}) {
       return {
         id,
         message: replaceText(message, options),
-        href: getMergeLink(id, remote),
+        href: getMergeLink(id, remote, options),
         author
       }
     }
@@ -184,17 +184,17 @@ function getIssueLink (match, id, remote, issueUrl) {
   return `${remote.url}/issues/${id}`
 }
 
-function getMergeLink (id, remote) {
+function getMergeLink (id, remote, options = {}) {
   if (!remote) {
     return null
   }
-  if (/bitbucket/.test(remote.hostname)) {
+  if ((/bitbucket/.test(remote.hostname) && options.platform === undefined) || options.platform === 'bitbucket') {
     return `${remote.url}/pull-requests/${id}`
   }
-  if (/gitlab/.test(remote.hostname)) {
+  if ((/gitlab/.test(remote.hostname) && options.platform === undefined) || options.platform === 'gitlab') {
     return `${remote.url}/merge_requests/${id}`
   }
-  if (/dev\.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
+  if (((/dev\.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) && options.platform === undefined) || options.platform === 'azure') {
     return `${remote.url}/pullrequest/${id}`
   }
   return `${remote.url}/pull/${id}`

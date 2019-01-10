@@ -40,6 +40,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('--starting-commit [hash]', 'starting commit to use for changelog generation')
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
+    .option('--platform [platform]', 'set platform manually [bitbucket, gitlab, azure]')
     .version(version)
     .parse(argv)
 
