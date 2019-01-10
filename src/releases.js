@@ -4,7 +4,7 @@ import { niceDate } from './utils'
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
-export function parseReleases (commits, remote, latestVersion, options) {
+export function parseReleases (commits, remote, tags, latestVersion, options) {
   let release = newRelease(latestVersion)
   const releases = []
   for (let commit of commits) {
@@ -22,7 +22,8 @@ export function parseReleases (commits, remote, latestVersion, options) {
         })
       }
       const summary = getSummary(commit.message, options.releaseSummary)
-      release = newRelease(commit.tag, commit.date, summary)
+      let tagMessage = (tags[commit.tag] !== undefined) ? tags[commit.tag] : null
+      release = newRelease(commit.tag, commit.date, summary, tagMessage)
     }
     if (commit.merge) {
       release.merges.push(commit.merge)
@@ -49,7 +50,7 @@ export function sortReleases (a, b) {
   return 0
 }
 
-function newRelease (tag = null, date = new Date().toISOString(), summary = null) {
+function newRelease (tag = null, date = new Date().toISOString(), summary = null, tagMessage = null) {
   return {
     commits: [],
     fixes: [],
@@ -59,7 +60,8 @@ function newRelease (tag = null, date = new Date().toISOString(), summary = null
     summary,
     title: tag || 'Unreleased',
     niceDate: niceDate(date),
-    isoDate: date.slice(0, 10)
+    isoDate: date.slice(0, 10),
+    tagMessage
   }
 }
 

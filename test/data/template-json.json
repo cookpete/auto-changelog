@@ -22,6 +22,7 @@
     "fixes": [],
     "merges": [],
     "tag": "v1.0.0",
+    "tagMessage": null,
     "date": "2015-12-15T12:03:09.000Z",
     "summary": null,
     "title": "v1.0.0",
@@ -70,6 +71,7 @@
     "fixes": [],
     "merges": [],
     "tag": "v0.1.0",
+    "tagMessage": null,
     "date": "2015-12-29T21:19:17.000Z",
     "summary": null,
     "title": "v0.1.0",
@@ -123,6 +125,7 @@
       }
     ],
     "tag": "v0.0.2",
+    "tagMessage": null,
     "date": "2015-12-28T21:17:17.000Z",
     "summary": null,
     "title": "v0.0.2",
@@ -204,6 +207,7 @@
       }
     ],
     "tag": "v0.0.1",
+    "tagMessage": null,
     "date": "2015-12-15T12:03:09.000Z",
     "summary": null,
     "title": "v0.0.1",

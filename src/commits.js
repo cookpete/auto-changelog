@@ -1,5 +1,5 @@
 import semver from 'semver'
-import { cmd, isLink, replaceText, getGitVersion } from './utils'
+import { cmd, getGitVersion, isLink, replaceText } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
@@ -23,6 +23,15 @@ export async function fetchCommits (remote, options, branch = null, onProgress) 
   const format = await getLogFormat()
   const log = await cmd(`${command} --shortstat --pretty=format:${format}`, onProgress)
   return parseCommits(log, remote, options)
+}
+
+export async function fetchTags (remote, options, onProgress) {
+  if (!options.tagMessage) {
+    return {}
+  }
+  const command = 'git tag -n1'
+  const tags = await cmd(`${command}`, onProgress)
+  return parseTags(tags, remote, options)
 }
 
 async function getLogFormat () {
@@ -54,6 +63,22 @@ function parseCommits (string, remote, options = {}) {
   return commits
 }
 
+function parseTags (string, remote, options = {}) {
+  let tags = string
+    .split('\n')
+    .map(tag => parseTag(tag, remote, options))
+    .filter(tag => {
+      return tag.name !== ''
+    })
+
+  let newTags = {}
+  tags.forEach(function (el) {
+    newTags[el.name] = el.message
+  })
+
+  return newTags
+}
+
 function parseCommit (commit, remote, options = {}) {
   const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [message, stats] = tail.split(MESSAGE_SEPARATOR)
@@ -72,6 +97,12 @@ function parseCommit (commit, remote, options = {}) {
     breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats.trim())
   }
+}
+
+function parseTag (tag, remote, options = {}) {
+  let tagName = tag.substring(0, 16).replace(/ /g, '')
+  let tagMessage = tag.substring(16)
+  return { name: tagName, message: tagMessage }
 }
 
 function getTag (refs, options) {

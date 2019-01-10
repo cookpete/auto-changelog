@@ -4,9 +4,11 @@ import { join } from 'path'
 import { readFile } from '../src/utils'
 import remotes from './data/remotes'
 import commits from './data/commits'
+import tags from './data/tags'
 import commitsNoRemote from './data/commits-no-remote'
 import {
   fetchCommits,
+  fetchTags,
   __get__,
   __Rewire__ as mock,
   __ResetDependency__ as unmock
@@ -27,6 +29,16 @@ describe('fetchCommits', () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     mock('cmd', () => gitLog)
     expect(await fetchCommits(remotes.github, options)).to.deep.equal(commits)
+    unmock('cmd')
+  })
+})
+
+describe('fetchTags', () => {
+  it('fetches commits', async () => {
+    const gitLog = await readFile(join(__dirname, 'data', 'git-tags.txt'))
+    mock('cmd', () => gitLog)
+    options.tagMessage = true
+    expect(await fetchTags(remotes.github, options)).to.deep.equal(tags)
     unmock('cmd')
   })
 })

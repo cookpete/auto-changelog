@@ -3,10 +3,10 @@ import semver from 'semver'
 import uniqBy from 'lodash.uniqby'
 import { version } from '../package.json'
 import { fetchRemote } from './remote'
-import { fetchCommits } from './commits'
+import { fetchCommits, fetchTags } from './commits'
 import { parseReleases, sortReleases } from './releases'
 import { compileTemplate } from './template'
-import { parseLimit, readJson, writeFile, fileExists, log, formatBytes } from './utils'
+import { fileExists, formatBytes, log, parseLimit, readJson, writeFile } from './utils'
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -40,6 +40,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('--starting-commit [hash]', 'starting commit to use for changelog generation')
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
+    .option('--tag-message', 'show tag message')
     .version(version)
     .parse(argv)
 
@@ -75,14 +76,14 @@ function getLatestVersion (options, pkg, commits) {
   return null
 }
 
-async function getReleases (commits, remote, latestVersion, options) {
-  let releases = parseReleases(commits, remote, latestVersion, options)
+async function getReleases (commits, remote, tags, latestVersion, options) {
+  let releases = parseReleases(commits, remote, tags, latestVersion, options)
   if (options.includeBranch) {
     for (const branch of options.includeBranch) {
       const commits = await fetchCommits(remote, options, branch)
       releases = [
         ...releases,
-        ...parseReleases(commits, remote, latestVersion, options)
+        ...parseReleases(commits, remote, tags, latestVersion, options)
       ]
     }
   }
@@ -97,9 +98,11 @@ export default async function run (argv) {
   const remote = await fetchRemote(options.remote)
   const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
   const commits = await fetchCommits(remote, options, null, commitProgress)
+  const tagProgress = bytes => log(`Fetching tags… ${formatBytes(bytes)} loaded`)
+  const tags = await fetchTags(remote, options, null, tagProgress)
   log('Generating changelog…')
   const latestVersion = getLatestVersion(options, pkg, commits)
-  const releases = await getReleases(commits, remote, latestVersion, options)
+  const releases = await getReleases(commits, remote, tags, latestVersion, options)
   const changelog = await compileTemplate(options.template, { releases })
   await writeFile(options.output, changelog)
   const bytes = Buffer.byteLength(changelog, 'utf8')

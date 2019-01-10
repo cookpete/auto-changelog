@@ -3,12 +3,18 @@ import { expect } from 'chai'
 import { join } from 'path'
 import { readFile } from '../src/utils'
 import releases from './data/releases'
+import releasesTagMessage from './data/releases-tag-message'
 import { compileTemplate } from '../src/template'
 
 describe('compileTemplate', () => {
   it('compiles using compact template', async () => {
     const expected = await readFile(join(__dirname, 'data', 'template-compact.md'))
     expect(await compileTemplate('compact', { releases })).to.equal(expected)
+  })
+
+  it('compiles using compact template with tag', async () => {
+    const expected = await readFile(join(__dirname, 'data', 'template-compact-tag-message.md'))
+    expect(await compileTemplate('compact', { releases: releasesTagMessage })).to.equal(expected)
   })
 
   it('compiles using keepachangelog template', async () => {
