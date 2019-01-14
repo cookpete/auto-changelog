@@ -15,10 +15,10 @@ describe('matches helper', () => {
   it('matches on field value', () => {
     const matches =
       '{{#matches href "12c0624"}}\n' +
-        '- {{message}}\n' +
+        '- {{{message}}}\n' +
       '{{/matches}}\n'
     const expected =
-      '- Commit that fixes nothing\n'
+      '- Commit that fixes nothing with `backticks`\n'
     expect(compileCommits(matches)({ releases })).to.equal(expected)
   })
 

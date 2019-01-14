@@ -16,6 +16,7 @@ const remote = {
 const options = {
   unreleased: false,
   commitLimit: 3,
+  backfillLimit: 3,
   tagPrefix: ''
 }
 
