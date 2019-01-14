@@ -204,6 +204,10 @@ describe('run', () => {
     return run(['', '', '--latest-version', 'v3.0.0'])
   })
 
+  it('does not error when using stdout option', () => {
+    return run(['', '', '--stdout'])
+  })
+
   it('throws an error when no package found', done => {
     run(['', '', '--package'])
       .then(() => done('Should throw an error'))

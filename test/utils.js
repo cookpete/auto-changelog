@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import {
-  log,
+  updateLog,
   cmd,
   niceDate,
   isLink,
@@ -14,10 +14,10 @@ import {
   __ResetDependency__ as unmock
 } from '../src/utils'
 
-describe('log', () => {
+describe('updateLog', () => {
   it('doesn\'t error', async () => {
-    log('Test', false)
-    log('Test')
+    updateLog('Test', false)
+    updateLog('Test')
   })
 })
 

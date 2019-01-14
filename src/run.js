@@ -6,7 +6,7 @@ import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
 import { parseReleases, sortReleases } from './releases'
 import { compileTemplate } from './template'
-import { parseLimit, readJson, writeFile, fileExists, log, formatBytes } from './utils'
+import { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes } from './utils'
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -40,6 +40,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('--starting-commit [hash]', 'starting commit to use for changelog generation')
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
+    .option('--stdout', 'output changelog to stdout')
     .version(version)
     .parse(argv)
 
@@ -93,6 +94,7 @@ export default async function run (argv) {
   const pkg = await fileExists(PACKAGE_FILE) && await readJson(PACKAGE_FILE)
   const dotOptions = await fileExists(OPTIONS_DOTFILE) && await readJson(OPTIONS_DOTFILE)
   const options = getOptions(argv, pkg, dotOptions)
+  const log = string => options.stdout ? null : updateLog(string)
   log('Fetching remote…')
   const remote = await fetchRemote(options.remote)
   const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
@@ -101,7 +103,11 @@ export default async function run (argv) {
   const latestVersion = getLatestVersion(options, pkg, commits)
   const releases = await getReleases(commits, remote, latestVersion, options)
   const changelog = await compileTemplate(options.template, { releases })
-  await writeFile(options.output, changelog)
+  if (options.stdout) {
+    process.stdout.write(changelog)
+  } else {
+    await writeFile(options.output, changelog)
+  }
   const bytes = Buffer.byteLength(changelog, 'utf8')
   log(`${formatBytes(bytes)} written to ${options.output}\n`)
 }

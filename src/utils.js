@@ -4,7 +4,7 @@ import { spawn } from 'child_process'
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-export function log (string, clearLine = true) {
+export function updateLog (string, clearLine = true) {
   if (clearLine) {
     readline.clearLine(process.stdout)
     readline.cursorTo(process.stdout, 0)
