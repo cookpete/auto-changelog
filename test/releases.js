@@ -84,4 +84,17 @@ describe('sortReleases', () => {
     expect(sortReleases({ tag: null }, { tag: '0.1.0' })).to.equal(-1)
     expect(sortReleases({ tag: null }, { tag: null })).to.equal(-0)
   })
+
+  it('supports non-semver tags', () => {
+    expect(sortReleases({ tag: 'abc' }, { tag: 'def' })).to.equal(1)
+    expect(sortReleases({ tag: 'def' }, { tag: 'abc' })).to.equal(-1)
+    expect(sortReleases({ tag: 'abc' }, { tag: 'abc' })).to.equal(0)
+  })
+
+  it('supports non-semver numeric tags', () => {
+    expect(sortReleases({ tag: '22.1' }, { tag: '22.0' })).to.equal(-1)
+    expect(sortReleases({ tag: '22.0' }, { tag: '22.1' })).to.equal(1)
+    expect(sortReleases({ tag: '123.0' }, { tag: '22.1' })).to.equal(-1)
+    expect(sortReleases({ tag: '0.1' }, { tag: '0.01' })).to.equal(-1)
+  })
 })
