@@ -141,9 +141,17 @@ function getFixPattern (options) {
   return DEFAULT_FIX_PATTERN
 }
 
+function getMergePatterns (options) {
+  if (options.mergePattern) {
+    return [new RegExp(options.mergePattern, 'g')]
+  }
+  return MERGE_PATTERNS
+}
+
 function getMerge (message, author, remote, options = {}) {
-  for (let pattern of MERGE_PATTERNS) {
-    const match = message.match(pattern)
+  const patterns = getMergePatterns(options)
+  for (let pattern of patterns) {
+    const match = pattern.exec(message)
     if (match) {
       const id = /^\d+$/.test(match[1]) ? match[1] : match[2]
       const message = /^\d+$/.test(match[1]) ? match[2] : match[1]
