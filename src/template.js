@@ -48,6 +48,16 @@ Handlebars.registerHelper('matches', function (val, pattern, options) {
   return r.test(val) ? options.fn(this) : options.inverse(this)
 })
 
+Handlebars.registerHelper('replace', function (find, replace, options) {
+  const string = options.fn(this)
+  const isRegexp = find.match(/^\/(.+)\/$/)
+
+  if (isRegexp) {
+    find = new RegExp(isRegexp[1], options.hash.flags || '')
+  }
+  return (string || '').replace(find, replace)
+})
+
 async function getTemplate (template) {
   if (MATCH_URL.test(template)) {
     const response = await fetch(template)
