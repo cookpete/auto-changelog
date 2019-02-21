@@ -286,6 +286,16 @@ To insert links or other markup to PR titles and commit messages that appear in 
 
 Here, any time a pattern like `ABC-123` appears in your log, it will be replaced with a link to the relevant issue in Jira. Each pattern is applied using `string.replace(new RegExp(key, 'g'), value)`.
 
+---
+
+You also can replace strings in your custom template, using our helper `#replace`.
+
+```hbs
+{{#replace "v" "v."}}{{title}}{{/replace}}
+
+{{#replace "/v/" "v." flags="g"}}{{title}}{{/replace}}
+```
+
 ### Migrating to `1.x`
 
 If you are upgrading from `0.x`, the same options are still supported out of the box. Nothing will break, but your changelog may look slightly different:
