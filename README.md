@@ -15,7 +15,9 @@ npm install -g auto-changelog
 
 ### Usage
 
-Simply run `auto-changelog` in the root folder of a git repository. `git log` is run behind the scenes in order to parse the commit history.
+Simply run `auto-changelog` in the root folder of a git repository.
+
+Behind the scenes, `git log` is run in order to parse the commit history. Commits are ordered by relevance by default (i.e. breaking changes first, followed by commits that made the most changes). To order by date instead, see the `--sort-commits-by-date` option below.
 
 ```bash
 Usage: auto-changelog [options]
