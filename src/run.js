@@ -38,6 +38,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('--tag-pattern [regex]', 'override regex pattern for release tags')
     .option('--tag-prefix [prefix]', 'prefix used in version tags')
     .option('--starting-commit [hash]', 'starting commit to use for changelog generation')
+    .option('--sort-commits-by-date', 'sort commits by date (descending) instead of sorting by relevance')
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--stdout', 'output changelog to stdout')

@@ -37,6 +37,7 @@ Options:
       --tag-pattern [regex]           # override regex pattern for release tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --starting-commit [hash]        # starting commit to use for changelog generation
+      --sort-commits-by-date          # sort commits by date (descending) instead of sorting by relevance
       --include-branch [branch]       # one or more branches to include commits from, comma separated
       --release-summary               # display tagged commit message body as release summary
       --stdout                        # output changelog to stdout

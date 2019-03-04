@@ -6,6 +6,7 @@ const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 const NUMERIC_PATTERN = /^\d+(\.\d+)?$/
 
 export function parseReleases (commits, remote, latestVersion, options) {
+  const sortCommits = options.sortCommitsByDate ? sortCommitsByDateDescending : sortCommitsByRelevance
   let release = newRelease(latestVersion)
   const releases = []
   for (let commit of commits) {
@@ -117,10 +118,14 @@ function getSummary (message, releaseSummary) {
   return null
 }
 
-function sortCommits (a, b) {
+function sortCommitsByRelevance (a, b) {
   if (!a.breaking && b.breaking) return 1
   if (a.breaking && !b.breaking) return -1
   return (b.insertions + b.deletions) - (a.insertions + a.deletions)
+}
+
+function sortCommitsByDateDescending (a, b) {
+  return a.date < b.date ? 1 : -1
 }
 
 function sliceCommits (commits, options, release) {
