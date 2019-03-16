@@ -8,6 +8,7 @@ const NUMERIC_PATTERN = /^\d+(\.\d+)?$/
 export function parseReleases (commits, remote, latestVersion, options) {
   let release = newRelease(latestVersion)
   const releases = []
+  const sortCommits = commitSorter(options)
   for (let commit of commits) {
     if (commit.tag) {
       if (release.tag || options.unreleased) {
@@ -117,10 +118,13 @@ function getSummary (message, releaseSummary) {
   return null
 }
 
-function sortCommits (a, b) {
-  if (!a.breaking && b.breaking) return 1
-  if (a.breaking && !b.breaking) return -1
-  return (b.insertions + b.deletions) - (a.insertions + a.deletions)
+function commitSorter ({ sortCommits }) {
+  return (a, b) => {
+    if (!a.breaking && b.breaking) return 1
+    if (a.breaking && !b.breaking) return -1
+    if (sortCommits === 'date') return new Date(a.date) - new Date(b.date)
+    return (b.insertions + b.deletions) - (a.insertions + a.deletions)
+  }
 }
 
 function sliceCommits (commits, options, release) {

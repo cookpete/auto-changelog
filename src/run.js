@@ -14,7 +14,8 @@ const DEFAULT_OPTIONS = {
   remote: 'origin',
   commitLimit: 3,
   backfillLimit: 3,
-  tagPrefix: ''
+  tagPrefix: '',
+  sortCommits: 'relevance'
 }
 
 const PACKAGE_FILE = 'package.json'
@@ -39,6 +40,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('--tag-pattern [regex]', 'override regex pattern for release tags')
     .option('--tag-prefix [prefix]', 'prefix used in version tags')
     .option('--starting-commit [hash]', 'starting commit to use for changelog generation')
+    .option('--sort-commits [property]', `sort commits by property, default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--stdout', 'output changelog to stdout')

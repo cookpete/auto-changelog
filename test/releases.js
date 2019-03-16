@@ -2,6 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import remotes from './data/remotes'
 import commits from './data/commits'
+import commitsSingleRelease from './data/commits-single-release'
 import releases from './data/releases'
 import { parseReleases, sortReleases } from '../src/releases'
 
@@ -9,7 +10,8 @@ const options = {
   unreleased: false,
   commitLimit: 3,
   backfillLimit: 3,
-  tagPrefix: ''
+  tagPrefix: '',
+  sortCommits: 'relevance'
 }
 
 describe('parseReleases', () => {
@@ -69,6 +71,21 @@ describe('parseReleases', () => {
     const releases = parseReleases(commits, remotes.github, 'v3.0.0', options)
     expect(releases).to.be.an('array')
     expect(releases[0]).to.have.property('tag', 'v3.0.0')
+  })
+
+  it('supports sortCommits options', () => {
+    const releases = parseReleases(commitsSingleRelease, remotes.github, null, {
+      ...options,
+      sortCommits: 'date',
+      commitLimit: false
+    })
+    expect(releases).to.be.an('array')
+    expect(releases[0].commits.map(c => c.date)).to.deep.equal([
+      '2015-12-14T17:06:12.000Z',
+      '2015-12-29T21:18:19.000Z',
+      '2015-12-29T21:19:19.000Z',
+      '2015-12-29T21:57:19.000Z'
+    ])
   })
 })
 
