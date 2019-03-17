@@ -73,7 +73,13 @@ function cleanTemplate (template) {
     .replace(/\n\n$/, '\n')
 }
 
-export async function compileTemplate (template, data) {
+export async function compileTemplate ({ template, handlebarsSetup }, data) {
+  if (handlebarsSetup) {
+    const setup = require(join(process.cwd(), handlebarsSetup))
+    if (typeof setup === 'function') {
+      setup(Handlebars)
+    }
+  }
   const compile = Handlebars.compile(await getTemplate(template))
   if (template === 'json') {
     return compile(data)

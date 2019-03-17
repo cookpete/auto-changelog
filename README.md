@@ -41,6 +41,7 @@ Options:
       --sort-commits [property]       # sort commits by property [relevance, date], default: relevance
       --include-branch [branch]       # one or more branches to include commits from, comma separated
       --release-summary               # display tagged commit message body as release summary
+      --handlebars-setup              # handlebars setup file
       --stdout                        # output changelog to stdout
   -V, --version                       # output the version number
   -h, --help                          # output usage information
@@ -287,6 +288,24 @@ To insert links or other markup to PR titles and commit messages that appear in 
 ```
 
 Here, any time a pattern like `ABC-123` appears in your log, it will be replaced with a link to the relevant issue in Jira. Each pattern is applied using `string.replace(new RegExp(key, 'g'), value)`.
+
+### Handlebars setup file
+
+The `--handlebars-setup` options allows you to point to a file to add custom Handlebars helpers, for use in custom templates using `--template`. Paths are relative to the directory in which you run `auto-changelog`.
+
+```js
+auto-changelog --handlebars-setup setup.js --template custom-template.hbs
+
+// setup.js
+module.exports = function (Handlebars) {
+  Handlebars.registerHelper('custom', function (context, options) {
+    return 'custom helpers!'
+  })
+}
+
+// custom-template.hbs
+Now you can use {{custom}}
+```
 
 ### Migrating to `1.x`
 

@@ -43,6 +43,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('--sort-commits [property]', `sort commits by property, default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
+    .option('--handlebars-setup', 'handlebars setup file')
     .option('--stdout', 'output changelog to stdout')
     .version(version)
     .parse(argv)
@@ -105,7 +106,7 @@ export default async function run (argv) {
   log('Generating changelog…')
   const latestVersion = getLatestVersion(options, pkg, commits)
   const releases = await getReleases(commits, remote, latestVersion, options)
-  const changelog = await compileTemplate(options.template, { releases })
+  const changelog = await compileTemplate(options, { releases })
   if (options.stdout) {
     process.stdout.write(changelog)
   } else {
