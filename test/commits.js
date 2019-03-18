@@ -314,6 +314,20 @@ describe('getMerge', () => {
     })
   })
 
+  it('supports mergePattern parameter', () => {
+    const options = {
+      mergePattern: 'PR #(\\d+) from .+\\n\\n.+\\n(.+)'
+    }
+
+    const message = 'PR #37 from repo/branch\n\ncommit sha512\nPull request title'
+    expect(getMerge(message, 'Commit Author', remotes.github, options)).to.deep.equal({
+      id: '37',
+      message: 'Pull request title',
+      href: 'https://github.com/user/repo/pull/37',
+      author: 'Commit Author'
+    })
+  })
+
   it('supports replaceText option', () => {
     const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
     const options = {
