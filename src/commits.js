@@ -143,7 +143,7 @@ function getFixPattern (options) {
 
 function getMergePatterns (options) {
   if (options.mergePattern) {
-    return [new RegExp(options.mergePattern, 'g')]
+    return MERGE_PATTERNS.concat(new RegExp(options.mergePattern, 'g'))
   }
   return MERGE_PATTERNS
 }

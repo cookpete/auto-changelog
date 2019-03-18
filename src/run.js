@@ -34,7 +34,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('-i, --issue-url [url]', 'override url for issues, use {id} for issue id')
     .option('--issue-pattern [regex]', 'override regex pattern for issues in commit messages')
     .option('--breaking-pattern [regex]', 'regex pattern for breaking change commits')
-    .option('--merge-pattern [regex]', 'override regex pattern for merge commits')
+    .option('--merge-pattern [regex]', 'add custom regex pattern for merge commits')
     .option('--ignore-commit-pattern [regex]', 'pattern to ignore when parsing commits')
     .option('--tag-pattern [regex]', 'override regex pattern for release tags')
     .option('--tag-prefix [prefix]', 'prefix used in version tags')
