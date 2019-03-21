@@ -42,7 +42,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
+    "@babel/polyfill": "^7.4.0",
     "commander": "^2.19.0",
     "handlebars": "^4.0.12",
     "lodash.uniqby": "^4.7.0",
