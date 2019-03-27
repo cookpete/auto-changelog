@@ -48,7 +48,7 @@
     "lodash.uniqby": "^4.7.0",
     "node-fetch": "^2.3.0",
     "parse-github-url": "^1.0.2",
-    "semver": "^5.6.0"
+    "semver": "^6.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
