@@ -54,14 +54,6 @@ describe('parseCommits', () => {
     expect(parseCommits(gitLog, remotes.github, options)).to.have.length(10)
   })
 
-  it('supports ignoreCommitPattern option', async () => {
-    const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
-    const options = { ignoreCommitPattern: 'Second commit' }
-    const result = parseCommits(gitLog, remotes.github, options)
-    expect(result).to.have.length(commits.length - 1)
-    expect(JSON.stringify(result)).to.not.contain('Second commit')
-  })
-
   it('supports breakingPattern option', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const options = { breakingPattern: 'Some breaking change' }

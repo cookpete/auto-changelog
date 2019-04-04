@@ -19,7 +19,13 @@ export function parseReleases (commits, remote, latestVersion, options) {
             release.tag ? `${options.tagPrefix}${release.tag}` : 'HEAD',
             remote
           ),
-          commits: sliceCommits(release.commits.sort(sortCommits), options, release),
+          commits: sliceCommits(release.commits.sort(sortCommits), options, release)
+            .filter(commit => {
+              if (options.ignoreCommitPattern) {
+                return new RegExp(options.ignoreCommitPattern).test(commit.subject) === false
+              }
+              return true
+            }),
           major: !options.tagPattern && commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
         })
       }

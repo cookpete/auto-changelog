@@ -87,6 +87,13 @@ describe('parseReleases', () => {
       '2015-12-29T21:57:19.000Z'
     ])
   })
+
+  it('supports ignoreCommitPattern option', async () => {
+    const options = { ignoreCommitPattern: 'This is my major release description' }
+    const result = parseReleases(commits, remotes.github, null, options)
+    expect(result).to.have.length(4)
+    expect(JSON.stringify(result)).to.not.contain('This is my major release description')
+  })
 })
 
 describe('sortReleases', () => {
