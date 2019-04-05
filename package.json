@@ -62,7 +62,7 @@
     "chai": "^4.2.0",
     "codecov": "^3.1.0",
     "cross-env": "^5.2.0",
-    "markdownlint-cli": "^0.14.0",
+    "markdownlint-cli": "^0.15.0",
     "mocha": "^6.0.0",
     "nyc": "^13.1.0",
     "snazzy": "^8.0.0",
