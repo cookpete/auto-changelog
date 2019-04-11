@@ -33,7 +33,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
         fixes: commit.fixes,
         commit
       })
-    } else if (filterCommit(commit, release, options.commitLimit)) {
+    } else if (filterCommit(commit, options, release)) {
       release.commits.push(commit)
     }
   }
@@ -76,9 +76,23 @@ function newRelease (tag = null, date = new Date().toISOString(), summary = null
   }
 }
 
-function filterCommit (commit, release, limit) {
+function sliceCommits (commits, { commitLimit, backfillLimit }, release) {
+  if (commitLimit === false) {
+    return commits
+  }
+  const emptyRelease = release.fixes.length === 0 && release.merges.length === 0
+  const limit = emptyRelease ? backfillLimit : commitLimit
+  const minLimit = commits.filter(c => c.breaking).length
+  return commits.slice(0, Math.max(minLimit, limit))
+}
+
+function filterCommit (commit, { ignoreCommitPattern }, release) {
   if (commit.breaking) {
     return true
+  }
+  if (ignoreCommitPattern) {
+    // Filter out commits that match ignoreCommitPattern
+    return new RegExp(ignoreCommitPattern).test(commit.subject) === false
   }
   if (semver.valid(commit.subject)) {
     // Filter out version commits
@@ -125,14 +139,4 @@ function commitSorter ({ sortCommits }) {
     if (sortCommits === 'date') return new Date(a.date) - new Date(b.date)
     return (b.insertions + b.deletions) - (a.insertions + a.deletions)
   }
-}
-
-function sliceCommits (commits, options, release) {
-  if (options.commitLimit === false) {
-    return commits
-  }
-  const emptyRelease = release.fixes.length === 0 && release.merges.length === 0
-  const limit = emptyRelease ? options.backfillLimit : options.commitLimit
-  const minLimit = commits.filter(c => c.breaking).length
-  return commits.slice(0, Math.max(minLimit, limit))
 }
