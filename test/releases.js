@@ -88,11 +88,11 @@ describe('parseReleases', () => {
     ])
   })
 
-  it('supports ignoreCommitPattern option', async () => {
-    const options = { ignoreCommitPattern: 'This is my major release description' }
+  it('supports ignoreCommitPattern option', () => {
+    const options = { ignoreCommitPattern: 'Some breaking change' }
     const result = parseReleases(commits, remotes.github, null, options)
     expect(result).to.have.length(4)
-    expect(JSON.stringify(result)).to.not.contain('This is my major release description')
+    expect(JSON.stringify(result)).to.not.contain('Some breaking change')
   })
 })
 
