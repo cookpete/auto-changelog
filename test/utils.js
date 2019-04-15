@@ -95,7 +95,10 @@ describe('fileExists', () => {
 
 describe('readJson', () => {
   it('reads file', async () => {
-    mock('fs', { readFile: (path, type, cb) => cb(null, '{"abc":123}') })
+    mock('fs', {
+      readFile: (path, type, cb) => cb(null, '{"abc":123}'),
+      access: (path, cb) => cb(null)
+    })
     expect(await readJson()).to.deep.equal({ abc: 123 })
     unmock('cmd')
   })

@@ -100,8 +100,8 @@ async function getReleases (commits, remote, latestVersion, options) {
 }
 
 export default async function run (argv) {
-  const pkg = await fileExists(PACKAGE_FILE) && await readJson(PACKAGE_FILE)
-  const dotOptions = await fileExists(OPTIONS_DOTFILE) && await readJson(OPTIONS_DOTFILE)
+  const pkg = await readJson(PACKAGE_FILE)
+  const dotOptions = await readJson(OPTIONS_DOTFILE)
   const options = getOptions(argv, pkg, dotOptions)
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching remote…')

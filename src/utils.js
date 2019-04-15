@@ -89,6 +89,8 @@ export function fileExists (path) {
 }
 
 export async function readJson (path) {
-  const json = await readFile(path)
-  return JSON.parse(json)
+  if (await fileExists(path) === false) {
+    return null
+  }
+  return JSON.parse(await readFile(path))
 }
