@@ -27,7 +27,7 @@ function getOptions (argv, pkg, dotOptions) {
     .option('-o, --output [file]', `output file, default: ${DEFAULT_OPTIONS.output}`)
     .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
     .option('-r, --remote [remote]', `specify git remote to use for links, default: ${DEFAULT_OPTIONS.remote}`)
-    .option('-p, --package', 'use version from package.json as latest release')
+    .option('-p, --package [file]', 'use version from file as latest release, default: package.json')
     .option('-v, --latest-version [version]', 'use specified version as latest release')
     .option('-u, --unreleased', 'include section for unreleased changes')
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
@@ -66,7 +66,7 @@ function getOptions (argv, pkg, dotOptions) {
   }
 }
 
-function getLatestVersion (options, pkg, commits) {
+async function getLatestVersion (options, commits) {
   if (options.latestVersion) {
     if (!semver.valid(options.latestVersion)) {
       throw new Error('--latest-version must be a valid semver version')
@@ -74,8 +74,13 @@ function getLatestVersion (options, pkg, commits) {
     return options.latestVersion
   }
   if (options.package) {
+    const file = options.package === true ? PACKAGE_FILE : options.package
+    if (await fileExists(file) === false) {
+      throw new Error(`File ${file} does not exist`)
+    }
+    const { version } = await readJson(file)
     const prefix = commits.some(c => /^v/.test(c.tag)) ? 'v' : ''
-    return `${prefix}${pkg.version}`
+    return `${prefix}${version}`
   }
   return null
 }
@@ -104,7 +109,7 @@ export default async function run (argv) {
   const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
   const commits = await fetchCommits(remote, options, null, commitProgress)
   log('Generating changelog…')
-  const latestVersion = getLatestVersion(options, pkg, commits)
+  const latestVersion = await getLatestVersion(options, commits)
   const releases = await getReleases(commits, remote, latestVersion, options)
   const changelog = await compileTemplate(options, { releases })
   if (options.stdout) {

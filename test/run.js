@@ -97,6 +97,21 @@ describe('run', () => {
     return run(['', '', '--package'])
   })
 
+  it('uses version from custom package file', async () => {
+    mock('fileExists', () => true)
+    mock('readJson', file => {
+      if (file === 'test.json') {
+        return { version: '2.0.0' }
+      }
+      return {}
+    })
+    mock('writeFile', (output, log) => {
+      expect(log).to.include('v2.0.0')
+    })
+
+    return run(['', '', '--package', 'test.json'])
+  })
+
   it('uses version from package.json with no prefix', async () => {
     mock('fileExists', () => true)
     mock('readJson', () => ({
@@ -210,6 +225,12 @@ describe('run', () => {
 
   it('throws an error when no package found', done => {
     run(['', '', '--package'])
+      .then(() => done('Should throw an error'))
+      .catch(() => done())
+  })
+
+  it('throws an error when no custom package found', done => {
+    run(['', '', '--package', 'does-not-exist.json'])
       .then(() => done('Should throw an error'))
       .catch(() => done())
   })
