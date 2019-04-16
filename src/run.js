@@ -22,7 +22,7 @@ const PACKAGE_FILE = 'package.json'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 const OPTIONS_DOTFILE = '.auto-changelog'
 
-function getOptions (argv, pkg, dotOptions) {
+async function getOptions (argv) {
   const options = new Command()
     .option('-o, --output [file]', `output file, default: ${DEFAULT_OPTIONS.output}`)
     .option('-t, --template [template]', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
@@ -48,20 +48,14 @@ function getOptions (argv, pkg, dotOptions) {
     .version(version)
     .parse(argv)
 
-  if (!pkg) {
-    if (options.package) {
-      throw new Error('package.json could not be found')
-    }
-    return {
-      ...DEFAULT_OPTIONS,
-      ...dotOptions,
-      ...options
-    }
-  }
+  const pkg = await readJson(PACKAGE_FILE)
+  const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null
+  const dotOptions = await readJson(OPTIONS_DOTFILE)
+
   return {
     ...DEFAULT_OPTIONS,
     ...dotOptions,
-    ...pkg[PACKAGE_OPTIONS_KEY],
+    ...packageOptions,
     ...options
   }
 }
@@ -100,9 +94,7 @@ async function getReleases (commits, remote, latestVersion, options) {
 }
 
 export default async function run (argv) {
-  const pkg = await readJson(PACKAGE_FILE)
-  const dotOptions = await readJson(OPTIONS_DOTFILE)
-  const options = getOptions(argv, pkg, dotOptions)
+  const options = await getOptions(argv)
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching remote…')
   const remote = await fetchRemote(options.remote)
