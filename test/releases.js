@@ -121,4 +121,13 @@ describe('sortReleases', () => {
     expect(sortReleases({ tag: '123.0' }, { tag: '22.1' })).to.equal(-1)
     expect(sortReleases({ tag: '0.1' }, { tag: '0.01' })).to.equal(-1)
   })
+
+  it('supports partial semver tags', () => {
+    expect(sortReleases({ tag: 'v0.50.7' }, { tag: 'v0.51' })).to.equal(1)
+    expect(sortReleases({ tag: 'v0.51' }, { tag: 'v0.50.7' })).to.equal(-1)
+    expect(sortReleases({ tag: 'v0.6' }, { tag: 'v0.50.7' })).to.equal(1)
+    expect(sortReleases({ tag: 'v0.50.7' }, { tag: 'v0.6' })).to.equal(-1)
+    expect(sortReleases({ tag: 'v2' }, { tag: 'v11' })).to.equal(1)
+    expect(sortReleases({ tag: 'v11' }, { tag: 'v2' })).to.equal(-1)
+  })
 })
