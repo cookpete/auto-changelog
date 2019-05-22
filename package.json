@@ -13,7 +13,6 @@
     "coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
     "clean": "rm -rf lib coverage",
     "build": "babel src -d lib",
-    "build:sourcemaps": "babel src -d lib --source-maps",
     "preversion": "npm run lint && npm run test",
     "version": "babel-node src/index.js --package && git add CHANGELOG.md",
     "prepublish": "npm run clean && npm run build",
