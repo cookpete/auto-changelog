@@ -152,8 +152,8 @@ function commitSorter ({ sortCommits }) {
   return (a, b) => {
     if (!a.breaking && b.breaking) return 1
     if (a.breaking && !b.breaking) return -1
-    if (sortCommits === 'date') return new Date(a.date) - new Date(b.date);
-    if (sortCommits === 'datedesc') return new Date(b.date) - new Date(a.date);
+    if (sortCommits === 'date') return new Date(a.date) - new Date(b.date)
+    if (sortCommits === 'datedesc') return new Date(b.date) - new Date(a.date)
     return (b.insertions + b.deletions) - (a.insertions + a.deletions)
   }
 }
