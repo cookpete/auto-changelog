@@ -9,11 +9,8 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}\\lib\\index.js",
-            // "args": ["--unreleased", "--commit-limit", "100", "--backfill-limit", "1000", "--handlebars-setup", "sort.js", "--template", "ChangeLogTemplate.hbs", "--output", "Changes.html"],
             "args": ["--unreleased", "--commit-limit", "100", "--backfill-limit", "1000", "--sort-commits", "date DESC", "--template", "ChangeLogTemplate.hbs", "--output", "Changes.html"],
-            // "args": ["--unreleased", "--commit-limit", "100", "--backfill-limit", "1000", "--sort-commits", "date", "--template", "ChangeLogTemplate.hbs", "--output", "Changes.html"],
-            "cwd": "C:/Users/Irox_Saul/Desktop/prime-dev/"
-            // "cwd": "${fileDirname}"
+            "cwd": "${fileDirname}"
         }
     ]
 }
