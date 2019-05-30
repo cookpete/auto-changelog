@@ -21,12 +21,12 @@ const MERGE_PATTERNS = [
 export async function fetchCommits (remote, options, branch = null, onProgress) {
   const command = branch ? `git log ${branch}` : 'git log'
   const format = await getLogFormat()
-  const cliOptions = [
+  let cliOptions = [
     '--shortstat',
     `--pretty=format:${format}`
   ]
   if (options.firstParent) {
-    cliOptions.push('--first-parent')
+    cliOptions = ['--first-parent', ...cliOptions]
   }
 
   const flatCliOptions = cliOptions.reduce((p, c) => `${p} ${c}`)
