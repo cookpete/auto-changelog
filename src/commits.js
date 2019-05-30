@@ -29,7 +29,7 @@ export async function fetchCommits (remote, options, branch = null, onProgress) 
     cliOptions = ['--first-parent', ...cliOptions]
   }
 
-  const flatCliOptions = cliOptions.reduce((p, c) => `${p} ${c}`)
+  const flatCliOptions = cliOptions.join(' ')
   const log = await cmd(`${command} ${flatCliOptions}`, onProgress)
   return parseCommits(log, remote, options)
 }
