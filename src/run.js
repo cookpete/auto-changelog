@@ -33,6 +33,7 @@ async function getOptions (argv) {
     .option('-l, --commit-limit [count]', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-b, --backfill-limit [count]', `number of commits to backfill empty releases with, default: ${DEFAULT_OPTIONS.backfillLimit}`, parseLimit)
     .option('-i, --issue-url [url]', 'override url for issues, use {id} for issue id')
+    .option('-fp, --first-parent', 'Collapses commits based on their first parent (use when squash or rebase isn\'t used)')
     .option('--issue-pattern [regex]', 'override regex pattern for issues in commit messages')
     .option('--breaking-pattern [regex]', 'regex pattern for breaking change commits')
     .option('--merge-pattern [regex]', 'add custom regex pattern for merge commits')
