@@ -42,8 +42,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@babel/polyfill": "^7.4.3",
     "commander": "^2.20.0",
+    "core-js": "^3.1.3",
     "handlebars": "^4.0.12",
     "lodash.uniqby": "^4.7.0",
     "node-fetch": "^2.3.0",
@@ -70,7 +70,10 @@
   },
   "babel": {
     "presets": [
-      "@babel/preset-env"
+      ["@babel/preset-env", {
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }]
     ],
     "env": {
       "test": {
@@ -96,7 +99,7 @@
     "report-dir": "./coverage",
     "temp-dir": "./coverage/.nyc_output",
     "require": [
-      "@babel/polyfill",
+      "core-js/stable",
       "@babel/register"
     ],
     "reporter": [

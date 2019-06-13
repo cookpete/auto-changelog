@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import '@babel/polyfill'
+import 'core-js/stable'
 import run from './run'
 
 run(process.argv)
