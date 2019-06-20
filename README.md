@@ -41,6 +41,7 @@ Options:
       --include-branch [branch]       # one or more branches to include commits from, comma separated
       --release-summary               # display tagged commit message body as release summary
       --handlebars-setup [file]       # handlebars setup file
+      --append-git-log [string]       # string to append to git log command
       --stdout                        # output changelog to stdout
   -V, --version                       # output the version number
   -h, --help                          # output usage information
