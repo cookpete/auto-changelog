@@ -40,7 +40,7 @@ Options:
       --sort-commits [property]       # sort commits by property [relevance, date, date-desc], default: relevance
       --include-branch [branch]       # one or more branches to include commits from, comma separated
       --release-summary               # display tagged commit message body as release summary
-      --handlebars-setup              # handlebars setup file
+      --handlebars-setup [file]       # handlebars setup file
       --stdout                        # output changelog to stdout
   -V, --version                       # output the version number
   -h, --help                          # output usage information
