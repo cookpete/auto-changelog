@@ -40,7 +40,7 @@ async function getOptions (argv) {
     .option('--tag-pattern [regex]', 'override regex pattern for release tags')
     .option('--tag-prefix [prefix]', 'prefix used in version tags')
     .option('--starting-commit [hash]', 'starting commit to use for changelog generation')
-    .option('--sort-commits [property]', `sort commits by property, default: ${DEFAULT_OPTIONS.sortCommits}`)
+    .option('--sort-commits [property]', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--include-branch [branch]', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--handlebars-setup <file>', 'handlebars setup file')
