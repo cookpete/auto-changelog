@@ -175,7 +175,7 @@ auto-changelog --breaking-pattern "BREAKING CHANGE:"
 
 ### Custom templates
 
-If you aren’t happy with the default templates or want to tweak something, you can point to a [handlebars](http://handlebarsjs.com) template in your local repo. Check out the [existing templates](templates) to see what is possible.
+If you aren’t happy with the default templates or want to tweak something, you can point to a [handlebars](https://handlebarsjs.com) template in your local repo. Check out the [existing templates](templates) to see what is possible.
 
 Save `changelog-template.hbs` somewhere in your repo:
 
@@ -311,7 +311,7 @@ Now you can use {{custom}}
 If you are upgrading from `0.x`, the same options are still supported out of the box. Nothing will break, but your changelog may look slightly different:
 
 - The default template is now `compact`
-  - If you still want to use the [`keepachangelog`](http://keepachangelog.com) format, use `--template keepachangelog`
+  - If you still want to use the [`keepachangelog`](https://keepachangelog.com) format, use `--template keepachangelog`
 - Templates now use `-` instead of `*` for lists
 - Up to 3 commits are now shown per release by default, use `--commit-limit` to change this
 - Unreleased changes are no longer listed by default, use `--unreleased` to include them
@@ -323,7 +323,7 @@ If anything isn’t working correctly, [open an issue](https://github.com/CookPe
 
 #### What’s a changelog?
 
-See [keepachangelog.com](http://keepachangelog.com).
+See [keepachangelog.com](https://keepachangelog.com).
 
 #### What does this do?
 
