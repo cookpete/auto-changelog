@@ -51,7 +51,7 @@ function parseCommits (string, remote, options = {}) {
 function parseCommit (commit, remote, options = {}) {
   const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [message, stats] = tail.split(MESSAGE_SEPARATOR)
-  return {
+  const parsed = {
     hash,
     shorthash: hash.slice(0, 7),
     author,
@@ -61,10 +61,13 @@ function parseCommit (commit, remote, options = {}) {
     subject: replaceText(getSubject(message), options),
     message: message.trim(),
     fixes: getFixes(message, author, remote, options),
-    merge: getMerge(message, author, remote, options),
     href: getCommitLink(hash, remote),
     breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats.trim())
+  }
+  return {
+    ...parsed,
+    merge: getMerge(parsed, message, remote, options)
   }
 }
 
@@ -142,7 +145,7 @@ function getMergePatterns (options) {
   return MERGE_PATTERNS
 }
 
-function getMerge (message, author, remote, options = {}) {
+function getMerge (commit, message, remote, options = {}) {
   const patterns = getMergePatterns(options)
   for (let pattern of patterns) {
     const match = pattern.exec(message)
@@ -153,7 +156,8 @@ function getMerge (message, author, remote, options = {}) {
         id,
         message: replaceText(message, options),
         href: getMergeLink(id, remote),
-        author
+        author: commit.author,
+        commit
       }
     }
   }

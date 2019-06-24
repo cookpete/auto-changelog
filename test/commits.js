@@ -205,39 +205,47 @@ describe('getFixes', () => {
 })
 
 describe('getMerge', () => {
+  const EXAMPLE_COMMIT = {
+    author: 'Commit Author',
+    id: 123
+  }
+
   it('returns null on fail', () => {
     const message = 'Not a merge commit'
-    expect(getMerge(message, 'Commit Author', remotes.github)).to.equal(null)
+    expect(getMerge(EXAMPLE_COMMIT, message, remotes.github)).to.equal(null)
   })
 
   describe('github', () => {
     it('parses a merge', () => {
       const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
-      expect(getMerge(message, 'Commit Author', remotes.github)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.github)).to.deep.equal({
         id: '3',
         message: 'Pull request title',
         href: 'https://github.com/user/repo/pull/3',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
 
     it('parses a squash merge', () => {
       const message = 'Update dependencies to enable Greenkeeper 🌴 (#10)\n\n* chore(package): update dependencies'
-      expect(getMerge(message, 'Commit Author', remotes.github)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.github)).to.deep.equal({
         id: '10',
         message: 'Update dependencies to enable Greenkeeper 🌴',
         href: 'https://github.com/user/repo/pull/10',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
 
     it('parses a squash merge with no message', () => {
       const message = 'Generate changelogs that show the commits between tags (#411)'
-      expect(getMerge(message, 'Commit Author', remotes.github)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.github)).to.deep.equal({
         id: '411',
         message: 'Generate changelogs that show the commits between tags',
         href: 'https://github.com/user/repo/pull/411',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
   })
@@ -245,11 +253,12 @@ describe('getMerge', () => {
   describe('gitlab', () => {
     it('parses a merge', () => {
       const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007'
-      expect(getMerge(message, 'Commit Author', remotes.gitlab)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.gitlab)).to.deep.equal({
         id: '15007',
         message: 'Memoize GitLab logger to reduce open file descriptors',
         href: 'https://gitlab.com/user/repo/merge_requests/15007',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
 
@@ -259,11 +268,12 @@ describe('getMerge', () => {
         hostname: 'gitlab.com',
         url: 'https://gitlab.com/user/repo/subgroup'
       }
-      expect(getMerge(message, 'Commit Author', remote)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remote)).to.deep.equal({
         id: '15007',
         message: 'Memoize GitLab logger to reduce open file descriptors',
         href: 'https://gitlab.com/user/repo/subgroup/merge_requests/15007',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
   })
@@ -271,11 +281,12 @@ describe('getMerge', () => {
   describe('bitbucket', () => {
     it('parses a merge', () => {
       const message = 'Merged in eshvedai/fix-schema-issue (pull request #4518)\n\nfix(component): re-export createSchema from editor-core\n\nApproved-by: Scott Sidwell <ssidwell@atlassian.com>'
-      expect(getMerge(message, 'Commit Author', remotes.bitbucket)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.bitbucket)).to.deep.equal({
         id: '4518',
         message: 'fix(component): re-export createSchema from editor-core',
         href: 'https://bitbucket.org/user/repo/pull-requests/4518',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
   })
@@ -284,11 +295,12 @@ describe('getMerge', () => {
     it('parses a merge', () => {
       // Use github merge message until we can find out what an azure devops one looks like
       const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
-      expect(getMerge(message, 'Commit Author', remotes.azure)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.azure)).to.deep.equal({
         id: '3',
         message: 'Pull request title',
         href: 'https://dev.azure.com/user/project/_git/repo/pullrequest/3',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
   })
@@ -297,11 +309,12 @@ describe('getMerge', () => {
     it('parses a merge', () => {
       // Use github merge message until we can find out what a visual studio one looks like
       const message = 'Merge pull request #3 from repo/branch\n\nPull request title'
-      expect(getMerge(message, 'Commit Author', remotes.visualstudio)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.visualstudio)).to.deep.equal({
         id: '3',
         message: 'Pull request title',
         href: 'https://user.visualstudio.com/project/_git/repo/pullrequest/3',
-        author: 'Commit Author'
+        author: 'Commit Author',
+        commit: EXAMPLE_COMMIT
       })
     })
   })
@@ -312,11 +325,12 @@ describe('getMerge', () => {
     }
 
     const message = 'PR #37 from repo/branch\n\ncommit sha512\nPull request title'
-    expect(getMerge(message, 'Commit Author', remotes.github, options)).to.deep.equal({
+    expect(getMerge(EXAMPLE_COMMIT, message, remotes.github, options)).to.deep.equal({
       id: '37',
       message: 'Pull request title',
       href: 'https://github.com/user/repo/pull/37',
-      author: 'Commit Author'
+      author: 'Commit Author',
+      commit: EXAMPLE_COMMIT
     })
   })
 
@@ -327,11 +341,12 @@ describe('getMerge', () => {
         '(..l)': '_$1_'
       }
     }
-    expect(getMerge(message, 'Commit Author', remotes.github, options)).to.deep.equal({
+    expect(getMerge(EXAMPLE_COMMIT, message, remotes.github, options)).to.deep.equal({
       id: '3',
       message: '_Pul_l request t_itl_e',
       href: 'https://github.com/user/repo/pull/3',
-      author: 'Commit Author'
+      author: 'Commit Author',
+      commit: EXAMPLE_COMMIT
     })
   })
 })
