@@ -15,12 +15,12 @@ export default [
         "author": "Pete Cook"
       }
     ],
-    "merge": null,
     "href": "https://github.com/user/repo/commit/2401ee4706e94629f48830bab9ed5812c032734a",
     "breaking": false,
     "files": 5,
     "insertions": 10,
-    "deletions": 10
+    "deletions": 10,
+    "merge": null
   },
   {
     "hash": "77bb243170408cd18e70ca05bf8b3ca7646ea437",
@@ -32,12 +32,12 @@ export default [
     "subject": "1.0.0",
     "message": "1.0.0\n\nThis is my major release description.\n\n- And a bullet point",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/77bb243170408cd18e70ca05bf8b3ca7646ea437",
     "breaking": false,
     "files": 2,
     "insertions": 8,
-    "deletions": 2
+    "deletions": 2,
+    "merge": null
   },
   {
     "hash": "b0b304049847d9568585bc11399fa6cfa4cab5dc",
@@ -49,12 +49,12 @@ export default [
     "subject": "Some breaking change",
     "message": "Some breaking change",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/b0b304049847d9568585bc11399fa6cfa4cab5dc",
     "breaking": false,
     "files": 5,
     "insertions": 10,
-    "deletions": 10
+    "deletions": 10,
+    "merge": null
   },
   {
     "hash": "db92947e6129cc20cd7777b7ed90b2bd547918c0",
@@ -66,12 +66,12 @@ export default [
     "subject": "0.1.0",
     "message": "0.1.0",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/db92947e6129cc20cd7777b7ed90b2bd547918c0",
     "breaking": false,
     "files": 2,
     "insertions": 8,
-    "deletions": 2
+    "deletions": 2,
+    "merge": null
   },
   {
     "hash": "e9a43b2bf50449fc0d84465308e6008cc1597bb3",
@@ -83,12 +83,12 @@ export default [
     "subject": "Another commit that fixes nothing but with less changes",
     "message": "Another commit that fixes nothing but with less changes",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/e9a43b2bf50449fc0d84465308e6008cc1597bb3",
     "breaking": false,
     "files": 1,
     "insertions": 1,
-    "deletions": 1
+    "deletions": 1,
+    "merge": null
   },
   {
     "hash": "12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
@@ -100,12 +100,12 @@ export default [
     "subject": "Commit that fixes nothing with `backticks`",
     "message": "Commit that fixes nothing with `backticks`",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
     "breaking": false,
     "files": 1,
     "insertions": 2,
-    "deletions": 3
+    "deletions": 3,
+    "merge": null
   },
   {
     "hash": "ef17dcc732d282f027aa3bddf8f91cbb05998cc8",
@@ -117,12 +117,12 @@ export default [
     "subject": "0.0.2",
     "message": "0.0.2",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/ef17dcc732d282f027aa3bddf8f91cbb05998cc8",
     "breaking": false,
     "files": 2,
     "insertions": 8,
-    "deletions": 2
+    "deletions": 2,
+    "merge": null
   },
   {
     "hash": "0e24bf427a51eac52133cc731b4b5d74a7e04672",
@@ -134,14 +134,27 @@ export default [
     "subject": "Merge pull request #5 from repo/branch",
     "message": "Merge pull request #5 from repo/branch\n\nShould not parse #4 in PR title",
     "fixes": null,
+    "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
+    "breaking": false,
     "merge": {
       "id": "5",
       "message": "Should not parse #4 in PR title",
       "href": "https://github.com/user/repo/pull/5",
-      "author": "Pete Cook"
-    },
-    "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
-    "breaking": false
+      "author": "Pete Cook",
+      "commit": {
+        "hash": "0e24bf427a51eac52133cc731b4b5d74a7e04672",
+        "shorthash": "0e24bf4",
+        "author": "Pete Cook",
+        "email": "email@example.com",
+        "date": "2015-12-24T20:29:22.000Z",
+        "tag": null,
+        "subject": "Merge pull request #5 from repo/branch",
+        "message": "Merge pull request #5 from repo/branch\n\nShould not parse #4 in PR title",
+        "fixes": null,
+        "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
+        "breaking": false
+      }
+    }
   },
   {
     "hash": "92839699a6aaea148dcd72ea897321e66cae0c18",
@@ -153,12 +166,12 @@ export default [
     "subject": "Merge remote-tracking branch 'random-branch' into master",
     "message": "Merge remote-tracking branch 'random-branch' into master",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/92839699a6aaea148dcd72ea897321e66cae0c18",
     "breaking": false,
     "files": 1,
     "insertions": 1,
-    "deletions": 0
+    "deletions": 0,
+    "merge": null
   },
   {
     "hash": "17fbef87e82889f01d8257900f7edc55b05918a2",
@@ -176,12 +189,12 @@ export default [
         "author": "Pete Cook"
       }
     ],
-    "merge": null,
     "href": "https://github.com/user/repo/commit/17fbef87e82889f01d8257900f7edc55b05918a2",
     "breaking": false,
     "files": 1,
     "insertions": 1,
-    "deletions": 0
+    "deletions": 0,
+    "merge": null
   },
   {
     "hash": "796edd129a6aaea148dcd72ea897321e66cae0c1",
@@ -193,12 +206,12 @@ export default [
     "subject": "0.0.1",
     "message": "0.0.1",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/796edd129a6aaea148dcd72ea897321e66cae0c1",
     "breaking": false,
     "files": 2,
     "insertions": 8,
-    "deletions": 2
+    "deletions": 2,
+    "merge": null
   },
   {
     "hash": "31b7d3da24d64e32a0a7e558f254d01c348613f3",
@@ -210,14 +223,27 @@ export default [
     "subject": "Merge pull request #3 from repo/branch",
     "message": "Merge pull request #3 from repo/branch\n\nThird commit with same name as PR",
     "fixes": null,
+    "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
+    "breaking": false,
     "merge": {
       "id": "3",
       "message": "Third commit with same name as PR",
       "href": "https://github.com/user/repo/pull/3",
-      "author": "Pete Cook"
-    },
-    "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
-    "breaking": false
+      "author": "Pete Cook",
+      "commit": {
+        "hash": "31b7d3da24d64e32a0a7e558f254d01c348613f3",
+        "shorthash": "31b7d3d",
+        "author": "Pete Cook",
+        "email": "email@example.com",
+        "date": "2015-12-15T11:37:05.000Z",
+        "tag": null,
+        "subject": "Merge pull request #3 from repo/branch",
+        "message": "Merge pull request #3 from repo/branch\n\nThird commit with same name as PR",
+        "fixes": null,
+        "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
+        "breaking": false
+      }
+    }
   },
   {
     "hash": "1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
@@ -229,12 +255,12 @@ export default [
     "subject": "Third commit with same name as PR",
     "message": "Third commit with same name as PR",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
     "breaking": false,
     "files": 8,
     "insertions": 57,
-    "deletions": 53
+    "deletions": 53,
+    "merge": null
   },
   {
     "hash": "90ef33485369fc7892d11b2e4da04ffb64df1e99",
@@ -257,12 +283,12 @@ export default [
         "author": "Pete Cook"
       }
     ],
-    "merge": null,
     "href": "https://github.com/user/repo/commit/90ef33485369fc7892d11b2e4da04ffb64df1e99",
     "breaking": false,
     "files": 8,
     "insertions": 57,
-    "deletions": 53
+    "deletions": 53,
+    "merge": null
   },
   {
     "hash": "158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
@@ -274,11 +300,11 @@ export default [
     "subject": "First commit",
     "message": "First commit",
     "fixes": null,
-    "merge": null,
     "href": "https://github.com/user/repo/commit/158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
     "breaking": false,
     "files": 7,
     "insertions": 37,
-    "deletions": 22
+    "deletions": 22,
+    "merge": null
   }
 ]
