@@ -47,6 +47,7 @@
     "lodash.uniqby": "^4.7.0",
     "node-fetch": "^2.6.0",
     "parse-github-url": "^1.0.2",
+    "regenerator-runtime": "^0.13.2",
     "semver": "^6.1.1"
   },
   "devDependencies": {
