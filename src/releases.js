@@ -3,7 +3,6 @@ import { niceDate } from './utils'
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
-const NUMERIC_PATTERN = /^\d+(\.\d+)?$/
 
 export function parseReleases (commits, remote, latestVersion, options) {
   let release = newRelease(latestVersion)
@@ -53,9 +52,6 @@ export function sortReleases (a, b) {
     if (semver.valid(tags.a) && semver.valid(tags.b)) {
       return semver.rcompare(tags.a, tags.b)
     }
-    if (NUMERIC_PATTERN.test(tags.a) && NUMERIC_PATTERN.test(tags.b)) {
-      return parseFloat(tags.a) < parseFloat(tags.b) ? 1 : -1
-    }
     if (tags.a === tags.b) {
       return 0
     }
@@ -67,11 +63,11 @@ export function sortReleases (a, b) {
 }
 
 function inferSemver (tag) {
-  if (/^v\d+$/.test(tag)) {
+  if (/^v?\d+$/.test(tag)) {
     // v1 becomes v1.0.0
     return `${tag}.0.0`
   }
-  if (/^v\d+\.\d+$/.test(tag)) {
+  if (/^v?\d+\.\d+$/.test(tag)) {
     // v1.0 becomes v1.0.0
     return `${tag}.0`
   }

@@ -120,6 +120,8 @@ describe('sortReleases', () => {
     expect(sortReleases({ tag: '22.0' }, { tag: '22.1' })).to.equal(1)
     expect(sortReleases({ tag: '123.0' }, { tag: '22.1' })).to.equal(-1)
     expect(sortReleases({ tag: '0.1' }, { tag: '0.01' })).to.equal(-1)
+    expect(sortReleases({ tag: '0.14' }, { tag: '0.2' })).to.equal(-1)
+    expect(sortReleases({ tag: '0.2' }, { tag: '0.14' })).to.equal(1)
   })
 
   it('supports partial semver tags', () => {
