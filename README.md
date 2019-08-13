@@ -30,6 +30,7 @@ Options:
   -l, --commit-limit [count]          # number of commits to display per release, default: 3
   -b, --backfill-limit [count]        # number of commits to backfill empty releases with, default: 3
   -i, --issue-url [url]               # override url for issues, use {id} for issue id
+  -c, --config [file]                 # config file location, default: .auto-changelog
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
