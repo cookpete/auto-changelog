@@ -8,7 +8,7 @@ export function parseReleases (commits, remote, latestVersion, options) {
   let release = newRelease(latestVersion)
   const releases = []
   const sortCommits = commitSorter(options)
-  for (let commit of commits) {
+  for (const commit of commits) {
     if (commit.tag) {
       if (release.tag || options.unreleased) {
         releases.push({

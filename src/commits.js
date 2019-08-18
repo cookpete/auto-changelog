@@ -73,7 +73,7 @@ function parseCommit (commit, remote, options = {}) {
 
 function getTag (refs, options) {
   if (!refs) return null
-  for (let ref of refs.split(', ')) {
+  for (const ref of refs.split(', ')) {
     const prefix = `tag: ${options.tagPrefix}`
     if (ref.indexOf(prefix) === 0) {
       const tag = ref.replace(prefix, '')
@@ -110,7 +110,7 @@ function getStats (stats) {
 
 function getFixes (message, author, remote, options = {}) {
   const pattern = getFixPattern(options)
-  let fixes = []
+  const fixes = []
   let match = pattern.exec(message)
   if (!match) return null
   while (match) {
@@ -147,7 +147,7 @@ function getMergePatterns (options) {
 
 function getMerge (commit, message, remote, options = {}) {
   const patterns = getMergePatterns(options)
-  for (let pattern of patterns) {
+  for (const pattern of patterns) {
     const match = pattern.exec(message)
     if (match) {
       const id = /^\d+$/.test(match[1]) ? match[1] : match[2]

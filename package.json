@@ -8,6 +8,7 @@
   },
   "scripts": {
     "lint": "standard --verbose | snazzy",
+    "lint-fix": "standard --fix",
     "lint-markdown": "markdownlint README.md test/data/*.md",
     "test": "cross-env NODE_ENV=test nyc mocha test",
     "coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",

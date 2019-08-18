@@ -18,7 +18,7 @@ export function formatBytes (bytes) {
 
 // Simple util for calling a child process
 export function cmd (string, onProgress) {
-  const [ cmd, ...args ] = string.trim().split(' ')
+  const [cmd, ...args] = string.trim().split(' ')
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, args)
     let data = ''

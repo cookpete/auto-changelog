@@ -81,7 +81,7 @@ describe('parseCommits', () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     const options = {
       replaceText: {
-        'breaking': '**BREAKING**'
+        breaking: '**BREAKING**'
       }
     }
     const result = parseCommits(gitLog, remotes.github, options)

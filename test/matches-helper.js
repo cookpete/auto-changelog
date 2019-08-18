@@ -51,15 +51,17 @@ describe('matches helper', () => {
   })
 
   it('matches on multiline content', () => {
-    const multiReleases = [{ commits: [
-      {
-        shorthash: 'c0f25d7',
-        message: 'Hello\n\nWorld\n\nBREAKING CHANGE: mock break\n\nsome more text'
-      }, {
-        shorthash: '12cd728',
-        message: 'Nope'
-      }
-    ] }]
+    const multiReleases = [{
+      commits: [
+        {
+          shorthash: 'c0f25d7',
+          message: 'Hello\n\nWorld\n\nBREAKING CHANGE: mock break\n\nsome more text'
+        }, {
+          shorthash: '12cd728',
+          message: 'Nope'
+        }
+      ]
+    }]
     const matches =
       '{{#matches message "BREAKING CHANGE"}}\n' +
         '- {{shorthash}}\n' +
