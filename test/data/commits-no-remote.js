@@ -279,7 +279,7 @@ export default [
       },
       {
         "id": "2",
-        "href": null,
+        "href": "https://github.com/user/repo/issues/2",
         "author": "Pete Cook"
       }
     ],

@@ -58,7 +58,7 @@ describe('run', () => {
   it('generates a changelog with no remote', async () => {
     const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'))
 
-    mock('fetchRemote', () => null)
+    mock('fetchRemote', () => remotes.null)
     mock('fetchCommits', () => commitsNoRemote)
     mock('writeFile', (output, log) => {
       expect(output).to.equal('CHANGELOG.md')

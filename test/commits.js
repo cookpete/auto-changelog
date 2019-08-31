@@ -39,7 +39,7 @@ describe('parseCommits', () => {
 
   it('parses commits without remote', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
-    expect(parseCommits(gitLog, null, options)).to.deep.equal(commitsNoRemote)
+    expect(parseCommits(gitLog, remotes.null, options)).to.deep.equal(commitsNoRemote)
   })
 
   it('parses bitbucket commits', async () => {
@@ -170,36 +170,24 @@ describe('getFixes', () => {
     ])
   })
 
-  it('supports issueUrl parameter', () => {
-    const options = {
-      issueUrl: 'http://example.com/issues/{id}'
-    }
-    const message = 'Commit message\n\nCloses #8'
-    expect(getFixes(message, 'Commit Author', remotes.github, options)).to.deep.equal([
-      { id: '8', href: 'http://example.com/issues/8', author: 'Commit Author' }
-    ])
-  })
-
   it('supports issuePattern parameter', () => {
     const options = {
-      issuePattern: '[A-Z]+-\\d+',
-      issueUrl: 'http://example.com/issues/{id}'
+      issuePattern: '[A-Z]+-\\d+'
     }
     const message = 'Commit message\n\nCloses ABC-1234'
     expect(getFixes(message, 'Commit Author', remotes.github, options)).to.deep.equal([
-      { id: 'ABC-1234', href: 'http://example.com/issues/ABC-1234', author: 'Commit Author' }
+      { id: 'ABC-1234', href: 'https://github.com/user/repo/issues/ABC-1234', author: 'Commit Author' }
     ])
   })
 
   it('supports issuePattern parameter with capture group', () => {
     const options = {
-      issuePattern: '[Ff]ixes ([A-Z]+-\\d+)',
-      issueUrl: 'http://example.com/issues/{id}'
+      issuePattern: '[Ff]ixes ([A-Z]+-\\d+)'
     }
     const message = 'Commit message\n\nFixes ABC-1234 and fixes ABC-2345 but not BCD-2345'
     expect(getFixes(message, 'Commit Author', remotes.github, options)).to.deep.equal([
-      { id: 'ABC-1234', href: 'http://example.com/issues/ABC-1234', author: 'Commit Author' },
-      { id: 'ABC-2345', href: 'http://example.com/issues/ABC-2345', author: 'Commit Author' }
+      { id: 'ABC-1234', href: 'https://github.com/user/repo/issues/ABC-1234', author: 'Commit Author' },
+      { id: 'ABC-2345', href: 'https://github.com/user/repo/issues/ABC-2345', author: 'Commit Author' }
     ])
   })
 })
@@ -264,11 +252,7 @@ describe('getMerge', () => {
 
     it('parses a merge for subgroups', () => {
       const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request user/repo/subgroup!15007'
-      const remote = {
-        hostname: 'gitlab.com',
-        url: 'https://gitlab.com/user/repo/subgroup'
-      }
-      expect(getMerge(EXAMPLE_COMMIT, message, remote)).to.deep.equal({
+      expect(getMerge(EXAMPLE_COMMIT, message, remotes.gitlabSubgroup)).to.deep.equal({
         id: '15007',
         message: 'Memoize GitLab logger to reduce open file descriptors',
         href: 'https://gitlab.com/user/repo/subgroup/merge_requests/15007',

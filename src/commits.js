@@ -61,7 +61,7 @@ function parseCommit (commit, remote, options = {}) {
     subject: replaceText(getSubject(message), options),
     message: message.trim(),
     fixes: getFixes(message, author, remote, options),
-    href: getCommitLink(hash, remote),
+    href: remote.getCommitLink(hash),
     breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats.trim())
   }
@@ -115,7 +115,7 @@ function getFixes (message, author, remote, options = {}) {
   if (!match) return null
   while (match) {
     const id = getFixID(match)
-    const href = getIssueLink(match, id, remote, options.issueUrl)
+    const href = isLink(match[2]) ? match[2] : remote.getIssueLink(id)
     fixes.push({ id, href, author })
     match = pattern.exec(message)
   }
@@ -155,53 +155,11 @@ function getMerge (commit, message, remote, options = {}) {
       return {
         id,
         message: replaceText(message, options),
-        href: getMergeLink(id, remote),
+        href: remote.getMergeLink(id),
         author: commit.author,
         commit
       }
     }
   }
   return null
-}
-
-function getCommitLink (hash, remote) {
-  if (!remote) {
-    return null
-  }
-  if (/bitbucket/.test(remote.hostname)) {
-    return `${remote.url}/commits/${hash}`
-  }
-  return `${remote.url}/commit/${hash}`
-}
-
-function getIssueLink (match, id, remote, issueUrl) {
-  if (!remote) {
-    return null
-  }
-  if (isLink(match[2])) {
-    return match[2]
-  }
-  if (issueUrl) {
-    return issueUrl.replace('{id}', id)
-  }
-  if (/dev\.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
-    return `${remote.projectUrl}/_workitems/edit/${id}`
-  }
-  return `${remote.url}/issues/${id}`
-}
-
-function getMergeLink (id, remote) {
-  if (!remote) {
-    return null
-  }
-  if (/bitbucket/.test(remote.hostname)) {
-    return `${remote.url}/pull-requests/${id}`
-  }
-  if (/gitlab/.test(remote.hostname)) {
-    return `${remote.url}/merge_requests/${id}`
-  }
-  if (/dev\.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
-    return `${remote.url}/pullrequest/${id}`
-  }
-  return `${remote.url}/pull/${id}`
 }

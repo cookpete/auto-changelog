@@ -13,10 +13,9 @@ export function parseReleases (commits, remote, latestVersion, options) {
       if (release.tag || options.unreleased) {
         releases.push({
           ...release,
-          href: getCompareLink(
+          href: remote.getCompareLink(
             `${options.tagPrefix}${commit.tag}`,
-            release.tag ? `${options.tagPrefix}${release.tag}` : 'HEAD',
-            remote
+            release.tag ? `${options.tagPrefix}${release.tag}` : 'HEAD'
           ),
           commits: sliceCommits(release.commits.sort(sortCommits), options, release),
           major: !options.tagPattern && commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
@@ -119,19 +118,6 @@ function filterCommit (commit, { ignoreCommitPattern }, release) {
     return false
   }
   return true
-}
-
-function getCompareLink (from, to, remote) {
-  if (!remote) {
-    return null
-  }
-  if (/bitbucket/.test(remote.hostname)) {
-    return `${remote.url}/compare/${to}..${from}`
-  }
-  if (/dev\.azure/.test(remote.hostname) || /visualstudio/.test(remote.hostname)) {
-    return `${remote.url}/branches?baseVersion=GT${to}&targetVersion=GT${from}&_a=commits`
-  }
-  return `${remote.url}/compare/${from}...${to}`
 }
 
 function getSummary (message, releaseSummary) {
