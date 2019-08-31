@@ -22,6 +22,7 @@ Usage: auto-changelog [options]
 Options:
 
   -o, --output [file]                 # output file, default: CHANGELOG.md
+  -c, --config [file]                 # config file location, default: .auto-changelog
   -t, --template [template]           # specify template to use [compact, keepachangelog, json], default: compact
   -r, --remote [remote]               # specify git remote to use for links, default: origin
   -p, --package                       # use version from package.json as latest release
@@ -29,8 +30,10 @@ Options:
   -u, --unreleased                    # include section for unreleased changes
   -l, --commit-limit [count]          # number of commits to display per release, default: 3
   -b, --backfill-limit [count]        # number of commits to backfill empty releases with, default: 3
-  -i, --issue-url [url]               # override url for issues, use {id} for issue id
-  -c, --config [file]                 # config file location, default: .auto-changelog
+      --commit-url [url]              # override url for commits, use {id} for commit id
+      --issue-url [url]               # override url for issues, use {id} for issue id
+      --merge-url [url]               # override url for merges, use {id} for merge id
+      --compare-url [url]             # override url for compares, use {from} and {to} for tags
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
@@ -51,80 +54,12 @@ Options:
 # Write log to CHANGELOG.md in current directory
 auto-changelog
 
-# Write log to HISTORY.md
-auto-changelog --output HISTORY.md
+# Write log to HISTORY.md using keepachangelog template
+auto-changelog --output HISTORY.md --template keepachangelog
 
-# Write log using keepachangelog template
-auto-changelog --template keepachangelog
-
-# Write log using custom handlebars template in current directory
-auto-changelog --template my-custom-template.hbs
-
-# Change rendered commit limit to 5
-auto-changelog --commit-limit 5
-
-# Disable the commit limit, rendering all commits
+# Disable the commit limit, rendering all commits for every release
 auto-changelog --commit-limit false
 ```
-
-By default, changelogs will link to the appropriate pages for commits, issues and merge requests based on the `origin` remote of your repo. GitHub, GitLab, BitBucket and Azure DevOps are all supported. If you [close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords) but refer to issues outside of your repository, you can use `--issue-url` to link somewhere else:
-
-```bash
-# Link all issues to redmine
-auto-changelog --issue-url https://www.redmine.org/issues/{id}
-```
-
-Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
-
-```bash
-# When all versions are tagged like my-package/1.2.3
-auto-changelog --tag-prefix my-package/
-```
-
-By default, `auto-changelog` looks for valid semver tags to build a list of releases. If you are using another format (or want to include all tags), use `--tag-pattern [regex]`:
-
-```bash
-# When all versions are tagged like build-12345
-auto-changelog --tag-pattern build-\d+
-
-# Include any tag as a release
-auto-changelog --tag-pattern .+
-```
-
-You can also set any option in `package.json` under the `auto-changelog` key, using camelCase options. Note that `includeBranch` should be an array here, not a comma separated list:
-
-```js
-{
-  "name": "my-awesome-package",
-  "version": "1.0.0",
-  "scripts": {
-    // ...
-  },
-  "auto-changelog": {
-    "output": "HISTORY.md",
-    "template": "keepachangelog",
-    "unreleased": true,
-    "commitLimit": false,
-    "includeBranch": [
-      "release-v2",
-      "release-v3"
-    ]
-  }
-}
-```
-
-You can also store config options in an `.auto-changelog` file in your project root:
-
-```js
-{
-  "output": "HISTORY.md",
-  "template": "keepachangelog",
-  "unreleased": true,
-  "commitLimit": false
-}
-```
-
-Note that any options set in `package.json` will take precedence over any set in `.auto-changelog`.
 
 ### Requirements
 
@@ -167,7 +102,79 @@ Using `-p` or `--package` uses the `version` from `package.json` as the latest r
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
 
-### Breaking changes
+### Advanced Usage
+
+#### URL Overrides
+
+Links to commits, issues, pull requests and version diffs are automatically generated based on your remote URL. GitHub, GitLab, BitBucket and Azure DevOps are all supported. If you have an unusual remote or need to override one of the link formats, use `--commit-url`, `--issue-url` or `--merge-url` with an `{id}` token. For custom version diffs, use `--compare-url` with `{from}` and `{to}` tokens.
+
+```bash
+# Link all issues to redmine
+auto-changelog --issue-url https://www.redmine.org/issues/{id}
+
+# Link to custom diff page
+auto-changelog --compare-url https://example.com/repo/compare/{from}...{to}
+```
+
+#### Configuration
+
+You can set any option in `package.json` under the `auto-changelog` key, using camelCase options. Note that `includeBranch` should be an array here, not a comma separated list:
+
+```js
+{
+  "name": "my-awesome-package",
+  "version": "1.0.0",
+  "scripts": {
+    // ...
+  },
+  "auto-changelog": {
+    "output": "HISTORY.md",
+    "template": "keepachangelog",
+    "unreleased": true,
+    "commitLimit": false,
+    "includeBranch": [
+      "release-v2",
+      "release-v3"
+    ]
+  }
+}
+```
+
+You can also store config options in an `.auto-changelog` file in your project root:
+
+```js
+{
+  "output": "HISTORY.md",
+  "template": "keepachangelog",
+  "unreleased": true,
+  "commitLimit": false
+}
+```
+
+Note that any options set in `package.json` will take precedence over any set in `.auto-changelog`.
+
+#### Tag prefixes
+
+Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
+
+```bash
+# When all versions are tagged like my-package/1.2.3
+auto-changelog --tag-prefix my-package/
+```
+
+#### Tag patterns
+
+By default, `auto-changelog` looks for valid semver tags to build a list of releases. If you are using another format (or want to include all tags), use `--tag-pattern [regex]`:
+
+```bash
+# When all versions are tagged like build-12345
+auto-changelog --tag-pattern build-\d+
+
+# Include any tag as a release
+auto-changelog --tag-pattern .+
+```
+
+#### Breaking changes
 
 If you use a common pattern in your commit messages for breaking changes, use `--breaking-pattern` to highlight those commits as breaking changes in your changelog. Breaking change commits will always be listed as part of a release, regardless of any `--commit-limit` set.
 
@@ -175,7 +182,35 @@ If you use a common pattern in your commit messages for breaking changes, use `-
 auto-changelog --breaking-pattern "BREAKING CHANGE:"
 ```
 
-### Custom templates
+#### Custom issue patterns
+
+By default, `auto-changelog` will parse [GitHub-style issue fixes](https://help.github.com/articles/closing-issues-using-keywords/) in your commit messages. If you use Jira or an alternative pattern in your commits to reference issues, you can pass in a custom regular expression to `--issue-pattern` along with `--issue-url`:
+
+```bash
+# Parse Jira-style issues in your commit messages, like PROJECT-418
+auto-changelog --issue-pattern [A-Z]+-\d+ --issue-url https://issues.apache.org/jira/browse/{id}
+```
+
+Or, in your `package.json`:
+
+```js
+{
+  "name": "my-awesome-package",
+  "auto-changelog": {
+    "issueUrl": "https://issues.apache.org/jira/browse/{id}",
+    "issuePattern": "[A-Z]+-\d+"
+  }
+}
+```
+
+If you use a certain pattern before or after the issue number, like `fixes {id}`, just use a capturing group:
+
+```bash
+# "This commit fixes ISSUE-123" will now parse ISSUE-123 as an issue fix
+auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
+```
+
+#### Custom templates
 
 If you aren’t happy with the default templates or want to tweak something, you can point to a [handlebars](https://handlebarsjs.com) template in your local repo. Check out the [existing templates](templates) to see what is possible.
 
@@ -218,7 +253,7 @@ To see exactly what data is passed in to the templates, you can generate a JSON 
 auto-changelog --template json --output changelog-data.json
 ```
 
-### `commit-list` helper
+#### `commit-list` helper
 
 Use `{{#commit-list}}` to render a list of commits depending on certain patterns in the commit messages:
 
@@ -245,35 +280,7 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
 | `subject` | A regex pattern to match against the commit subject only |
 | `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
 
-### Custom issue patterns
-
-By default, `auto-changelog` will parse [GitHub-style issue fixes](https://help.github.com/articles/closing-issues-using-keywords/) in your commit messages. If you use Jira or an alternative pattern in your commits to reference issues, you can pass in a custom regular expression to `--issue-pattern` along with `--issue-url`:
-
-```bash
-# Parse Jira-style issues in your commit messages, like PROJECT-418
-auto-changelog --issue-pattern [A-Z]+-\d+ --issue-url https://issues.apache.org/jira/browse/{id}
-```
-
-Or, in your `package.json`:
-
-```js
-{
-  "name": "my-awesome-package",
-  "auto-changelog": {
-    "issueUrl": "https://issues.apache.org/jira/browse/{id}",
-    "issuePattern": "[A-Z]+-\d+"
-  }
-}
-```
-
-If you use a certain pattern before or after the issue number, like `fixes {id}`, just use a capturing group:
-
-```bash
-# "This commit fixes ISSUE-123" will now parse ISSUE-123 as an issue fix
-auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
-```
-
-### Replacing text
+#### Replacing text
 
 To insert links or other markup to PR titles and commit messages that appear in the log, use the `replaceText` option in your `package.json`:
 
@@ -290,7 +297,7 @@ To insert links or other markup to PR titles and commit messages that appear in 
 
 Here, any time a pattern like `ABC-123` appears in your log, it will be replaced with a link to the relevant issue in Jira. Each pattern is applied using `string.replace(new RegExp(key, 'g'), value)`.
 
-### Handlebars setup file
+#### Handlebars setup file
 
 The `--handlebars-setup` options allows you to point to a file to add custom Handlebars helpers, for use in custom templates using `--template`. Paths are relative to the directory in which you run `auto-changelog`.
 
@@ -307,19 +314,6 @@ module.exports = function (Handlebars) {
 // custom-template.hbs
 Now you can use {{custom}}
 ```
-
-### Migrating to `1.x`
-
-If you are upgrading from `0.x`, the same options are still supported out of the box. Nothing will break, but your changelog may look slightly different:
-
-- The default template is now `compact`
-  - If you still want to use the [`keepachangelog`](https://keepachangelog.com) format, use `--template keepachangelog`
-- Templates now use `-` instead of `*` for lists
-- Up to 3 commits are now shown per release by default, use `--commit-limit` to change this
-- Unreleased changes are no longer listed by default, use `--unreleased` to include them
-- [GitLab](https://gitlab.com) and [BitBucket](https://bitbucket.org) are now fully supported
-
-If anything isn’t working correctly, [open an issue](https://github.com/CookPete/auto-changelog/issues).
 
 ### FAQ
 
