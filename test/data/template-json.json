@@ -1,5 +1,10 @@
 [
   {
+    "tag": "v1.0.0",
+    "title": "v1.0.0",
+    "date": "2015-12-15T12:03:09.000Z",
+    "isoDate": "2015-12-15",
+    "niceDate": "15 December 2015",
     "commits": [
       {
         "hash": "b0b304049847d9568585bc11399fa6cfa4cab5dc",
@@ -19,18 +24,18 @@
         "merge": null
       }
     ],
-    "fixes": [],
     "merges": [],
-    "tag": "v1.0.0",
-    "date": "2015-12-15T12:03:09.000Z",
+    "fixes": [],
     "summary": null,
-    "title": "v1.0.0",
-    "niceDate": "15 December 2015",
-    "isoDate": "2015-12-15",
-    "href": "https://github.com/user/repo/compare/v0.1.0...v1.0.0",
-    "major": true
+    "major": true,
+    "href": "https://github.com/user/repo/compare/v0.1.0...v1.0.0"
   },
   {
+    "tag": "v0.1.0",
+    "title": "v0.1.0",
+    "date": "2015-12-29T21:19:17.000Z",
+    "isoDate": "2015-12-29",
+    "niceDate": "29 December 2015",
     "commits": [
       {
         "hash": "12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
@@ -67,19 +72,40 @@
         "merge": null
       }
     ],
-    "fixes": [],
     "merges": [],
-    "tag": "v0.1.0",
-    "date": "2015-12-29T21:19:17.000Z",
+    "fixes": [],
     "summary": null,
-    "title": "v0.1.0",
-    "niceDate": "29 December 2015",
-    "isoDate": "2015-12-29",
-    "href": "https://github.com/user/repo/compare/v0.0.2...v0.1.0",
-    "major": false
+    "major": false,
+    "href": "https://github.com/user/repo/compare/v0.0.2...v0.1.0"
   },
   {
+    "tag": "v0.0.2",
+    "title": "v0.0.2",
+    "date": "2015-12-28T21:17:17.000Z",
+    "isoDate": "2015-12-28",
+    "niceDate": "28 December 2015",
     "commits": [],
+    "merges": [
+      {
+        "id": "5",
+        "message": "Should not parse #4 in PR title",
+        "href": "https://github.com/user/repo/pull/5",
+        "author": "Pete Cook",
+        "commit": {
+          "hash": "0e24bf427a51eac52133cc731b4b5d74a7e04672",
+          "shorthash": "0e24bf4",
+          "author": "Pete Cook",
+          "email": "email@example.com",
+          "date": "2015-12-24T20:29:22.000Z",
+          "tag": null,
+          "subject": "Merge pull request #5 from repo/branch",
+          "message": "Merge pull request #5 from repo/branch\n\nShould not parse #4 in PR title",
+          "fixes": null,
+          "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
+          "breaking": false
+        }
+      }
+    ],
     "fixes": [
       {
         "fixes": [
@@ -114,37 +140,16 @@
         }
       }
     ],
-    "merges": [
-      {
-        "id": "5",
-        "message": "Should not parse #4 in PR title",
-        "href": "https://github.com/user/repo/pull/5",
-        "author": "Pete Cook",
-        "commit": {
-          "hash": "0e24bf427a51eac52133cc731b4b5d74a7e04672",
-          "shorthash": "0e24bf4",
-          "author": "Pete Cook",
-          "email": "email@example.com",
-          "date": "2015-12-24T20:29:22.000Z",
-          "tag": null,
-          "subject": "Merge pull request #5 from repo/branch",
-          "message": "Merge pull request #5 from repo/branch\n\nShould not parse #4 in PR title",
-          "fixes": null,
-          "href": "https://github.com/user/repo/commit/0e24bf427a51eac52133cc731b4b5d74a7e04672",
-          "breaking": false
-        }
-      }
-    ],
-    "tag": "v0.0.2",
-    "date": "2015-12-28T21:17:17.000Z",
     "summary": null,
-    "title": "v0.0.2",
-    "niceDate": "28 December 2015",
-    "isoDate": "2015-12-28",
-    "href": "https://github.com/user/repo/compare/v0.0.1...v0.0.2",
-    "major": false
+    "major": false,
+    "href": "https://github.com/user/repo/compare/v0.0.1...v0.0.2"
   },
   {
+    "tag": "v0.0.1",
+    "title": "v0.0.1",
+    "date": "2015-12-15T12:03:09.000Z",
+    "isoDate": "2015-12-15",
+    "niceDate": "15 December 2015",
     "commits": [
       {
         "hash": "158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
@@ -162,6 +167,27 @@
         "insertions": 37,
         "deletions": 22,
         "merge": null
+      }
+    ],
+    "merges": [
+      {
+        "id": "3",
+        "message": "Third commit with same name as PR",
+        "href": "https://github.com/user/repo/pull/3",
+        "author": "Pete Cook",
+        "commit": {
+          "hash": "31b7d3da24d64e32a0a7e558f254d01c348613f3",
+          "shorthash": "31b7d3d",
+          "author": "Pete Cook",
+          "email": "email@example.com",
+          "date": "2015-12-15T11:37:05.000Z",
+          "tag": null,
+          "subject": "Merge pull request #3 from repo/branch",
+          "message": "Merge pull request #3 from repo/branch\n\nThird commit with same name as PR",
+          "fixes": null,
+          "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
+          "breaking": false
+        }
       }
     ],
     "fixes": [
@@ -208,32 +234,8 @@
         }
       }
     ],
-    "merges": [
-      {
-        "id": "3",
-        "message": "Third commit with same name as PR",
-        "href": "https://github.com/user/repo/pull/3",
-        "author": "Pete Cook",
-        "commit": {
-          "hash": "31b7d3da24d64e32a0a7e558f254d01c348613f3",
-          "shorthash": "31b7d3d",
-          "author": "Pete Cook",
-          "email": "email@example.com",
-          "date": "2015-12-15T11:37:05.000Z",
-          "tag": null,
-          "subject": "Merge pull request #3 from repo/branch",
-          "message": "Merge pull request #3 from repo/branch\n\nThird commit with same name as PR",
-          "fixes": null,
-          "href": "https://github.com/user/repo/commit/31b7d3da24d64e32a0a7e558f254d01c348613f3",
-          "breaking": false
-        }
-      }
-    ],
-    "tag": "v0.0.1",
-    "date": "2015-12-15T12:03:09.000Z",
     "summary": null,
-    "title": "v0.0.1",
-    "niceDate": "15 December 2015",
-    "isoDate": "2015-12-15"
+    "major": false,
+    "href": null
   }
 ]
