@@ -4,42 +4,49 @@ import { niceDate } from './utils'
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
-export function parseReleases (commits, remote, latestVersion, options) {
-  let release = newRelease(latestVersion)
-  const releases = []
-  const sortCommits = commitSorter(options)
-  for (const commit of commits) {
-    if (commit.tag) {
-      if (release.tag || options.unreleased) {
-        releases.push({
-          ...release,
-          href: remote.getCompareLink(
-            `${options.tagPrefix}${commit.tag}`,
-            release.tag ? `${options.tagPrefix}${release.tag}` : 'HEAD'
-          ),
-          commits: sliceCommits(release.commits.sort(sortCommits), options, release),
-          major: !options.tagPattern && commit.tag && release.tag && semver.diff(commit.tag, release.tag) === 'major'
-        })
-      }
-      const summary = getSummary(commit.message, options.releaseSummary)
-      release = newRelease(commit.tag, commit.date, summary)
-    }
-    if (commit.merge) {
-      release.merges.push(commit.merge)
-    } else if (commit.fixes) {
-      release.fixes.push({
-        fixes: commit.fixes,
-        commit
-      })
-    } else if (filterCommit(commit, options, release)) {
-      release.commits.push(commit)
-    }
+function commitReducer ({ map, version }, commit) {
+  const currentVersion = commit.tag || version
+  const commits = map[currentVersion] || []
+  return {
+    map: {
+      ...map,
+      [currentVersion]: [...commits, commit]
+    },
+    version: currentVersion
   }
-  releases.push({
-    ...release,
-    commits: sliceCommits(release.commits.sort(sortCommits), options, release)
+}
+
+export function parseReleases (commits, remote, latestVersion, options) {
+  const { map } = commits.reduce(commitReducer, { map: {}, version: latestVersion })
+  return Object.keys(map).map((key, index, versions) => {
+    const commits = map[key]
+    const previousVersion = versions[index + 1] || null
+    const versionCommit = commits.find(commit => commit.tag) || {}
+    const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
+    const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
+    const tag = versionCommit.tag || latestVersion
+    const date = versionCommit.date || new Date().toISOString()
+    const filteredCommits = commits
+      .filter(commit => filterCommit(commit, options, merges))
+      .sort(commitSorter(options))
+    const emptyRelease = merges.length === 0 && fixes.length === 0
+    const { tagPattern, tagPrefix } = options
+    return {
+      tag,
+      title: tag || 'Unreleased',
+      date,
+      isoDate: date.slice(0, 10),
+      niceDate: niceDate(date),
+      commits: sliceCommits(filteredCommits, options, emptyRelease),
+      merges,
+      fixes,
+      summary: getSummary(versionCommit.message, options),
+      major: Boolean(!tagPattern && tag && previousVersion && semver.diff(tag, previousVersion) === 'major'),
+      href: previousVersion ? remote.getCompareLink(`${tagPrefix}${previousVersion}`, tag ? `${tagPrefix}${tag}` : 'HEAD') : null
+    }
+  }).filter(release => {
+    return options.unreleased ? true : release.tag
   })
-  return releases
 }
 
 export function sortReleases (a, b) {
@@ -73,31 +80,20 @@ function inferSemver (tag) {
   return tag
 }
 
-function newRelease (tag = null, date = new Date().toISOString(), summary = null) {
-  return {
-    commits: [],
-    fixes: [],
-    merges: [],
-    tag,
-    date,
-    summary,
-    title: tag || 'Unreleased',
-    niceDate: niceDate(date),
-    isoDate: date.slice(0, 10)
-  }
-}
-
-function sliceCommits (commits, { commitLimit, backfillLimit }, release) {
+function sliceCommits (commits, { commitLimit, backfillLimit }, emptyRelease) {
   if (commitLimit === false) {
     return commits
   }
-  const emptyRelease = release.fixes.length === 0 && release.merges.length === 0
   const limit = emptyRelease ? backfillLimit : commitLimit
   const minLimit = commits.filter(c => c.breaking).length
   return commits.slice(0, Math.max(minLimit, limit))
 }
 
-function filterCommit (commit, { ignoreCommitPattern }, release) {
+function filterCommit (commit, { ignoreCommitPattern }, merges) {
+  if (commit.fixes || commit.merge) {
+    // Filter out commits that already appear in fix or merge lists
+    return false
+  }
   if (commit.breaking) {
     return true
   }
@@ -113,14 +109,14 @@ function filterCommit (commit, { ignoreCommitPattern }, release) {
     // Filter out merge commits
     return false
   }
-  if (release.merges.findIndex(m => m.message === commit.subject) !== -1) {
+  if (merges.findIndex(m => m.message === commit.subject) !== -1) {
     // Filter out commits with the same message as an existing merge
     return false
   }
   return true
 }
 
-function getSummary (message, releaseSummary) {
+function getSummary (message, { releaseSummary }) {
   if (!message || !releaseSummary) {
     return null
   }
