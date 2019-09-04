@@ -1,5 +1,6 @@
 import readline from 'readline'
 import fs from 'fs'
+import os from 'os'
 import { spawn } from 'child_process'
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -80,6 +81,14 @@ export function writeFile (path, data) {
   return new Promise((resolve, reject) => {
     fs.writeFile(path, data, createCallback(resolve, reject))
   })
+}
+
+export async function appendFile (path, data) {
+  const content = await readFile(path)
+  const appended = content.toString().split(os.EOL)
+  appended.splice(0, 0, data)
+  const text = appended.join(os.EOL)
+  return writeFile(path, text)
 }
 
 export function fileExists (path) {
