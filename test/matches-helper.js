@@ -18,7 +18,7 @@ describe('matches helper', () => {
         '- {{{message}}}\n' +
       '{{/matches}}\n'
     const expected =
-      '- Commit that fixes nothing with `backticks`\n'
+      '- Commit that fixes nothing with `backticks` and &lt;html&gt;\n'
     expect(compileCommits(matches)({ releases })).to.equal(expected)
   })
 
