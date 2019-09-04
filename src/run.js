@@ -6,7 +6,7 @@ import { fetchRemote } from './remote'
 import { fetchCommits } from './commits'
 import { parseReleases, sortReleases } from './releases'
 import { compileTemplate } from './template'
-import { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes } from './utils'
+import { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes, appendFile } from './utils'
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -17,7 +17,8 @@ const DEFAULT_OPTIONS = {
   tagPrefix: '',
   sortCommits: 'relevance',
   appendGitLog: '',
-  config: '.auto-changelog'
+  config: '.auto-changelog',
+  tagLimit: 0
 }
 
 const PACKAGE_FILE = 'package.json'
@@ -50,7 +51,8 @@ async function getOptions (argv) {
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
-    .option('--stdout', 'output changelog to stdout')
+    .option('--prepend-output', 'Prepend output to file')
+    .option('--tag-limit <count>', 'Max realease to return, default: 0 = unlimited', parseLimit)
     .version(version)
     .parse(argv)
 
@@ -113,7 +115,14 @@ export default async function run (argv) {
   if (options.stdout) {
     process.stdout.write(changelog)
   } else {
-    await writeFile(options.output, changelog)
+    if (options.prependOutput) {
+      if (!await fileExists(options.output)) {
+        throw new Error(`File ${options.output} does not exist`)
+      }
+      await appendFile(options.output, changelog)
+    } else {
+      await writeFile(options.output, changelog)
+    }
   }
   const bytes = Buffer.byteLength(changelog, 'utf8')
   log(`${formatBytes(bytes)} written to ${options.output}\n`)

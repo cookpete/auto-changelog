@@ -18,7 +18,7 @@ function commitReducer ({ map, version }, commit) {
 
 export function parseReleases (commits, remote, latestVersion, options) {
   const { map } = commits.reduce(commitReducer, { map: {}, version: latestVersion })
-  return Object.keys(map).map((key, index, versions) => {
+  const releases = Object.keys(map).map((key, index, versions) => {
     const commits = map[key]
     const previousVersion = versions[index + 1] || null
     const versionCommit = commits.find(commit => commit.tag) || {}
@@ -47,6 +47,11 @@ export function parseReleases (commits, remote, latestVersion, options) {
   }).filter(release => {
     return options.unreleased ? true : release.tag
   })
+  /** Limit releases */
+  if (options.tagLimit === 0) {
+    return releases
+  }
+  return releases.slice(0, options.tagLimit)
 }
 
 export function sortReleases (a, b) {
