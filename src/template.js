@@ -5,6 +5,9 @@ import { readFile, fileExists } from './utils'
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
 const MATCH_URL = /^https?:\/\/.+/
+const COMPILE_OPTIONS = {
+  noEscape: true
+}
 
 Handlebars.registerHelper('json', function (object) {
   return new Handlebars.SafeString(JSON.stringify(object, null, 2))
@@ -80,7 +83,7 @@ export async function compileTemplate ({ template, handlebarsSetup }, data) {
       setup(Handlebars)
     }
   }
-  const compile = Handlebars.compile(await getTemplate(template))
+  const compile = Handlebars.compile(await getTemplate(template), COMPILE_OPTIONS)
   if (template === 'json') {
     return compile(data)
   }

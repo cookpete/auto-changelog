@@ -9,13 +9,14 @@ describe('matches helper', () => {
       '{{#each commits}}\n' +
         matches +
       '{{/each}}\n' +
-    '{{/each}}'
+    '{{/each}}',
+    { noEscape: true }
   )
 
   it('matches on field value', () => {
     const matches =
       '{{#matches href "12c0624"}}\n' +
-        '- {{{message}}}\n' +
+        '- {{message}}\n' +
       '{{/matches}}\n'
     const expected =
       '- Commit that fixes nothing with `backticks` and &lt;html&gt;\n'
