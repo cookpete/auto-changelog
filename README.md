@@ -47,6 +47,10 @@ Options:
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command
       --stdout                        # output changelog to stdout
+      --prepend-output                # prepend output to file
+      --tag-limit [count]             # max realease to return, default: 0 = unlimited
+      --stdout                        # output changelog to stdout
+      --stdout                        # output changelog to stdout
   -V, --version                       # output the version number
   -h, --help                          # output usage information
 

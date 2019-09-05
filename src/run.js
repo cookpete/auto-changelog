@@ -51,6 +51,7 @@ async function getOptions (argv) {
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
+    .option('--stdout', 'output changelog to stdout')
     .option('--prepend-output', 'Prepend output to file')
     .option('--tag-limit <count>', 'Max realease to return, default: 0 = unlimited', parseLimit)
     .version(version)

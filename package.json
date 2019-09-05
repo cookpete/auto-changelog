@@ -14,7 +14,7 @@
     "coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
     "clean": "rimraf lib coverage",
     "build": "babel src -d lib",
-    "preversion": "npm run lint",
+    "preversion": "npm run test && npm run lint",
     "version": "babel-node src/index.js --package && git add CHANGELOG.md",
     "prepublishOnly": "npm run clean && npm run build",
     "generate-test-data": "cross-env NODE_ENV=test babel-node scripts/generate-test-data.js"
