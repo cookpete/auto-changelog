@@ -51,6 +51,7 @@ async function getOptions (argv) {
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
     .option('--stdout', 'output changelog to stdout')
+    .option('--mercurial-compat', 'Simplified compatibility mode with mercurial repositories')
     .version(version)
     .parse(argv)
 
@@ -105,6 +106,7 @@ export default async function run (argv) {
   log('Fetching remote…')
   const remote = await fetchRemote(options)
   const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
+  log('Fetching commits…')
   const commits = await fetchCommits(remote, options, null, commitProgress)
   log('Generating changelog…')
   const latestVersion = await getLatestVersion(options, commits)

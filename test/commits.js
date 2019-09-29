@@ -19,7 +19,8 @@ const getSubject = __get__('getSubject')
 const getLogFormat = __get__('getLogFormat')
 
 const options = {
-  tagPrefix: ''
+  tagPrefix: '',
+  mercurialCompat: false
 }
 
 describe('fetchCommits', () => {
@@ -349,19 +350,36 @@ describe('getSubject', () => {
 describe('getLogFormat', () => {
   it('returns modern format', async () => {
     mock('getGitVersion', () => Promise.resolve('1.7.2'))
-    expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    const options = { mercurialCompat: false }
+    expect(await getLogFormat(options)).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
     unmock('cmd')
   })
 
   it('returns fallback format', async () => {
     mock('getGitVersion', () => Promise.resolve('1.7.1'))
-    expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    const options = { mercurialCompat: false }
+    expect(await getLogFormat(options)).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
     unmock('cmd')
   })
 
   it('returns fallback format when null', async () => {
     mock('getGitVersion', () => Promise.resolve(null))
-    expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    const options = { mercurialCompat: false }
+    expect(await getLogFormat(options)).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%d%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
+    unmock('cmd')
+  })
+
+  it('returns modern Hg format', async () => {
+    mock('getHgVersion', () => Promise.resolve('2.4.0'))
+    const options = { mercurialCompat: true }
+    expect(await getLogFormat(options)).to.equal(`__AUTO_CHANGELOG_COMMIT_SEPARATOR__{node}\n{if(tags,\' (tag: {tags})\n\',\'\n\')}{date|isodate}\n{author|person}\n{author|email}\n{desc}\n__AUTO_CHANGELOG_MESSAGE_SEPARATOR__\n {files|count} files changed, 0 insertions(+), 0 deletions(-)\n\n`)
+    unmock('cmd')
+  })
+
+  it('returns fallback format', async () => {
+    mock('getHgVersion', () => Promise.resolve('2.3.2'))
+    const options = { mercurialCompat: true }
+    expect(await getLogFormat(options)).to.equal(`__AUTO_CHANGELOG_COMMIT_SEPARATOR__{node}\n (tag: {tags})\n{date|isodate}\n{author|person}\n{author|email}\n{desc}\n__AUTO_CHANGELOG_MESSAGE_SEPARATOR__\n 0 files changed, 0 insertions(+), 0 deletions(-)\n\n`)
     unmock('cmd')
   })
 })

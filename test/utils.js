@@ -6,6 +6,7 @@ import {
   niceDate,
   isLink,
   getGitVersion,
+  getHgVersion,
   readFile,
   writeFile,
   fileExists,
@@ -30,6 +31,19 @@ describe('cmd', () => {
   it('runs onProgress', async () => {
     const result = await cmd('node --version', bytes => expect(bytes).to.be.a('number'))
     expect(result).to.be.a('string')
+  })
+
+  it('skips blank spaces in single quotes', async () => {
+    const result = await cmd(`echo 'foo bar\nbaz'`)
+    expect(result).to.be.a('string')
+    expect(result).to.equal("'foo bar\nbaz'\n")
+  })
+
+  it('skips blank spaces in double quotes', async () => {
+    const result = await cmd(`echo "foo bar\nbaz"`)
+    console.log(result)
+    expect(result).to.be.a('string')
+    expect(result).to.equal('"foo bar\nbaz"\n')
   })
 })
 
@@ -65,6 +79,37 @@ describe('getGitVersion', () => {
   it('returns null', async () => {
     mock('cmd', () => 'some sort of random output')
     expect(await getGitVersion()).to.equal(null)
+    unmock('cmd')
+  })
+})
+
+describe('getHgVersion', () => {
+  it('returns hg version', async () => {
+    mock('cmd', () => `Mercurial Distributed SCM (version 2.2.3)
+    (see http://mercurial.selenic.com for more information)
+
+    Copyright (C) 2005-2012 Matt Mackall and others
+    This is free software; see the source for copying conditions. There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    `)
+    expect(await getHgVersion()).to.equal('2.2.3')
+    unmock('cmd')
+  })
+  it('returns hg version converted to semver for majors', async () => {
+    mock('cmd', () => `Mercurial Distributed SCM (version 2.4)
+    (see http://mercurial.selenic.com for more information)
+
+    Copyright (C) 2005-2012 Matt Mackall and others
+    This is free software; see the source for copying conditions. There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    `)
+    expect(await getHgVersion()).to.equal('2.4.0')
+    unmock('cmd')
+  })
+
+  it('returns null', async () => {
+    mock('cmd', () => 'some sort of random output')
+    expect(await getHgVersion()).to.equal(null)
     unmock('cmd')
   })
 })

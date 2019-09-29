@@ -2,7 +2,7 @@ import parseRepoURL from 'parse-github-url'
 import { cmd } from './utils'
 
 export async function fetchRemote (options) {
-  const remoteURL = await cmd(`git config --get remote.${options.remote}.url`)
+  const remoteURL = options.mercurialCompat ? null : await cmd(`git config --get remote.${options.remote}.url`)
   return getRemote(remoteURL, options)
 }
 

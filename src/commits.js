@@ -1,5 +1,5 @@
 import semver from 'semver'
-import { cmd, isLink, encodeHTML, replaceText, getGitVersion } from './utils'
+import { cmd, isLink, encodeHTML, replaceText, getGitVersion, getHgVersion } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
@@ -7,6 +7,12 @@ const MATCH_COMMIT = /(.*)\n(?:\s\((.*)\))?\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
 const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) deletions?...)?/
 const BODY_FORMAT = '%B'
 const FALLBACK_BODY_FORMAT = '%s%n%n%b'
+
+// Mercurial formats matching the git log format for compatibility
+const MERCURIAL_BODY_FORMAT = '{node}\n{if(tags,\' (tag: {tags})\n\',\'\n\')}{date|isodate}\n{author|person}\n{author|email}\n{desc}\n'
+const MERCURIAL_FALLBACK_BODY_FORMAT = '{node}\n (tag: {tags})\n{date|isodate}\n{author|person}\n{author|email}\n{desc}\n'
+const MERCURIAL_STATS_FORMAT = ' {files|count} files changed, 0 insertions(+), 0 deletions(-)\n\n'
+const MERCURIAL_FALLBACK_STATS_FORMAT = ' 0 files changed, 0 insertions(+), 0 deletions(-)\n\n'
 
 // https://help.github.com/articles/closing-issues-via-commit-messages
 const DEFAULT_FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/(?:issues|pull|pull-requests|merge_requests)\/(\d+)))/gi
@@ -19,16 +25,32 @@ const MERGE_PATTERNS = [
 ]
 
 export async function fetchCommits (remote, options, branch = null, onProgress) {
-  const command = branch ? `git log ${branch}` : 'git log'
-  const format = await getLogFormat()
-  const log = await cmd(`${command} --shortstat --pretty=format:${format} ${options.appendGitLog}`, onProgress)
+  const format = await getLogFormat(options)
+  let command = ""
+  if (options.mercurialCompat) {
+    command = `hg log --template "${format}" ${options.appendGitLog}`
+  } else {
+    command = 'git log' + (branch ? ` ${branch}` : '') + ` --shortstat --pretty=format:${format} ${options.appendGitLog}`
+  }
+  const log = await cmd(`${command}`, onProgress)
   return parseCommits(log, remote, options)
 }
 
-async function getLogFormat () {
+async function getLogFormat (options) {
+    return options.mercurialCompat ? getHgLogFormat() : getGitLogFormat()
+}
+
+async function getGitLogFormat () {
   const gitVersion = await getGitVersion()
   const bodyFormat = gitVersion && semver.gte(gitVersion, '1.7.2') ? BODY_FORMAT : FALLBACK_BODY_FORMAT
   return `${COMMIT_SEPARATOR}%H%n%d%n%ai%n%an%n%ae%n${bodyFormat}${MESSAGE_SEPARATOR}`
+}
+
+async function getHgLogFormat () {
+  const hgVersion = await getHgVersion()
+  const bodyFormat = hgVersion && semver.gte(hgVersion, '2.4.0') ? MERCURIAL_BODY_FORMAT : MERCURIAL_FALLBACK_BODY_FORMAT
+  const statsFormat = hgVersion && semver.gte(hgVersion, '2.4.0') ? MERCURIAL_STATS_FORMAT : MERCURIAL_FALLBACK_STATS_FORMAT
+  return `${COMMIT_SEPARATOR}${bodyFormat}${MESSAGE_SEPARATOR}\n${statsFormat}`
 }
 
 function parseCommits (string, remote, options = {}) {
@@ -54,7 +76,7 @@ function parseCommit (commit, remote, options = {}) {
   const message = encodeHTML(body)
   const parsed = {
     hash,
-    shorthash: hash.slice(0, 7),
+    shorthash: hash.slice(0, (options.mercurialCompat ? 12 : 7)),
     author,
     email,
     date: new Date(date).toISOString(),
@@ -93,7 +115,7 @@ function getTag (refs, options) {
 }
 
 function getSubject (message) {
-  if (!message) {
+  if (!message || !message.match(/[^\n]+/)) {
     return '_No commit message_'
   }
   return message.match(/[^\n]+/)[0]

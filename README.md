@@ -47,6 +47,7 @@ Options:
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command
       --stdout                        # output changelog to stdout
+      --mercurial-compat              # simplified compatibility mode with mercurial repositories
   -V, --version                       # output the version number
   -h, --help                          # output usage information
 

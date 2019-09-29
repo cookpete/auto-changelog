@@ -18,7 +18,8 @@ export function formatBytes (bytes) {
 
 // Simple util for calling a child process
 export function cmd (string, onProgress) {
-  const [cmd, ...args] = string.trim().split(' ')
+  // Split only on spaces outside of quoted string, i.e. those followed by an even number of quotes
+  const [cmd, ...args] = string.trim().split(/ +(?=(?:(?:[^"]*"){2})*[^"]*$)(?=(?:(?:[^']*'){2})*[^']*$)/g)
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, args)
     let data = ''
@@ -38,6 +39,18 @@ export async function getGitVersion () {
   const output = await cmd('git --version')
   const match = output.match(/\d+\.\d+\.\d+/)
   return match ? match[0] : null
+}
+
+export async function getHgVersion () {
+  const output = await cmd('hg --version')
+  let match = output.match(/\d+\.\d+\.\d+/)
+  if (match) {
+    return match[0]
+  } else {
+    // Mercurial releases omit the patch version .0
+    match = output.match(/\d+\.\d+/)
+    return match ? `${match[0]}.0` : null
+  }
 }
 
 export function niceDate (string) {
