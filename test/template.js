@@ -47,4 +47,16 @@ describe('compileTemplate', () => {
       handlebarsSetup: './test/data/handlebars-setup.js'
     }, { releases })).to.equal(expected)
   })
+
+  for (const template of ['compact', 'keepachangelog']) {
+    it(`replaces special characters inside href in ${template} template`, async () => {
+      const oldHref = releases[0].href
+      releases[0].href = 'https://example.com/compare/commits?targetBranch=refs/tags/v0.1.0&sourceBranch=refs/tags/v1.0.0'
+      const changelog = await compileTemplate({ template: template }, { releases })
+      const line = changelog.split('\n').filter(line => line.match(/v0\.1\.0.*v1\.0\.0/))
+      expect(line.length).to.equal(1)
+      expect(line[0]).to.match(/targetBranch=refs\/tags\/v0\.1\.0&sourceBranch=refs\/tags\/v1\.0\.0/)
+      releases[0].href = oldHref
+    })
+  }
 })
