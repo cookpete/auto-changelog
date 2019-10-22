@@ -35,7 +35,7 @@ async function getOptions (argv) {
     .option('-l, --commit-limit <count>', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-b, --backfill-limit <count>', `number of commits to backfill empty releases with, default: ${DEFAULT_OPTIONS.backfillLimit}`, parseLimit)
     .option('--commit-url <url>', 'override url for commits, use {id} for commit id')
-    .option('--issue-url, -i <url>', 'override url for issues, use {id} for issue id') // -i kept for back compatibility
+    .option('-i, --issue-url <url>', 'override url for issues, use {id} for issue id') // -i kept for back compatibility
     .option('--merge-url <url>', 'override url for merges, use {id} for merge id')
     .option('--compare-url <url>', 'override url for compares, use {from} and {to} for tags')
     .option('--issue-pattern <regex>', 'override regex pattern for issues in commit messages')
