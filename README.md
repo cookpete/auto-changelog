@@ -9,7 +9,7 @@ Command line tool for generating a changelog from git tags and commit history
 ### Installation
 
 ```bash
-npm install -g auto-changelog
+npm install -g trycontrolmymind/auto-changelog
 ```
 
 ### Usage
@@ -82,9 +82,9 @@ There are some less strict requirements to improve your changelog:
 Install `auto-changelog` to dev dependencies:
 
 ```bash
-npm install auto-changelog --save-dev
+npm install trycontrolmymind/auto-changelog --save-dev
 # or
-yarn add auto-changelog --dev
+yarn add trycontrolmymind/auto-changelog --dev
 ```
 
 Add `auto-changelog -p && git add CHANGELOG.md` to the `version` scripts in your `package.json`:
