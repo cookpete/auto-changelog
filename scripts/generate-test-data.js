@@ -27,14 +27,16 @@ async function writeTemplate (filename, template, releases) {
 async function run () {
   const gitLog = await readFile(join(DATA_DIR, 'git-log.txt'))
   const commits = parseCommits(gitLog, remotes.github, options)
-  const commitsNoRemote = parseCommits(gitLog, remotes.null, options)
   const releases = parseReleases(commits, remotes.github, null, options)
+  const commitsNoRemote = parseCommits(gitLog, remotes.null, options)
+  const releasesNoRemote = parseReleases(commitsNoRemote, remotes.null, null, options)
   await writeObject('commits.js', commits)
   await writeObject('commits-no-remote.js', commitsNoRemote)
   await writeObject('releases.js', releases)
   await writeTemplate('template-compact.md', 'compact', releases)
   await writeTemplate('template-keepachangelog.md', 'keepachangelog', releases)
   await writeTemplate('template-json.json', 'json', releases)
+  await writeTemplate('template-compact-no-remote.md', 'compact', releasesNoRemote)
 }
 
 run().catch(e => console.error(e))

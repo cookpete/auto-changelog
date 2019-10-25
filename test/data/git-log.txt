@@ -54,7 +54,7 @@ __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
 2015-12-29 21:18:19 +0000
 Pete Cook
 email@example.com
-Commit that fixes nothing with `backticks`
+Commit that fixes nothing with `backticks` and <html>
 __AUTO_CHANGELOG_MESSAGE_SEPARATOR__
  1 files changed, 2 insertions(+), 3 deletions(-)
 

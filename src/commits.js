@@ -1,5 +1,5 @@
 import semver from 'semver'
-import { cmd, isLink, replaceText, getGitVersion } from './utils'
+import { cmd, isLink, encodeHTML, replaceText, getGitVersion } from './utils'
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
@@ -50,7 +50,8 @@ function parseCommits (string, remote, options = {}) {
 
 function parseCommit (commit, remote, options = {}) {
   const [, hash, refs, date, author, email, tail] = commit.match(MATCH_COMMIT)
-  const [message, stats] = tail.split(MESSAGE_SEPARATOR)
+  const [body, stats] = tail.split(MESSAGE_SEPARATOR)
+  const message = encodeHTML(body)
   const parsed = {
     hash,
     shorthash: hash.slice(0, 7),

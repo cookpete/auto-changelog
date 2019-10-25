@@ -57,6 +57,10 @@ export function parseLimit (limit) {
   return limit === 'false' ? false : parseInt(limit, 10)
 }
 
+export function encodeHTML (string) {
+  return string.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
 export function replaceText (string, options) {
   if (!options.replaceText) {
     return string
