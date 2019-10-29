@@ -23,6 +23,16 @@ describe('getOptions', () => {
     const options = await getOptions(['', '', '--commit-limit', 'false'])
     expect(options.commitLimit).to.equal(false)
   })
+
+  it('parses --issue-url correctly when given --issue-url', async () => {
+    const options = await getOptions(['', '', '--issue-url', 'https://test.issue.local/issues/{id}'])
+    expect(options.issueUrl).to.equal('https://test.issue.local/issues/{id}')
+  })
+
+  it('parses -i correctly when given -i', async () => {
+    const options = await getOptions(['', '', '-i', 'https://test.issue.local/issues/{id}'])
+    expect(options.issueUrl).to.equal('https://test.issue.local/issues/{id}')
+  })
 })
 
 describe('run', () => {
