@@ -1,92 +1,57 @@
 import semver from 'semver'
+import { fetchCommits } from './commits'
 import { niceDate } from './utils'
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
-function commitReducer ({ map, version }, commit) {
-  const currentVersion = commit.tag || version
-  const commits = map[currentVersion] || []
+async function createRelease (tag, previousTag, diff, remote, options) {
+  const commits = await fetchCommits(diff, remote, options)
+  const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
+  const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
+  const emptyRelease = merges.length === 0 && fixes.length === 0
+  const { date, message } = commits[0] || { date: new Date().toISOString() }
+  const breakingCount = commits.filter(c => c.breaking).length
+  const filteredCommits = commits
+    .filter(commit => filterCommit(commit, options, merges))
+    .sort(commitSorter(options))
+    .slice(0, getCommitLimit(options, emptyRelease, breakingCount))
   return {
-    map: {
-      ...map,
-      [currentVersion]: [...commits, commit]
-    },
-    version: currentVersion
+    tag,
+    title: tag || 'Unreleased',
+    date,
+    isoDate: date.slice(0, 10),
+    niceDate: niceDate(date),
+    commits: filteredCommits,
+    merges,
+    fixes,
+    summary: getSummary(message, options),
+    major: Boolean(!options.tagPattern && tag && previousTag && semver.diff(tag, previousTag) === 'major'),
+    href: getCompareLink(previousTag, tag, remote, options)
   }
 }
 
-export function parseReleases (commits, remote, latestVersion, options) {
-  const { map } = commits.reduce(commitReducer, { map: {}, version: latestVersion })
-  return Object.keys(map).map((key, index, versions) => {
-    const commits = map[key]
-    const previousVersion = versions[index + 1] || null
-    const versionCommit = commits.find(commit => commit.tag) || {}
-    const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
-    const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
-    const tag = versionCommit.tag || latestVersion
-    const date = versionCommit.date || new Date().toISOString()
-    const filteredCommits = commits
-      .filter(commit => filterCommit(commit, options, merges))
-      .sort(commitSorter(options))
-    const emptyRelease = merges.length === 0 && fixes.length === 0
-    const { tagPattern, tagPrefix } = options
-    return {
-      tag,
-      title: tag || 'Unreleased',
-      date,
-      isoDate: date.slice(0, 10),
-      niceDate: niceDate(date),
-      commits: sliceCommits(filteredCommits, options, emptyRelease),
-      merges,
-      fixes,
-      summary: getSummary(versionCommit.message, options),
-      major: Boolean(!tagPattern && tag && previousVersion && semver.diff(tag, previousVersion) === 'major'),
-      href: previousVersion ? remote.getCompareLink(`${tagPrefix}${previousVersion}`, tag ? `${tagPrefix}${tag}` : 'HEAD') : null
-    }
-  }).filter(release => {
-    return options.unreleased ? true : release.tag
+export function parseReleases (tags, remote, latestVersion, options) {
+  const releases = tags.map((tag, index, tags) => {
+    const previousTag = tags[index + 1]
+    const diff = previousTag ? `${previousTag}..${tag}` : tag
+    return createRelease(tag, previousTag, diff, remote, options)
   })
+  if (latestVersion || options.unreleased) {
+    const tag = latestVersion || null
+    const previousTag = tags[0]
+    const diff = `${previousTag}..`
+    releases.unshift(createRelease(tag, previousTag, diff, remote, options))
+  }
+  return Promise.all(releases)
 }
 
-export function sortReleases (a, b) {
-  const tags = {
-    a: inferSemver(a.tag),
-    b: inferSemver(b.tag)
-  }
-  if (tags.a && tags.b) {
-    if (semver.valid(tags.a) && semver.valid(tags.b)) {
-      return semver.rcompare(tags.a, tags.b)
-    }
-    if (tags.a === tags.b) {
-      return 0
-    }
-    return tags.a < tags.b ? 1 : -1
-  }
-  if (tags.a) return 1
-  if (tags.b) return -1
-  return 0
-}
-
-function inferSemver (tag) {
-  if (/^v?\d+$/.test(tag)) {
-    // v1 becomes v1.0.0
-    return `${tag}.0.0`
-  }
-  if (/^v?\d+\.\d+$/.test(tag)) {
-    // v1.0 becomes v1.0.0
-    return `${tag}.0`
-  }
-  return tag
-}
-
-function sliceCommits (commits, { commitLimit, backfillLimit }, emptyRelease) {
+function getCommitLimit ({ commitLimit, backfillLimit }, emptyRelease, breakingCount) {
   if (commitLimit === false) {
-    return commits
+    return undefined // Return all commits
   }
   const limit = emptyRelease ? backfillLimit : commitLimit
-  const minLimit = commits.filter(c => c.breaking).length
-  return commits.slice(0, Math.max(minLimit, limit))
+  return Math.max(breakingCount, limit)
 }
 
 function filterCommit (commit, { ignoreCommitPattern }, merges) {
@@ -97,9 +62,8 @@ function filterCommit (commit, { ignoreCommitPattern }, merges) {
   if (commit.breaking) {
     return true
   }
-  if (ignoreCommitPattern) {
-    // Filter out commits that match ignoreCommitPattern
-    return new RegExp(ignoreCommitPattern).test(commit.subject) === false
+  if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
+    return false
   }
   if (semver.valid(commit.subject)) {
     // Filter out version commits
@@ -134,4 +98,13 @@ function commitSorter ({ sortCommits }) {
     if (sortCommits === 'date-desc') return new Date(b.date) - new Date(a.date)
     return (b.insertions + b.deletions) - (a.insertions + a.deletions)
   }
+}
+
+function getCompareLink (previousTag, tag, remote, { tagPrefix = '' }) {
+  if (!previousTag) {
+    return null
+  }
+  const from = `${tagPrefix}${previousTag}`
+  const to = tag ? `${tagPrefix}${tag}` : 'HEAD'
+  return remote.getCompareLink(from, to)
 }

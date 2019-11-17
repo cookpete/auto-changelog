@@ -25,7 +25,7 @@ describe('matches helper', () => {
 
   it('matches with case insensitive flag', () => {
     const matches =
-      '{{#matches author "pete" flags="i"}}\n' +
+      '{{#matches author "example" flags="i"}}\n' +
         '- {{shorthash}}\n' +
       '{{/matches}}\n'
     const expected =

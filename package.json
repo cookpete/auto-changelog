@@ -6,12 +6,16 @@
   "bin": {
     "auto-changelog": "./lib/index.js"
   },
+  "engines" : {
+    "node" : ">=7.6"
+  },
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "lint-fix": "standard --fix",
     "lint-markdown": "markdownlint README.md test/data/*.md",
-    "test": "cross-env NODE_ENV=test nyc mocha test",
-    "coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
+    "test": "cross-env NODE_ENV=test mocha -r @babel/register test",
+    "test-coverage": "cross-env NODE_ENV=test nyc mocha test",
+    "report-coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
     "clean": "rimraf lib coverage",
     "build": "babel src -d lib",
     "preversion": "npm run lint && npm run test",
@@ -111,5 +115,8 @@
       "text",
       "html"
     ]
+  },
+  "auto-changelog": {
+    "breakingPattern": "Breaking change"
   }
 }

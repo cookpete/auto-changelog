@@ -1,10 +1,9 @@
 import { Command } from 'commander'
 import semver from 'semver'
-import uniqBy from 'lodash.uniqby'
 import { version } from '../package.json'
 import { fetchRemote } from './remote'
-import { fetchCommits } from './commits'
-import { parseReleases, sortReleases } from './releases'
+import { fetchTags } from './tags'
+import { parseReleases } from './releases'
 import { compileTemplate } from './template'
 import { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes } from './utils'
 
@@ -44,9 +43,7 @@ async function getOptions (argv) {
     .option('--ignore-commit-pattern <regex>', 'pattern to ignore when parsing commits')
     .option('--tag-pattern <regex>', 'override regex pattern for release tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
-    .option('--starting-commit <hash>', 'starting commit to use for changelog generation')
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
-    .option('--include-branch <branch>', 'one or more branches to include commits from, comma separated', str => str.split(','))
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
@@ -66,7 +63,7 @@ async function getOptions (argv) {
   }
 }
 
-async function getLatestVersion (options, commits) {
+async function getLatestVersion (options, tags) {
   if (options.latestVersion) {
     if (!semver.valid(options.latestVersion)) {
       throw new Error('--latest-version must be a valid semver version')
@@ -79,24 +76,10 @@ async function getLatestVersion (options, commits) {
       throw new Error(`File ${file} does not exist`)
     }
     const { version } = await readJson(file)
-    const prefix = commits.some(c => /^v/.test(c.tag)) ? 'v' : ''
+    const prefix = tags.some(tag => /^v/.test(tag)) ? 'v' : ''
     return `${prefix}${version}`
   }
   return null
-}
-
-async function getReleases (commits, remote, latestVersion, options) {
-  let releases = parseReleases(commits, remote, latestVersion, options)
-  if (options.includeBranch) {
-    for (const branch of options.includeBranch) {
-      const commits = await fetchCommits(remote, options, branch)
-      releases = [
-        ...releases,
-        ...parseReleases(commits, remote, latestVersion, options)
-      ]
-    }
-  }
-  return uniqBy(releases, 'tag').sort(sortReleases)
 }
 
 export default async function run (argv) {
@@ -104,11 +87,12 @@ export default async function run (argv) {
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching remote…')
   const remote = await fetchRemote(options)
-  const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
-  const commits = await fetchCommits(remote, options, null, commitProgress)
+  // const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
+  // const commits = await fetchCommits(remote, options, null, commitProgress)
   log('Generating changelog…')
-  const latestVersion = await getLatestVersion(options, commits)
-  const releases = await getReleases(commits, remote, latestVersion, options)
+  const tags = await fetchTags(options)
+  const latestVersion = await getLatestVersion(options, tags)
+  const releases = await parseReleases(tags, remote, latestVersion, options)
   const changelog = await compileTemplate(options, { releases })
   if (options.stdout) {
     process.stdout.write(changelog)

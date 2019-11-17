@@ -6,10 +6,10 @@ export async function fetchRemote (options) {
   return getRemote(remoteURL, options)
 }
 
-function getRemote (remoteURL, options = {}) {
+export function getRemote (remoteURL, options = {}) {
   const overrides = getOverrides(options)
   if (!remoteURL) {
-    // No point warning if everything is overriddens
+    // No point warning if everything is overridden
     if (Object.keys(overrides).length !== 4) {
       console.warn(`Warning: Git remote ${options.remote} was not found`)
     }
