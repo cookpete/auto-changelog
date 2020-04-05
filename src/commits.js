@@ -12,10 +12,10 @@ const FALLBACK_BODY_FORMAT = '%s%n%n%b'
 const DEFAULT_FIX_PATTERN = /(?:close[sd]?|fixe?[sd]?|resolve[sd]?)\s(?:#(\d+)|(https?:\/\/.+?\/(?:issues|pull|pull-requests|merge_requests)\/(\d+)))/gi
 
 const MERGE_PATTERNS = [
-  /Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
+  /^Merge pull request #(\d+) from .+\n\n(.+)/, // Regular GitHub merge
   /^(.+) \(#(\d+)\)(?:$|\n\n)/, // Github squash merge
-  /Merged in .+ \(pull request #(\d+)\)\n\n(.+)/, // BitBucket merge
-  /Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
+  /^Merged in .+ \(pull request #(\d+)\)\n\n(.+)/, // BitBucket merge
+  /^Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
 ]
 
 export async function fetchCommits (diff, remote, options = {}) {
