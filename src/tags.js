@@ -2,13 +2,17 @@ import semver from 'semver'
 import { cmd } from './utils'
 
 export async function fetchTags (options) {
-  const tags = await cmd('git tag --sort=committerdate')
-  return tags
+  const tags = (await cmd('git tag --sort=committerdate'))
     .trim()
     .split('\n')
     .reverse()
     .filter(isValidTag(options))
     .sort(sortTags(options))
+  if (options.startingVersion) {
+    const limit = tags.indexOf(options.startingVersion) + 1
+    return tags.slice(0, limit)
+  }
+  return tags
 }
 
 const isValidTag = ({ tagPattern, tagPrefix }) => tag => {

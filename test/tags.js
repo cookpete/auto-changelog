@@ -32,6 +32,13 @@ describe.only('fetchTags', () => {
       'v0.1.0'
     ])
   })
+
+  it('supports --starting-version', async () => {
+    expect(await fetchTags({ ...options, startingVersion: 'v0.3.0' })).to.deep.equal([
+      'v1.0.0',
+      'v0.3.0'
+    ])
+  })
 })
 
 describe('sortTags', () => {

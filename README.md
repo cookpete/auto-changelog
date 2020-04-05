@@ -38,8 +38,9 @@ Options:
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
-      --tag-pattern [regex]           # override regex pattern for release tags
+      --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
+      --starting-version [tag]        # specify earliest version to include in changelog
       --sort-commits [property]       # sort commits by property [relevance, date, date-desc], default: relevance
       --release-summary               # display tagged commit message body as release summary
       --handlebars-setup [file]       # handlebars setup file
