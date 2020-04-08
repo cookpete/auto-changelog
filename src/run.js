@@ -88,18 +88,18 @@ export default async function run (argv) {
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching remote…')
   const remote = await fetchRemote(options)
-  // const commitProgress = bytes => log(`Fetching commits… ${formatBytes(bytes)} loaded`)
-  // const commits = await fetchCommits(remote, options, null, commitProgress)
-  log('Generating changelog…')
+  log('Fetching tags…')
   const tags = await fetchTags(options)
+  log(`${tags.length} version tags found…`)
   const latestVersion = await getLatestVersion(options, tags)
-  const releases = await parseReleases(tags, remote, latestVersion, options)
+  const onParsed = ({ title }) => log(`Fetched ${title}…`)
+  const releases = await parseReleases(tags, remote, latestVersion, options, onParsed)
   const changelog = await compileTemplate(options, { releases })
   if (options.stdout) {
     process.stdout.write(changelog)
-  } else {
-    await writeFile(options.output, changelog)
+    process.exit(0)
   }
+  await writeFile(options.output, changelog)
   const bytes = Buffer.byteLength(changelog, 'utf8')
   log(`${formatBytes(bytes)} written to ${options.output}\n`)
 }

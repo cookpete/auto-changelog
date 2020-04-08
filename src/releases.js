@@ -5,7 +5,7 @@ import { niceDate } from './utils'
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
-async function createRelease (tag, previousTag, diff, remote, options) {
+async function createRelease (tag, previousTag, diff, remote, options, onParsed) {
   const commits = await fetchCommits(diff, remote, options)
   const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
   const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
@@ -16,7 +16,7 @@ async function createRelease (tag, previousTag, diff, remote, options) {
     .filter(commit => filterCommit(commit, options, merges))
     .sort(commitSorter(options))
     .slice(0, getCommitLimit(options, emptyRelease, breakingCount))
-  return {
+  const release = {
     tag,
     title: tag || 'Unreleased',
     date,
@@ -29,19 +29,23 @@ async function createRelease (tag, previousTag, diff, remote, options) {
     major: Boolean(!options.tagPattern && tag && previousTag && semver.diff(tag, previousTag) === 'major'),
     href: getCompareLink(previousTag, tag, remote, options)
   }
+  if (onParsed) {
+    onParsed(release)
+  }
+  return release
 }
 
-export function parseReleases (tags, remote, latestVersion, options) {
+export function parseReleases (tags, remote, latestVersion, options, onParsed) {
   const releases = tags.map((tag, index, tags) => {
     const previousTag = tags[index + 1]
     const diff = previousTag ? `${previousTag}..${tag}` : tag
-    return createRelease(tag, previousTag, diff, remote, options)
+    return createRelease(tag, previousTag, diff, remote, options, onParsed)
   })
   if (latestVersion || options.unreleased) {
     const tag = latestVersion || null
     const previousTag = tags[0]
     const diff = `${previousTag}..`
-    releases.unshift(createRelease(tag, previousTag, diff, remote, options))
+    releases.unshift(createRelease(tag, previousTag, diff, remote, options, onParsed))
   }
   return Promise.all(releases)
 }
