@@ -320,18 +320,18 @@ describe('getLogFormat', () => {
   it('returns modern format', async () => {
     mock('getGitVersion', () => Promise.resolve('1.7.2'))
     expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
-    unmock('cmd')
+    unmock('getGitVersion')
   })
 
   it('returns fallback format', async () => {
     mock('getGitVersion', () => Promise.resolve('1.7.1'))
     expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
-    unmock('cmd')
+    unmock('getGitVersion')
   })
 
   it('returns fallback format when null', async () => {
     mock('getGitVersion', () => Promise.resolve(null))
     expect(await getLogFormat()).to.equal('__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
-    unmock('cmd')
+    unmock('getGitVersion')
   })
 })

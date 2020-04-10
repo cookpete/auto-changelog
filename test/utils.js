@@ -73,7 +73,7 @@ describe('readFile', () => {
   it('reads file', async () => {
     mock('fs', { readFile: (path, type, cb) => cb(null, 'abc') })
     expect(await readFile()).to.equal('abc')
-    unmock('cmd')
+    unmock('fs')
   })
 })
 
@@ -100,6 +100,6 @@ describe('readJson', () => {
       access: (path, cb) => cb(null)
     })
     expect(await readJson()).to.deep.equal({ abc: 123 })
-    unmock('cmd')
+    unmock('fs')
   })
 })

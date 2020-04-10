@@ -13,7 +13,7 @@ const options = {
 
 const sortTags = __get__('sortTags')(options)
 
-describe.only('fetchTags', () => {
+describe('fetchTags', () => {
   beforeEach(() => {
     mock('cmd', () => Promise.resolve('v0.1.0\nv0.2.0\nv0.2.1\nv0.2.2\nv0.3.0\nv1.0.0'))
   })
