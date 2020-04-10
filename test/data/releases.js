@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   {
     "tag": "v1.0.0",
     "title": "v1.0.0",

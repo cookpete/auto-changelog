@@ -1,11 +1,11 @@
-import { Command } from 'commander'
-import semver from 'semver'
-import { version } from '../package.json'
-import { fetchRemote } from './remote'
-import { fetchTags } from './tags'
-import { parseReleases } from './releases'
-import { compileTemplate } from './template'
-import { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes } from './utils'
+const { Command } = require('commander')
+const semver = require('semver')
+const { version } = require('../package.json')
+const { fetchRemote } = require('./remote')
+const { fetchTags } = require('./tags')
+const { parseReleases } = require('./releases')
+const { compileTemplate } = require('./template')
+const { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes } = require('./utils')
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -83,7 +83,7 @@ async function getLatestVersion (options, tags) {
   return null
 }
 
-export default async function run (argv) {
+async function run (argv) {
   const options = await getOptions(argv)
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching remote…')
@@ -102,4 +102,8 @@ export default async function run (argv) {
   await writeFile(options.output, changelog)
   const bytes = Buffer.byteLength(changelog, 'utf8')
   log(`${formatBytes(bytes)} written to ${options.output}\n`)
+}
+
+module.exports = {
+  run
 }

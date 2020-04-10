@@ -1,8 +1,8 @@
-import semver from 'semver'
-import { cmd, isLink, encodeHTML, replaceText, getGitVersion } from './utils'
+const semver = require('semver')
+const { cmd, isLink, encodeHTML, replaceText, getGitVersion } = require('./utils')
 
-export const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
-export const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
+const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
+const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
 const MATCH_COMMIT = /(.*)\n(.*)\n(.*)\n(.*)\n([\S\s]+)/
 const MATCH_STATS = /(\d+) files? changed(?:, (\d+) insertions?...)?(?:, (\d+) deletions?...)?/
 const BODY_FORMAT = '%B'
@@ -18,7 +18,7 @@ const MERGE_PATTERNS = [
   /^Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
 ]
 
-export async function fetchCommits (diff, remote, options = {}) {
+async function fetchCommits (diff, remote, options = {}) {
   const format = await getLogFormat()
   const log = await cmd(`git log ${diff} --shortstat --pretty=format:${format} ${options.appendGitLog}`)
   return parseCommits(log, remote, options)
@@ -37,7 +37,7 @@ function parseCommits (string, remote, options = {}) {
     .map(commit => parseCommit(commit, remote, options))
 }
 
-export function parseCommit (commit, remote, options = {}) {
+function parseCommit (commit, remote, options = {}) {
   const [, hash, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [body, stats] = tail.split(MESSAGE_SEPARATOR)
   const message = encodeHTML(body)
@@ -131,4 +131,11 @@ function getMerge (commit, message, remote, options = {}) {
     }
   }
   return null
+}
+
+module.exports = {
+  COMMIT_SEPARATOR,
+  MESSAGE_SEPARATOR,
+  fetchCommits,
+  parseCommit
 }

@@ -1,10 +1,10 @@
-import readline from 'readline'
-import fs from 'fs'
-import { spawn } from 'child_process'
+const readline = require('readline')
+const fs = require('fs')
+const { spawn } = require('child_process')
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-export function updateLog (string, clearLine = true) {
+function updateLog (string, clearLine = true) {
   if (clearLine) {
     readline.clearLine(process.stdout)
     readline.cursorTo(process.stdout, 0)
@@ -12,12 +12,12 @@ export function updateLog (string, clearLine = true) {
   process.stdout.write(`auto-changelog: ${string}`)
 }
 
-export function formatBytes (bytes) {
+function formatBytes (bytes) {
   return `${Math.max(1, Math.round(bytes / 1024))} kB`
 }
 
 // Simple util for calling a child process
-export function cmd (string, onProgress) {
+function cmd (string, onProgress) {
   const [cmd, ...args] = string.trim().split(' ')
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, args)
@@ -34,13 +34,13 @@ export function cmd (string, onProgress) {
   })
 }
 
-export async function getGitVersion () {
+async function getGitVersion () {
   const output = await cmd('git --version')
   const match = output.match(/\d+\.\d+\.\d+/)
   return match ? match[0] : null
 }
 
-export function niceDate (string) {
+function niceDate (string) {
   const date = new Date(string)
   const day = date.getUTCDate()
   const month = MONTH_NAMES[date.getUTCMonth()]
@@ -48,19 +48,19 @@ export function niceDate (string) {
   return `${day} ${month} ${year}`
 }
 
-export function isLink (string) {
+function isLink (string) {
   return /^http/.test(string)
 }
 
-export function parseLimit (limit) {
+function parseLimit (limit) {
   return limit === 'false' ? false : parseInt(limit, 10)
 }
 
-export function encodeHTML (string) {
+function encodeHTML (string) {
   return string.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-export function replaceText (string, options) {
+function replaceText (string, options) {
   if (!options.replaceText) {
     return string
   }
@@ -74,27 +74,43 @@ const createCallback = (resolve, reject) => (err, data) => {
   else resolve(data)
 }
 
-export function readFile (path) {
+function readFile (path) {
   return new Promise((resolve, reject) => {
     fs.readFile(path, 'utf-8', createCallback(resolve, reject))
   })
 }
 
-export function writeFile (path, data) {
+function writeFile (path, data) {
   return new Promise((resolve, reject) => {
     fs.writeFile(path, data, createCallback(resolve, reject))
   })
 }
 
-export function fileExists (path) {
+function fileExists (path) {
   return new Promise(resolve => {
     fs.access(path, err => resolve(!err))
   })
 }
 
-export async function readJson (path) {
+async function readJson (path) {
   if (await fileExists(path) === false) {
     return null
   }
   return JSON.parse(await readFile(path))
+}
+
+module.exports = {
+  updateLog,
+  formatBytes,
+  cmd,
+  getGitVersion,
+  niceDate,
+  isLink,
+  parseLimit,
+  encodeHTML,
+  replaceText,
+  readFile,
+  writeFile,
+  fileExists,
+  readJson
 }

@@ -1,12 +1,12 @@
-import parseRepoURL from 'parse-github-url'
-import { cmd } from './utils'
+const parseRepoURL = require('parse-github-url')
+const { cmd } = require('./utils')
 
-export async function fetchRemote (options) {
+async function fetchRemote (options) {
   const remoteURL = await cmd(`git config --get remote.${options.remote}.url`)
   return getRemote(remoteURL, options)
 }
 
-export function getRemote (remoteURL, options = {}) {
+function getRemote (remoteURL, options = {}) {
   const overrides = getOverrides(options)
   if (!remoteURL) {
     // No point warning if everything is overridden
@@ -88,4 +88,9 @@ function getOverrides ({ commitUrl, issueUrl, mergeUrl, compareUrl }) {
   if (mergeUrl) overrides.getMergeLink = id => mergeUrl.replace('{id}', id)
   if (compareUrl) overrides.getCompareLink = (from, to) => compareUrl.replace('{from}', from).replace('{to}', to)
   return overrides
+}
+
+module.exports = {
+  fetchRemote,
+  getRemote
 }

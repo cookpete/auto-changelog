@@ -1,8 +1,8 @@
-import { generateCommits } from '../utils/commits'
+const { generateCommits } = require('../utils/commits')
 
-export const tags = ['v1.0.0', 'v0.1.0', 'v0.0.2', 'v0.0.1']
+const tags = ['v1.0.0', 'v0.1.0', 'v0.0.2', 'v0.0.1']
 
-export const commitsMap = {
+const commitsMap = {
   'v1.0.0..': generateCommits([
     {
       hash: '2401ee4706e94629f48830bab9ed5812c032734a',
@@ -127,4 +127,9 @@ export const commitsMap = {
       deletions: 22
     }
   ])
+}
+
+module.exports = {
+  tags,
+  commitsMap
 }

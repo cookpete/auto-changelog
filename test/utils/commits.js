@@ -1,10 +1,10 @@
-import { randomBytes } from 'crypto'
-import { parseCommit, MESSAGE_SEPARATOR } from '../../src/commits.js'
-import { getRemote } from '../../src/remote.js'
+const { randomBytes } = require('crypto')
+const { parseCommit, MESSAGE_SEPARATOR } = require('../../src/commits.js')
+const { getRemote } = require('../../src/remote.js')
 
 const DEFAULT_REMOTE = getRemote('https://github.com/user/repo')
 
-export function generateCommit (data, options = {}, remote = DEFAULT_REMOTE) {
+function generateCommit (data, options = {}, remote = DEFAULT_REMOTE) {
   const {
     message,
     hash = randomBytes(20).toString('hex'),
@@ -20,6 +20,11 @@ export function generateCommit (data, options = {}, remote = DEFAULT_REMOTE) {
   }
 }
 
-export function generateCommits (array, options, remote) {
+function generateCommits (array, options, remote) {
   return array.map(data => generateCommit(data, options, remote))
+}
+
+module.exports = {
+  generateCommit,
+  generateCommits
 }

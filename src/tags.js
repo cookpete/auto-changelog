@@ -1,7 +1,7 @@
-import semver from 'semver'
-import { cmd } from './utils'
+const semver = require('semver')
+const { cmd } = require('./utils')
 
-export async function fetchTags (options) {
+async function fetchTags (options) {
   const tags = (await cmd('git tag --sort=committerdate'))
     .trim()
     .split('\n')
@@ -43,4 +43,8 @@ function inferSemver (tag) {
     return `${tag}.0`
   }
   return tag
+}
+
+module.exports = {
+  fetchTags
 }

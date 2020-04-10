@@ -1,9 +1,9 @@
-import { join } from 'path'
-import { readFile, writeFile } from '../src/utils'
-import { __get__ } from '../src/commits'
-import { parseReleases } from '../src/releases'
-import { compileTemplate } from '../src/template'
-import remotes from '../test/data/remotes'
+const { join } = require('path')
+const { readFile, writeFile } = require('../src/utils')
+const { __get__ } = require('../src/commits')
+const { parseReleases } = require('../src/releases')
+const { compileTemplate } = require('../src/template')
+const remotes = require('../test/data/remotes')
 
 const parseCommits = __get__('parseCommits')
 
@@ -17,7 +17,7 @@ const options = {
 }
 
 function writeObject (filename, object) {
-  return writeFile(join(DATA_DIR, filename), `export default ${JSON.stringify(object, null, 2)}\n`)
+  return writeFile(join(DATA_DIR, filename), `module.exports = ${JSON.stringify(object, null, 2)}\n`)
 }
 
 async function writeTemplate (filename, template, releases) {

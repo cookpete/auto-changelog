@@ -1,7 +1,7 @@
-import { join } from 'path'
-import Handlebars from 'handlebars'
-import fetch from 'node-fetch'
-import { readFile, fileExists } from './utils'
+const { join } = require('path')
+const Handlebars = require('handlebars')
+const fetch = require('node-fetch')
+const { readFile, fileExists } = require('./utils')
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
 const MATCH_URL = /^https?:\/\/.+/
@@ -76,7 +76,7 @@ function cleanTemplate (template) {
     .replace(/\n\n$/, '\n')
 }
 
-export async function compileTemplate ({ template, handlebarsSetup }, data) {
+async function compileTemplate ({ template, handlebarsSetup }, data) {
   if (handlebarsSetup) {
     const setup = require(join(process.cwd(), handlebarsSetup))
     if (typeof setup === 'function') {
@@ -88,4 +88,8 @@ export async function compileTemplate ({ template, handlebarsSetup }, data) {
     return compile(data)
   }
   return cleanTemplate(compile(data))
+}
+
+module.exports = {
+  compileTemplate
 }

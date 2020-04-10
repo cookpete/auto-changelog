@@ -1,15 +1,15 @@
-import { describe, it, beforeEach, afterEach } from 'mocha'
-import { expect } from 'chai'
-import remotes from './data/remotes'
-import { tags, commitsMap } from './data/commits-map'
-import commitsSingleRelease from './data/commits-single-release'
-import releases from './data/releases'
-import { generateCommits } from './utils/commits'
-import {
+const { describe, it, beforeEach, afterEach } = require('mocha')
+const { expect } = require('chai')
+const remotes = require('./data/remotes')
+const { tags, commitsMap } = require('./data/commits-map')
+const commitsSingleRelease = require('./data/commits-single-release')
+const releases = require('./data/releases')
+const { generateCommits } = require('./utils/commits')
+const {
   parseReleases,
-  __Rewire__ as mock,
-  __ResetDependency__ as unmock
-} from '../src/releases'
+  __Rewire__: mock,
+  __ResetDependency__: unmock
+} = require('../src/releases')
 
 describe('parseReleases', () => {
   afterEach(() => {

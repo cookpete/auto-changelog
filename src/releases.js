@@ -1,6 +1,6 @@
-import semver from 'semver'
-import { fetchCommits } from './commits'
-import { niceDate } from './utils'
+const semver = require('semver')
+const { fetchCommits } = require('./commits')
+const { niceDate } = require('./utils')
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
@@ -35,7 +35,7 @@ async function createRelease (tag, previousTag, diff, remote, options, onParsed)
   return release
 }
 
-export function parseReleases (tags, remote, latestVersion, options, onParsed) {
+function parseReleases (tags, remote, latestVersion, options, onParsed) {
   const releases = tags.map((tag, index, tags) => {
     const previousTag = tags[index + 1]
     const diff = previousTag ? `${previousTag}..${tag}` : tag
@@ -111,4 +111,8 @@ function getCompareLink (previousTag, tag, remote, { tagPrefix = '' }) {
   const from = `${tagPrefix}${previousTag}`
   const to = tag ? `${tagPrefix}${tag}` : 'HEAD'
   return remote.getCompareLink(from, to)
+}
+
+module.exports = {
+  parseReleases
 }

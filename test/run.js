@@ -1,16 +1,17 @@
-import { describe, it, beforeEach, afterEach } from 'mocha'
-import { expect } from 'chai'
-import { join } from 'path'
-import { readFile } from '../src/utils'
-import remotes from './data/remotes'
-import releases from './data/releases'
-import { tags, commitsMap } from './data/commits-map'
-import commitsNoRemote from './data/commits-no-remote'
-import run, {
+const { describe, it, beforeEach, afterEach } = require('mocha')
+const { expect } = require('chai')
+const { join } = require('path')
+const { readFile } = require('../src/utils')
+const remotes = require('./data/remotes')
+const releases = require('./data/releases')
+const { tags, commitsMap } = require('./data/commits-map')
+const commitsNoRemote = require('./data/commits-no-remote')
+const {
+  run,
   __get__,
-  __Rewire__ as mock,
-  __ResetDependency__ as unmock
-} from '../src/run'
+  __Rewire__: mock,
+  __ResetDependency__: unmock
+} = require('../src/run')
 
 const getOptions = __get__('getOptions')
 

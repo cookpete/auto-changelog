@@ -1,7 +1,7 @@
-import { __get__ } from '../../src/remote'
+const { __get__ } = require('../../src/remote')
 const getRemote = __get__('getRemote')
 
-export default {
+module.exports = {
   null: getRemote(null),
   github: getRemote('https://github.com/user/repo'),
   gitlab: getRemote('https://gitlab.com/user/repo'),

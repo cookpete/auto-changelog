@@ -1,11 +1,11 @@
-import { describe, it, beforeEach, afterEach } from 'mocha'
-import { expect } from 'chai'
-import {
+const { describe, it, beforeEach, afterEach } = require('mocha')
+const { expect } = require('chai')
+const {
   fetchTags,
   __get__,
-  __Rewire__ as mock,
-  __ResetDependency__ as unmock
-} from '../src/tags'
+  __Rewire__: mock,
+  __ResetDependency__: unmock
+} = require('../src/tags')
 
 const options = {
   tagPrefix: ''
