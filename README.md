@@ -38,11 +38,10 @@ Options:
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
-      --tag-pattern [regex]           # override regex pattern for release tags
+      --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
-      --starting-commit [hash]        # starting commit to use for changelog generation
+      --starting-version [tag]        # specify earliest version to include in changelog
       --sort-commits [property]       # sort commits by property [relevance, date, date-desc], default: relevance
-      --include-branch [branch]       # one or more branches to include commits from, comma separated
       --release-summary               # display tagged commit message body as release summary
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command
@@ -118,7 +117,7 @@ auto-changelog --compare-url https://example.com/repo/compare/{from}...{to}
 
 #### Configuration
 
-You can set any option in `package.json` under the `auto-changelog` key, using camelCase options. Note that `includeBranch` should be an array here, not a comma separated list:
+You can set any option in `package.json` under the `auto-changelog` key, using camelCase options.
 
 ```js
 {
@@ -131,11 +130,7 @@ You can set any option in `package.json` under the `auto-changelog` key, using c
     "output": "HISTORY.md",
     "template": "keepachangelog",
     "unreleased": true,
-    "commitLimit": false,
-    "includeBranch": [
-      "release-v2",
-      "release-v3"
-    ]
+    "commitLimit": false
   }
 }
 ```

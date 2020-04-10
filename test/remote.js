@@ -1,10 +1,10 @@
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import {
+const { describe, it } = require('mocha')
+const { expect } = require('chai')
+const {
   fetchRemote,
-  __Rewire__ as mock,
-  __ResetDependency__ as unmock
-} from '../src/remote'
+  __Rewire__: mock,
+  __ResetDependency__: unmock
+} = require('../src/remote')
 
 const TEST_DATA = [
   {

@@ -1,7 +1,7 @@
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import Handlebars from 'handlebars'
-import releases from './data/releases'
+const { describe, it } = require('mocha')
+const { expect } = require('chai')
+const Handlebars = require('handlebars')
+const releases = require('./data/releases')
 
 describe('matches helper', () => {
   const compileCommits = (matches) => Handlebars.compile(
@@ -25,7 +25,7 @@ describe('matches helper', () => {
 
   it('matches with case insensitive flag', () => {
     const matches =
-      '{{#matches author "pete" flags="i"}}\n' +
+      '{{#matches author "example" flags="i"}}\n' +
         '- {{shorthash}}\n' +
       '{{/matches}}\n'
     const expected =

@@ -1,9 +1,9 @@
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import { join } from 'path'
-import { readFile } from '../src/utils'
-import releases from './data/releases'
-import { compileTemplate } from '../src/template'
+const { describe, it } = require('mocha')
+const { expect } = require('chai')
+const { join } = require('path')
+const { readFile } = require('../src/utils')
+const releases = require('./data/releases')
+const { compileTemplate } = require('../src/template')
 
 describe('compileTemplate', () => {
   it('compiles using compact template', async () => {

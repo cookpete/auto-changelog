@@ -1,6 +1,6 @@
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import {
+const { describe, it } = require('mocha')
+const { expect } = require('chai')
+const {
   updateLog,
   cmd,
   niceDate,
@@ -10,9 +10,9 @@ import {
   writeFile,
   fileExists,
   readJson,
-  __Rewire__ as mock,
-  __ResetDependency__ as unmock
-} from '../src/utils'
+  __Rewire__: mock,
+  __ResetDependency__: unmock
+} = require('../src/utils')
 
 describe('updateLog', () => {
   it('doesn\'t error', async () => {
@@ -73,7 +73,7 @@ describe('readFile', () => {
   it('reads file', async () => {
     mock('fs', { readFile: (path, type, cb) => cb(null, 'abc') })
     expect(await readFile()).to.equal('abc')
-    unmock('cmd')
+    unmock('fs')
   })
 })
 
@@ -100,6 +100,6 @@ describe('readJson', () => {
       access: (path, cb) => cb(null)
     })
     expect(await readJson()).to.deep.equal({ abc: 123 })
-    unmock('cmd')
+    unmock('fs')
   })
 })

@@ -1,6 +1,6 @@
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import Handlebars from 'handlebars'
+const { describe, it } = require('mocha')
+const { expect } = require('chai')
+const Handlebars = require('handlebars')
 
 describe('commit-list helper', () => {
   const commits = [

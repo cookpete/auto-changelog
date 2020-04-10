@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
-import 'core-js/stable'
-import run from './run'
+const { run } = require('./run')
 
-run(process.argv)
-  .catch(error => {
-    console.log('\n')
-    console.error(error)
-    process.exit(1)
-  })
+run(process.argv).catch(error => {
+  console.log('\n')
+  console.error(error)
+  process.exit(1)
+})

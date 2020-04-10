@@ -10,9 +10,9 @@ cache:
 script:
   - npm run lint
   - npm run lint-markdown
-  - npm run test
+  - npm run test-coverage
 after_success:
-  - npm run coverage
+  - npm run report-coverage
 env:
   global:
     secure: F80ocIyMwaljpsWzLXRhoXTxR7kkYE0V9rTpAzO7MI/OmQ2UiAeQkyTXdthK6tZuz1oVVrpjDtYuJ0hmvlTBm7WmVWNK0S6kYhHsHGy1sRmwilBqVSwSFEcjjKmOAJckfIHwOG8tjWLY9qemrf9KqpvPCG7DiG4Pn+YHLOZT7XlXbBiec/qCnaskwBpN5KhA+VAhupcZEQAy5AWW5h+CU7NF60a4chlX4gmWjAgeHZlYr472pNRi+kDZVztaXusTEWExJog/NZ/Oi8VTZkzX0t3uNiWmLfRyYC1S8blq/jaPRuwtJrgzZZRRHZswN01cmBl/D8HAzvgrA24k/70QpNdjFeJ4s5PW9+4GiGnky5z5F3tB8Hlv0ofNQAR3IKAnI+lXy/DfSD10ZJls4bQMEdoPdG/34E5EGliG2WmP6chuTh8vPlZtOGMesUi0TkXSoYPO5njZEV0Ketye37LHTfwO4sf6OC0tV8MsTtLjqMU+081K20ACHITwaJlpfWP1uGLJn+zUx3XsGS8z7abt9+a9cPl9p917IpDttLsdtLhvGC988uWvJQ5F6UMlayf1MYavwmz0vKldDu3eHBKJSaTDqugwvivww3TxdG7Jw/mNVYsrdWz4Hr49QuugGxiOrL5ZtEIbBV50W0sPFe4XFXGFyjN2x/8/td3ZXL8glN4=
