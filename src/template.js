@@ -19,7 +19,8 @@ Handlebars.registerHelper('commit-list', function (context, options) {
   }
 
   const list = context
-    .filter(commit => {
+    .filter(item => {
+      const commit = item.commit || item
       if (options.hash.exclude) {
         const pattern = new RegExp(options.hash.exclude, 'm')
         if (pattern.test(commit.message)) {

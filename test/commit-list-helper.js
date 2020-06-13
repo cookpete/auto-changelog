@@ -9,6 +9,12 @@ describe('commit-list helper', () => {
     { subject: 'feat: Commit 3', message: 'feat: Commit 3\n\nThis commit adds a feature' }
   ]
 
+  const merges = [
+    { commit: { subject: 'Commit 1', message: 'Commit 1\n\nThis is commit 1, nothing special' } },
+    { commit: { subject: 'Commit 2', message: 'Commit 2\n\nBREAKING CHANGE: This commit breaks something' } },
+    { commit: { subject: 'feat: Commit 3', message: 'feat: Commit 3\n\nThis commit adds a feature' } }
+  ]
+
   it('returns nothing with no commits', () => {
     const compile = Handlebars.compile(
       '{{#commit-list commits heading="# Heading"}}\n' +
@@ -43,6 +49,18 @@ describe('commit-list helper', () => {
       '# Heading\n\n' +
       '- feat: Commit 3\n'
     expect(compile({ commits })).to.equal(expected)
+  })
+
+  it('supports merge subject pattern matching', () => {
+    const compile = Handlebars.compile(
+      '{{#commit-list merges heading="# Heading" subject="^feat: "}}\n' +
+        '- {{commit.subject}}\n' +
+      '{{/commit-list}}'
+    )
+    const expected =
+      '# Heading\n\n' +
+      '- feat: Commit 3\n'
+    expect(compile({ merges })).to.equal(expected)
   })
 
   it('supports message pattern matching', () => {
