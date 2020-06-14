@@ -1,28 +1,37 @@
 const semver = require('semver')
 const { cmd } = require('./utils')
 
+const DIVIDER = '---'
+
 async function fetchTags (options) {
-  const tags = (await cmd('git tag --sort=committerdate'))
+  const tags = (await cmd(`git tag -l --sort=-creatordate --format=%(refname:short)${DIVIDER}%(creatordate:short)`))
     .trim()
     .split('\n')
-    .reverse()
+    .map(parseTag)
     .filter(isValidTag(options))
     .sort(sortTags(options))
   if (options.startingVersion) {
-    const limit = tags.indexOf(options.startingVersion) + 1
-    return tags.slice(0, limit)
+    const index = tags.findIndex(({ tag }) => tag === options.startingVersion)
+    if (index !== -1) {
+      return tags.slice(0, index + 1)
+    }
   }
   return tags
 }
 
-const isValidTag = ({ tagPattern, tagPrefix }) => tag => {
+const parseTag = string => {
+  const [tag, date] = string.split(DIVIDER)
+  return { tag, date }
+}
+
+const isValidTag = ({ tagPattern, tagPrefix }) => ({ tag }) => {
   if (tagPattern) {
     return new RegExp(tagPattern).test(tag)
   }
   return semver.valid(tag.replace(tagPrefix, ''))
 }
 
-const sortTags = ({ tagPrefix }) => (a, b) => {
+const sortTags = ({ tagPrefix }) => ({ tag: a }, { tag: b }) => {
   const versions = {
     a: inferSemver(a.replace(tagPrefix, '')),
     b: inferSemver(b.replace(tagPrefix, ''))

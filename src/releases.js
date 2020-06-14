@@ -5,12 +5,12 @@ const { niceDate } = require('./utils')
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
-async function createRelease (tag, previousTag, diff, remote, options, onParsed) {
+async function createRelease (tag, previousTag, date, diff, remote, options, onParsed) {
   const commits = await fetchCommits(diff, remote, options)
   const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
   const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
   const emptyRelease = merges.length === 0 && fixes.length === 0
-  const { date, message } = commits[0] || { date: new Date().toISOString() }
+  const { message } = commits[0] || { message: null }
   const breakingCount = commits.filter(c => c.breaking).length
   const filteredCommits = commits
     .filter(commit => filterCommit(commit, options, merges))
@@ -36,16 +36,17 @@ async function createRelease (tag, previousTag, diff, remote, options, onParsed)
 }
 
 function parseReleases (tags, remote, latestVersion, options, onParsed) {
-  const releases = tags.map((tag, index, tags) => {
-    const previousTag = tags[index + 1]
+  const releases = tags.map(({ tag, date }, index, tags) => {
+    const previousTag = tags[index + 1] ? tags[index + 1].tag : null
     const diff = previousTag ? `${previousTag}..${tag}` : tag
-    return createRelease(tag, previousTag, diff, remote, options, onParsed)
+    return createRelease(tag, previousTag, date, diff, remote, options, onParsed)
   })
   if (latestVersion || options.unreleased) {
     const tag = latestVersion || null
-    const previousTag = tags[0]
+    const previousTag = tags[0].tag
+    const date = new Date().toISOString()
     const diff = `${previousTag}..`
-    releases.unshift(createRelease(tag, previousTag, diff, remote, options, onParsed))
+    releases.unshift(createRelease(tag, previousTag, date, diff, remote, options, onParsed))
   }
   return Promise.all(releases)
 }

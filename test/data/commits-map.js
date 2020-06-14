@@ -1,6 +1,11 @@
 const { generateCommits } = require('../utils/commits')
 
-const tags = ['v1.0.0', 'v0.1.0', 'v0.0.2', 'v0.0.1']
+const tags = [
+  { tag: 'v1.0.0', date: '2015-12-15T12:03:09.000Z' },
+  { tag: 'v0.1.0', date: '2015-12-29T21:19:17.000Z' },
+  { tag: 'v0.0.2', date: '2015-12-28T21:17:17.000Z' },
+  { tag: 'v0.0.1', date: '2015-12-15T12:03:09.000Z' }
+]
 
 const commitsMap = {
   'v1.0.0..': generateCommits([

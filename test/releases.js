@@ -35,7 +35,11 @@ describe('parseReleases', () => {
       backfillLimit: 3,
       tagPrefix: ''
     }
-    const releases = await parseReleases(['v2.0.0', 'v1.0.0'], remotes.github, null, options)
+    const tags = [
+      { tag: 'v2.0.0', date: '2000-01-01' },
+      { tag: 'v1.0.0', date: '2000-01-01' }
+    ]
+    const releases = await parseReleases(tags, remotes.github, null, options)
     expect(releases).to.be.an('array')
     expect(releases[0]).to.include({
       tag: 'v2.0.0',
@@ -59,7 +63,8 @@ describe('parseReleases', () => {
     }
     mock('fetchCommits', diff => Promise.resolve(map[diff]))
     const options = { commitLimit: 1 }
-    const releases = await parseReleases(['v1.0.0'], remotes.github, null, options)
+    const tags = [{ tag: 'v1.0.0', date: '2000-01-01' }]
+    const releases = await parseReleases(tags, remotes.github, null, options)
     expect(releases[0].commits).to.have.lengthOf(1)
     expect(releases[0].commits[0]).to.include({ subject: 'Second commit' })
   })
@@ -70,7 +75,8 @@ describe('parseReleases', () => {
     }
     mock('fetchCommits', diff => Promise.resolve(map[diff]))
     const options = { commitLimit: false }
-    const releases = await parseReleases(['v1.0.0'], remotes.github, null, options)
+    const tags = [{ tag: 'v1.0.0', date: '2000-01-01' }]
+    const releases = await parseReleases(tags, remotes.github, null, options)
     expect(releases[0].commits).to.have.lengthOf(4)
   })
 
@@ -80,7 +86,8 @@ describe('parseReleases', () => {
     }
     mock('fetchCommits', diff => Promise.resolve(map[diff]))
     const options = { backfillLimit: 1 }
-    const releases = await parseReleases(['v1.0.0'], remotes.github, null, options)
+    const tags = [{ tag: 'v1.0.0', date: '2000-01-01' }]
+    const releases = await parseReleases(tags, remotes.github, null, options)
     expect(releases[0].commits).to.have.lengthOf(1)
     expect(releases[0].commits[0]).to.include({ subject: 'Second commit' })
   })
@@ -94,7 +101,8 @@ describe('parseReleases', () => {
     }
     mock('fetchCommits', diff => Promise.resolve(map[diff]))
     const options = { commitLimit: 0, backfillLimit: 0 }
-    const releases = await parseReleases(['v1.0.0'], remotes.github, null, options)
+    const tags = [{ tag: 'v1.0.0', date: '2000-01-01' }]
+    const releases = await parseReleases(tags, remotes.github, null, options)
     expect(releases[0].commits).to.have.lengthOf(1)
     expect(releases[0].commits[0]).to.include({ subject: 'First commit' })
   })

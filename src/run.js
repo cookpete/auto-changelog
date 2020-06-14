@@ -77,7 +77,7 @@ async function getLatestVersion (options, tags) {
       throw new Error(`File ${file} does not exist`)
     }
     const { version } = await readJson(file)
-    const prefix = tags.some(tag => /^v/.test(tag)) ? 'v' : ''
+    const prefix = tags.some(({ tag }) => /^v/.test(tag)) ? 'v' : ''
     return `${prefix}${version}`
   }
   return null
