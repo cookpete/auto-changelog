@@ -43,6 +43,7 @@ Options:
       --starting-version [tag]        # specify earliest version to include in changelog
       --sort-commits [property]       # sort commits by property [relevance, date, date-desc], default: relevance
       --release-summary               # display tagged commit message body as release summary
+      --unreleased-only               # only output unreleased changes
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command
       --stdout                        # output changelog to stdout

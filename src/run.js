@@ -47,6 +47,7 @@ async function getOptions (argv) {
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--release-summary', 'use tagged commit message body as release summary')
+    .option('--unreleased-only', 'only output unreleased changes')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
     .option('--stdout', 'output changelog to stdout')
