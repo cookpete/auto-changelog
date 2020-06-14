@@ -115,6 +115,10 @@ auto-changelog --issue-url https://www.redmine.org/issues/{id}
 auto-changelog --compare-url https://example.com/repo/compare/{from}...{to}
 ```
 
+#### Add to an existing changelog
+
+If you’d like to keep an existing changelog below your generated one, just add `<!-- auto-changelog-above -->` to your current changelog. The generated changelog will be added above this token, and anything below will remain.
+
 #### Configuration
 
 You can set any option in `package.json` under the `auto-changelog` key, using camelCase options.

@@ -141,7 +141,7 @@ describe('run', () => {
   })
 
   it('command line options override options from package.json', async () => {
-    mock('fileExists', () => true)
+    mock('fileExists', path => path === '.auto-changelog')
     mock('readJson', () => ({
       'auto-changelog': {
         output: 'should-not-be-this.md'
@@ -168,7 +168,7 @@ describe('run', () => {
   })
 
   it('command line options override options from .auto-changelog', async () => {
-    mock('fileExists', () => true)
+    mock('fileExists', path => path === '.auto-changelog')
     mock('readJson', (path) => {
       return path === '.auto-changelog' ? { output: 'should-not-be-this.md' } : null
     })

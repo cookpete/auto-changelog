@@ -5,7 +5,7 @@ const { fetchRemote } = require('./remote')
 const { fetchTags } = require('./tags')
 const { parseReleases } = require('./releases')
 const { compileTemplate } = require('./template')
-const { parseLimit, readJson, writeFile, fileExists, updateLog, formatBytes } = require('./utils')
+const { parseLimit, readFile, readJson, writeFile, fileExists, updateLog, formatBytes } = require('./utils')
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -21,6 +21,7 @@ const DEFAULT_OPTIONS = {
 
 const PACKAGE_FILE = 'package.json'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
+const PREPEND_TOKEN = '<!-- auto-changelog-above -->'
 
 async function getOptions (argv) {
   const options = new Command()
@@ -95,12 +96,26 @@ async function run (argv) {
   const onParsed = ({ title }) => log(`Fetched ${title}…`)
   const releases = await parseReleases(tags, remote, latestVersion, options, onParsed)
   const changelog = await compileTemplate(options, { releases })
+  await write(changelog, options, log)
+}
+
+async function write (changelog, options, log) {
   if (options.stdout) {
     process.stdout.write(changelog)
-    process.exit(0)
+    return
+  }
+  const bytes = Buffer.byteLength(changelog, 'utf8')
+  const existing = await fileExists(options.output) && await readFile(options.output, 'utf8')
+  if (existing) {
+    const index = existing.indexOf(PREPEND_TOKEN)
+    if (index !== -1) {
+      const prepended = `${changelog}\n${existing.slice(index)}`
+      await writeFile(options.output, prepended)
+      log(`${formatBytes(bytes)} prepended to ${options.output}\n`)
+      return
+    }
   }
   await writeFile(options.output, changelog)
-  const bytes = Buffer.byteLength(changelog, 'utf8')
   log(`${formatBytes(bytes)} written to ${options.output}\n`)
 }
 
