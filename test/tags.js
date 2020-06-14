@@ -36,7 +36,8 @@ describe('fetchTags', () => {
   it('supports --starting-version', async () => {
     expect(await fetchTags({ ...options, startingVersion: 'v0.3.0' })).to.deep.equal([
       { tag: 'v1.0.0', date: '2001-01-01' },
-      { tag: 'v0.3.0', date: '2000-04-01' }
+      { tag: 'v0.3.0', date: '2000-04-01' },
+      { tag: 'v0.2.2', date: '2000-03-03' }
     ])
   })
 })

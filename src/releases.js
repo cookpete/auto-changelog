@@ -37,6 +37,9 @@ async function createRelease (tag, previousTag, date, diff, remote, options, onP
 
 function parseReleases (tags, remote, latestVersion, options, onParsed) {
   const releases = tags.map(({ tag, date }, index, tags) => {
+    if (tags[index - 1] && tags[index - 1].tag === options.startingVersion) {
+      return null
+    }
     const previousTag = tags[index + 1] ? tags[index + 1].tag : null
     const diff = previousTag ? `${previousTag}..${tag}` : tag
     return createRelease(tag, previousTag, date, diff, remote, options, onParsed)
@@ -48,7 +51,7 @@ function parseReleases (tags, remote, latestVersion, options, onParsed) {
     const diff = `${previousTag}..`
     releases.unshift(createRelease(tag, previousTag, date, diff, remote, options, onParsed))
   }
-  return Promise.all(releases)
+  return Promise.all(releases.filter(release => release))
 }
 
 function getCommitLimit ({ commitLimit, backfillLimit }, emptyRelease, breakingCount) {

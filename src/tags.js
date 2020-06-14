@@ -13,7 +13,8 @@ async function fetchTags (options) {
   if (options.startingVersion) {
     const index = tags.findIndex(({ tag }) => tag === options.startingVersion)
     if (index !== -1) {
-      return tags.slice(0, index + 1)
+      // Leave the tag after the starting version for the diff
+      return tags.slice(0, index + 2)
     }
   }
   return tags
