@@ -125,7 +125,7 @@ async function write (changelog, options, log) {
     }
   }
   await writeFile(options.output, changelog)
-  log(`${formatBytes(bytes)} writtenaaa to ${options.output}\n`)
+  log(`${formatBytes(bytes)} written to ${options.output}\n`)
 }
 
 module.exports = {
