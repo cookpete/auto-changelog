@@ -25,6 +25,7 @@ const PREPEND_TOKEN = '<!-- auto-changelog-above -->'
 
 async function getOptions (argv) {
   const options = new Command()
+    .option('--input <file>', 'inform a release.json source pre-processed')
     .option('-o, --output <file>', `output file, default: ${DEFAULT_OPTIONS.output}`)
     .option('-c, --config <file>', `config file location, default: ${DEFAULT_OPTIONS.config}`)
     .option('-t, --template <template>', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
@@ -89,14 +90,20 @@ async function getLatestVersion (options, tags) {
 async function run (argv) {
   const options = await getOptions(argv)
   const log = string => options.stdout ? null : updateLog(string)
-  log('Fetching remote…')
-  const remote = await fetchRemote(options)
-  log('Fetching tags…')
-  const tags = await fetchTags(options)
-  log(`${tags.length} version tags found…`)
-  const latestVersion = await getLatestVersion(options, tags)
-  const onParsed = ({ title }) => log(`Fetched ${title}…`)
-  const releases = await parseReleases(tags, remote, latestVersion, options, onParsed)
+
+  let releases
+  if (options.input) {
+    releases = await readJson(options.input)
+  } else {
+    log('Fetching remote…')
+    const remote = await fetchRemote(options)
+    log('Fetching tags…')
+    const tags = await fetchTags(options)
+    log(`${tags.length} version tags found…`)
+    const latestVersion = await getLatestVersion(options, tags)
+    const onParsed = ({ title }) => log(`Fetched ${title}…`)
+    releases = await parseReleases(tags, remote, latestVersion, options, onParsed)
+  }
   const changelog = await compileTemplate(options, { releases, options })
   await write(changelog, options, log)
 }
@@ -118,7 +125,7 @@ async function write (changelog, options, log) {
     }
   }
   await writeFile(options.output, changelog)
-  log(`${formatBytes(bytes)} written to ${options.output}\n`)
+  log(`${formatBytes(bytes)} writtenaaa to ${options.output}\n`)
 }
 
 module.exports = {
