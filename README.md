@@ -1,7 +1,4 @@
-# auto-changelog (customized for Azure)
-
-
-# auto-changelog (original project)
+# auto-changelog
 
 Command line tool for generating a changelog from git tags and commit history. Used by [Modernizr](https://modernizr.com), [Netlify](https://netlify.com), [Neutrino](https://neutrinojs.org) and [Velocity.js](http://velocityjs.org).
 
