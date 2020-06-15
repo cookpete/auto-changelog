@@ -1,4 +1,7 @@
-# auto-changelog
+# auto-changelog (customized for Azure)
+
+
+# auto-changelog (original project)
 
 Command line tool for generating a changelog from git tags and commit history. Used by [Modernizr](https://modernizr.com), [Netlify](https://netlify.com), [Neutrino](https://neutrinojs.org) and [Velocity.js](http://velocityjs.org).
 
@@ -21,6 +24,7 @@ Usage: auto-changelog [options]
 
 Options:
 
+  --input [file]                      # inform a release.json source pre-processed. Follow releases.json-sample for the estructure expected
   -o, --output [file]                 # output file, default: CHANGELOG.md
   -c, --config [file]                 # config file location, default: .auto-changelog
   -t, --template [template]           # specify template to use [compact, keepachangelog, json], default: compact
