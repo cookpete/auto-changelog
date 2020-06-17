@@ -46,7 +46,7 @@ function parseReleases (tags, remote, latestVersion, options, onParsed) {
   })
   if (latestVersion || options.unreleased || options.unreleasedOnly) {
     const tag = latestVersion || null
-    const previousTag = tags[0].tag
+    const previousTag = tags[0] ? tags[0].tag : null
     const date = new Date().toISOString()
     const diff = `${previousTag}..`
     const unreleased = createRelease(tag, previousTag, date, diff, remote, options, onParsed)
