@@ -49,6 +49,7 @@
     "lodash.uniqby": "^4.7.0",
     "make-fetch-happen": "^8.0.7",
     "node-fetch": "^2.6.0",
+    "p-map": "^4.0.0",
     "parse-github-url": "^1.0.2",
     "semver": "^6.3.0"
   },

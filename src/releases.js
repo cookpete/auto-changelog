@@ -1,13 +1,33 @@
 const semver = require('semver')
 const { fetchCommits } = require('./commits')
 const { niceDate } = require('./utils')
+const pMap = require('p-map')
+const GithubAPI = require('./github');
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
+async function downloadIssueData(merges, options) {
+  let github = new GithubAPI(options);
+  await pMap(
+    merges,
+    async (merge) => {
+      if (merge.id) {
+        merge.githubIssue = await github.getIssueData(options.repo, merge.id);
+      }
+    },
+    { concurrency: 5 }
+  );
+}
+
 async function createRelease (tag, previousTag, date, diff, remote, options, onParsed) {
   const commits = await fetchCommits(diff, remote, options)
   const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
+
+  if (options.loadGithubIssueData) {
+    await downloadIssueData(merges, options);
+  }
+
   const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
   const emptyRelease = merges.length === 0 && fixes.length === 0
   const { message } = commits[0] || { message: null }
