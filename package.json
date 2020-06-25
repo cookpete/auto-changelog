@@ -45,6 +45,7 @@
   "dependencies": {
     "commander": "^5.0.0",
     "handlebars": "^4.7.3",
+    "hosted-git-info": "^3.0.4",
     "lodash.uniqby": "^4.7.0",
     "make-fetch-happen": "^8.0.7",
     "node-fetch": "^2.6.0",

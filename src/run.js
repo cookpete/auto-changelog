@@ -1,5 +1,6 @@
 const { Command } = require('commander')
 const semver = require('semver')
+const hostedGitInfo = require('hosted-git-info');
 const { version } = require('../package.json')
 const { fetchRemote } = require('./remote')
 const { fetchTags } = require('./tags')
@@ -66,7 +67,16 @@ async function getOptions (argv) {
     ...DEFAULT_OPTIONS,
     ...dotOptions,
     ...packageOptions,
-    ...options
+    ...options,
+    repo: findRepoFromPkg(pkg)
+  }
+}
+
+function findRepoFromPkg(pkg) {
+  const url = pkg.repository.url || pkg.repository;
+  const info = hostedGitInfo.fromUrl(url);
+  if (info && info.type === "github") {
+    return `${info.user}/${info.project}`;
   }
 }
 
