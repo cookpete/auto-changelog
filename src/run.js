@@ -53,6 +53,8 @@ async function getOptions (argv) {
     .option('--append-git-log <string>', 'string to append to git log command')
     .option('--prepend', 'prepend changelog to output file')
     .option('--stdout', 'output changelog to stdout')
+    .option('--load-github-issue-data', 'download PR data from github for each merge')
+    .option('--github-cache-dir', 'directory for github data cache')
     .version(version)
     .parse(argv)
 
