@@ -52,6 +52,7 @@ async function getOptions (argv) {
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
     .option('--stdout', 'output changelog to stdout')
+    .option('--prepend', 'prepend changelog to the start of the changelog file')
     .version(version)
     .parse(argv)
 
@@ -109,7 +110,12 @@ async function write (changelog, options, log) {
   const bytes = Buffer.byteLength(changelog, 'utf8')
   const existing = await fileExists(options.output) && await readFile(options.output, 'utf8')
   if (existing) {
-    const index = existing.indexOf(PREPEND_TOKEN)
+    let index = existing.indexOf(PREPEND_TOKEN)
+
+    if (index === -1 && options.prepend) {
+      index = 0;
+    }
+
     if (index !== -1) {
       const prepended = `${changelog}\n${existing.slice(index)}`
       await writeFile(options.output, prepended)
