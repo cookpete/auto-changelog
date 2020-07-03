@@ -47,6 +47,7 @@ Options:
       --hide-credit                   # hide auto-changelog credit
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command
+      --prepend                       # prepend changelog to output file
       --stdout                        # output changelog to stdout
   -V, --version                       # output the version number
   -h, --help                          # output usage information
