@@ -235,10 +235,4 @@ describe('run', () => {
       .then(() => done('Should throw an error'))
       .catch(() => done())
   })
-
-  it('throws an error when given an invalid latest version', done => {
-    run(['', '', '--latest-version', 'invalid'])
-      .then(() => done('Should throw an error'))
-      .catch(() => done())
-  })
 })

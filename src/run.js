@@ -1,5 +1,4 @@
 const { Command } = require('commander')
-const semver = require('semver')
 const { version } = require('../package.json')
 const { fetchRemote } = require('./remote')
 const { fetchTags } = require('./tags')
@@ -76,9 +75,6 @@ const getOptions = async argv => {
 
 const getLatestVersion = async options => {
   if (options.latestVersion) {
-    if (!semver.valid(options.latestVersion)) {
-      throw new Error('--latest-version must be a valid semver version')
-    }
     return options.latestVersion
   }
   if (options.package) {
