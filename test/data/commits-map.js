@@ -1,10 +1,10 @@
 const { generateCommits } = require('../utils/commits')
 
 const tags = [
-  { tag: 'v1.0.0', date: '2015-12-15T12:03:09.000Z' },
-  { tag: 'v0.1.0', date: '2015-12-29T21:19:17.000Z' },
-  { tag: 'v0.0.2', date: '2015-12-28T21:17:17.000Z' },
-  { tag: 'v0.0.1', date: '2015-12-15T12:03:09.000Z' }
+  { tag: 'v1.0.0', date: '2015-12-15T12:03:09.000Z', diff: 'v0.1.0..v1.0.0', major: true },
+  { tag: 'v0.1.0', date: '2015-12-29T21:19:17.000Z', diff: 'v0.0.2..v0.1.0' },
+  { tag: 'v0.0.2', date: '2015-12-28T21:17:17.000Z', diff: 'v0.0.1..v0.0.2' },
+  { tag: 'v0.0.1', date: '2015-12-15T12:03:09.000Z', diff: 'v0.0.1' }
 ]
 
 const commitsMap = {

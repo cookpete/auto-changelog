@@ -18,26 +18,26 @@ const MERGE_PATTERNS = [
   /^Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/ // GitLab merge
 ]
 
-async function fetchCommits (diff, remote, options = {}) {
+const fetchCommits = async (diff, options = {}) => {
   const format = await getLogFormat()
   const log = await cmd(`git log ${diff} --shortstat --pretty=format:${format} ${options.appendGitLog}`)
-  return parseCommits(log, remote, options)
+  return parseCommits(log, options)
 }
 
-async function getLogFormat () {
+const getLogFormat = async () => {
   const gitVersion = await getGitVersion()
   const bodyFormat = gitVersion && semver.gte(gitVersion, '1.7.2') ? BODY_FORMAT : FALLBACK_BODY_FORMAT
   return `${COMMIT_SEPARATOR}%H%n%ai%n%an%n%ae%n${bodyFormat}${MESSAGE_SEPARATOR}`
 }
 
-function parseCommits (string, remote, options = {}) {
+const parseCommits = (string, options = {}) => {
   return string
     .split(COMMIT_SEPARATOR)
     .slice(1)
-    .map(commit => parseCommit(commit, remote, options))
+    .map(commit => parseCommit(commit, options))
 }
 
-function parseCommit (commit, remote, options = {}) {
+const parseCommit = (commit, options = {}) => {
   const [, hash, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [body, stats] = tail.split(MESSAGE_SEPARATOR)
   const message = encodeHTML(body)
@@ -49,25 +49,25 @@ function parseCommit (commit, remote, options = {}) {
     date: new Date(date).toISOString(),
     subject: replaceText(getSubject(message), options),
     message: message.trim(),
-    fixes: getFixes(message, author, remote, options),
-    href: remote.getCommitLink(hash),
+    fixes: getFixes(message, author, options),
+    href: options.getCommitLink(hash),
     breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),
     ...getStats(stats)
   }
   return {
     ...parsed,
-    merge: getMerge(parsed, message, remote, options)
+    merge: getMerge(parsed, message, options)
   }
 }
 
-function getSubject (message) {
+const getSubject = (message) => {
   if (!message) {
     return '_No commit message_'
   }
   return message.match(/[^\n]+/)[0]
 }
 
-function getStats (stats) {
+const getStats = (stats) => {
   if (!stats.trim()) return {}
   const [, files, insertions, deletions] = stats.match(MATCH_STATS)
   return {
@@ -77,21 +77,21 @@ function getStats (stats) {
   }
 }
 
-function getFixes (message, author, remote, options = {}) {
+const getFixes = (message, author, options = {}) => {
   const pattern = getFixPattern(options)
   const fixes = []
   let match = pattern.exec(message)
   if (!match) return null
   while (match) {
     const id = getFixID(match)
-    const href = isLink(match[2]) ? match[2] : remote.getIssueLink(id)
+    const href = isLink(match[2]) ? match[2] : options.getIssueLink(id)
     fixes.push({ id, href, author })
     match = pattern.exec(message)
   }
   return fixes
 }
 
-function getFixID (match) {
+const getFixID = (match) => {
   // Get the last non-falsey value in the match array
   for (let i = match.length; i >= 0; i--) {
     if (match[i]) {
@@ -100,21 +100,21 @@ function getFixID (match) {
   }
 }
 
-function getFixPattern (options) {
+const getFixPattern = (options) => {
   if (options.issuePattern) {
     return new RegExp(options.issuePattern, 'g')
   }
   return DEFAULT_FIX_PATTERN
 }
 
-function getMergePatterns (options) {
+const getMergePatterns = (options) => {
   if (options.mergePattern) {
     return MERGE_PATTERNS.concat(new RegExp(options.mergePattern, 'g'))
   }
   return MERGE_PATTERNS
 }
 
-function getMerge (commit, message, remote, options = {}) {
+const getMerge = (commit, message, options = {}) => {
   const patterns = getMergePatterns(options)
   for (const pattern of patterns) {
     const match = pattern.exec(message)
@@ -124,7 +124,7 @@ function getMerge (commit, message, remote, options = {}) {
       return {
         id,
         message: replaceText(message, options),
-        href: remote.getMergeLink(id),
+        href: options.getMergeLink(id),
         author: commit.author,
         commit
       }

@@ -1,21 +1,27 @@
 const { describe, it, beforeEach, afterEach } = require('mocha')
 const { expect } = require('chai')
+const remotes = require('./data/remotes')
 const {
   fetchTags,
-  __get__,
   __Rewire__: mock,
   __ResetDependency__: unmock
 } = require('../src/tags')
 
 const options = {
-  tagPrefix: ''
+  tagPrefix: '',
+  ...remotes.github
 }
-
-const sortTags = __get__('sortTags')(options)
 
 describe('fetchTags', () => {
   beforeEach(() => {
-    mock('cmd', () => Promise.resolve('v0.1.0---2000-02-01\nv0.2.0---2000-03-01\nv0.2.1---2000-03-02\nv0.2.2---2000-03-03\nv0.3.0---2000-04-01\nv1.0.0---2001-01-01'))
+    mock('cmd', () => Promise.resolve([
+      'v0.1.0---2000-02-01',
+      'v0.2.0---2000-03-01',
+      'v0.2.1---2000-03-02',
+      'v0.2.2---2000-03-03',
+      'v0.3.0---2000-04-01',
+      'v1.0.0---2001-01-01'
+    ].join('\n')))
   })
 
   afterEach(() => {
@@ -23,53 +29,108 @@ describe('fetchTags', () => {
   })
 
   it('fetches tags', async () => {
-    expect(await fetchTags(options)).to.deep.equal([
-      { tag: 'v1.0.0', date: '2001-01-01' },
-      { tag: 'v0.3.0', date: '2000-04-01' },
-      { tag: 'v0.2.2', date: '2000-03-03' },
-      { tag: 'v0.2.1', date: '2000-03-02' },
-      { tag: 'v0.2.0', date: '2000-03-01' },
-      { tag: 'v0.1.0', date: '2000-02-01' }
-    ])
+    expect(await fetchTags(options)).to.deep.equal([{
+      tag: 'v1.0.0',
+      version: 'v1.0.0',
+      title: 'v1.0.0',
+      date: '2001-01-01',
+      isoDate: '2001-01-01',
+      niceDate: '1 January 2001',
+      diff: 'v0.3.0..v1.0.0',
+      href: 'https://github.com/user/repo/compare/v0.3.0...v1.0.0',
+      major: true
+    },
+    {
+      tag: 'v0.3.0',
+      version: 'v0.3.0',
+      title: 'v0.3.0',
+      date: '2000-04-01',
+      isoDate: '2000-04-01',
+      niceDate: '1 April 2000',
+      diff: 'v0.2.2..v0.3.0',
+      href: 'https://github.com/user/repo/compare/v0.2.2...v0.3.0',
+      major: false
+    },
+    {
+      tag: 'v0.2.2',
+      version: 'v0.2.2',
+      title: 'v0.2.2',
+      date: '2000-03-03',
+      isoDate: '2000-03-03',
+      niceDate: '3 March 2000',
+      diff: 'v0.2.1..v0.2.2',
+      href: 'https://github.com/user/repo/compare/v0.2.1...v0.2.2',
+      major: false
+    },
+    {
+      tag: 'v0.2.1',
+      version: 'v0.2.1',
+      title: 'v0.2.1',
+      date: '2000-03-02',
+      isoDate: '2000-03-02',
+      niceDate: '2 March 2000',
+      diff: 'v0.2.0..v0.2.1',
+      href: 'https://github.com/user/repo/compare/v0.2.0...v0.2.1',
+      major: false
+    },
+    {
+      tag: 'v0.2.0',
+      version: 'v0.2.0',
+      title: 'v0.2.0',
+      date: '2000-03-01',
+      isoDate: '2000-03-01',
+      niceDate: '1 March 2000',
+      diff: 'v0.1.0..v0.2.0',
+      href: 'https://github.com/user/repo/compare/v0.1.0...v0.2.0',
+      major: false
+    },
+    {
+      tag: 'v0.1.0',
+      version: 'v0.1.0',
+      title: 'v0.1.0',
+      date: '2000-02-01',
+      isoDate: '2000-02-01',
+      niceDate: '1 February 2000',
+      diff: 'v0.1.0',
+      href: null,
+      major: false
+    }])
   })
 
   it('supports --starting-version', async () => {
-    expect(await fetchTags({ ...options, startingVersion: 'v0.3.0' })).to.deep.equal([
-      { tag: 'v1.0.0', date: '2001-01-01' },
-      { tag: 'v0.3.0', date: '2000-04-01' },
-      { tag: 'v0.2.2', date: '2000-03-03' }
+    expect(await fetchTags({ ...options, startingVersion: 'v0.2.2' })).to.have.lengthOf(3)
+  })
+
+  it('supports partial semver tags', async () => {
+    mock('cmd', () => Promise.resolve([
+      'v0.1---2000-02-01',
+      'v0.2---2000-03-01',
+      'v0.2.1---2000-03-02',
+      'v0.2.2---2000-03-03',
+      'v0.3---2000-04-01',
+      'v1---2001-01-01'
+    ].join('\n')))
+    const tags = await fetchTags(options)
+    expect(tags.map(t => t.version)).to.deep.equal([
+      'v1.0.0',
+      'v0.3.0',
+      'v0.2.2',
+      'v0.2.1',
+      'v0.2.0',
+      'v0.1.0'
     ])
   })
-})
 
-describe('sortTags', () => {
-  it('compares semver tags', () => {
-    expect(sortTags({ tag: '1.0.0' }, { tag: '0.1.0' })).to.equal(-1)
-    expect(sortTags({ tag: '0.1.0' }, { tag: '1.0.0' })).to.equal(1)
-    expect(sortTags({ tag: '0.1.0' }, { tag: '0.1.0' })).to.equal(0)
-  })
-
-  it('supports non-semver tags', () => {
-    expect(sortTags({ tag: 'abc' }, { tag: 'def' })).to.equal(1)
-    expect(sortTags({ tag: 'def' }, { tag: 'abc' })).to.equal(-1)
-    expect(sortTags({ tag: 'abc' }, { tag: 'abc' })).to.equal(0)
-  })
-
-  it('supports non-semver numeric tags', () => {
-    expect(sortTags({ tag: '22.1' }, { tag: '22.0' })).to.equal(-1)
-    expect(sortTags({ tag: '22.0' }, { tag: '22.1' })).to.equal(1)
-    expect(sortTags({ tag: '123.0' }, { tag: '22.1' })).to.equal(-1)
-    expect(sortTags({ tag: '0.1' }, { tag: '0.01' })).to.equal(-1)
-    expect(sortTags({ tag: '0.14' }, { tag: '0.2' })).to.equal(-1)
-    expect(sortTags({ tag: '0.2' }, { tag: '0.14' })).to.equal(1)
-  })
-
-  it('supports partial semver tags', () => {
-    expect(sortTags({ tag: 'v0.50.7' }, { tag: 'v0.51' })).to.equal(1)
-    expect(sortTags({ tag: 'v0.51' }, { tag: 'v0.50.7' })).to.equal(-1)
-    expect(sortTags({ tag: 'v0.6' }, { tag: 'v0.50.7' })).to.equal(1)
-    expect(sortTags({ tag: 'v0.50.7' }, { tag: 'v0.6' })).to.equal(-1)
-    expect(sortTags({ tag: 'v2' }, { tag: 'v11' })).to.equal(1)
-    expect(sortTags({ tag: 'v11' }, { tag: 'v2' })).to.equal(-1)
+  it('ignores invalid semver tags', async () => {
+    mock('cmd', () => Promise.resolve([
+      'v0.1.0---2000-02-01',
+      'invalid-semver-tag---2000-03-01',
+      'v0.2.0---2000-03-02'
+    ].join('\n')))
+    const tags = await fetchTags(options)
+    expect(tags.map(t => t.version)).to.deep.equal([
+      'v0.2.0',
+      'v0.1.0'
+    ])
   })
 })

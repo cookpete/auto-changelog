@@ -23,8 +23,8 @@ const PACKAGE_FILE = 'package.json'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 const PREPEND_TOKEN = '<!-- auto-changelog-above -->'
 
-async function getOptions (argv) {
-  const options = new Command()
+const getOptions = async argv => {
+  const commandOptions = new Command()
     .option('-o, --output <file>', `output file, default: ${DEFAULT_OPTIONS.output}`)
     .option('-c, --config <file>', `config file location, default: ${DEFAULT_OPTIONS.config}`)
     .option('-t, --template <template>', `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}`)
@@ -58,17 +58,23 @@ async function getOptions (argv) {
 
   const pkg = await readJson(PACKAGE_FILE)
   const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null
-  const dotOptions = await readJson(options.config || DEFAULT_OPTIONS.config)
-
-  return {
+  const dotOptions = await readJson(commandOptions.config || DEFAULT_OPTIONS.config)
+  const options = {
     ...DEFAULT_OPTIONS,
     ...dotOptions,
     ...packageOptions,
-    ...options
+    ...commandOptions
+  }
+  const remote = await fetchRemote(options)
+  const latestVersion = await getLatestVersion(options)
+  return {
+    ...options,
+    ...remote,
+    latestVersion
   }
 }
 
-async function getLatestVersion (options, tags) {
+const getLatestVersion = async options => {
   if (options.latestVersion) {
     if (!semver.valid(options.latestVersion)) {
       throw new Error('--latest-version must be a valid semver version')
@@ -81,45 +87,41 @@ async function getLatestVersion (options, tags) {
       throw new Error(`File ${file} does not exist`)
     }
     const { version } = await readJson(file)
-    const prefix = tags.some(({ tag }) => /^v/.test(tag)) ? 'v' : ''
-    return `${prefix}${version}`
+    return version
   }
   return null
 }
 
-async function run (argv) {
+const run = async argv => {
   const options = await getOptions(argv)
   const log = string => options.stdout ? null : updateLog(string)
-  log('Fetching remote…')
-  const remote = await fetchRemote(options)
   log('Fetching tags…')
   const tags = await fetchTags(options)
   log(`${tags.length} version tags found…`)
-  const latestVersion = await getLatestVersion(options, tags)
   const onParsed = ({ title }) => log(`Fetched ${title}…`)
-  const releases = await parseReleases(tags, remote, latestVersion, options, onParsed)
-  const changelog = await compileTemplate(options, { releases, options })
+  const releases = await parseReleases(tags, options, onParsed)
+  const changelog = await compileTemplate(releases, options)
   await write(changelog, options, log)
 }
 
-async function write (changelog, options, log) {
+const write = async (changelog, options, log) => {
   if (options.stdout) {
     process.stdout.write(changelog)
     return
   }
-  const bytes = Buffer.byteLength(changelog, 'utf8')
+  const bytes = formatBytes(Buffer.byteLength(changelog, 'utf8'))
   const existing = await fileExists(options.output) && await readFile(options.output, 'utf8')
   if (existing) {
     const index = options.prepend ? 0 : existing.indexOf(PREPEND_TOKEN)
     if (index !== -1) {
       const prepended = `${changelog}\n${existing.slice(index)}`
       await writeFile(options.output, prepended)
-      log(`${formatBytes(bytes)} prepended to ${options.output}\n`)
+      log(`${bytes} prepended to ${options.output}\n`)
       return
     }
   }
   await writeFile(options.output, changelog)
-  log(`${formatBytes(bytes)} written to ${options.output}\n`)
+  log(`${bytes} written to ${options.output}\n`)
 }
 
 module.exports = {

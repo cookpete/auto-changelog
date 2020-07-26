@@ -4,7 +4,7 @@ const { spawn } = require('child_process')
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-function updateLog (string, clearLine = true) {
+const updateLog = (string, clearLine = true) => {
   if (clearLine) {
     readline.clearLine(process.stdout)
     readline.cursorTo(process.stdout, 0)
@@ -12,12 +12,12 @@ function updateLog (string, clearLine = true) {
   process.stdout.write(`auto-changelog: ${string}`)
 }
 
-function formatBytes (bytes) {
+const formatBytes = (bytes) => {
   return `${Math.max(1, Math.round(bytes / 1024))} kB`
 }
 
 // Simple util for calling a child process
-function cmd (string, onProgress) {
+const cmd = (string, onProgress) => {
   const [cmd, ...args] = string.trim().split(' ')
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, args)
@@ -34,13 +34,13 @@ function cmd (string, onProgress) {
   })
 }
 
-async function getGitVersion () {
+const getGitVersion = async () => {
   const output = await cmd('git --version')
   const match = output.match(/\d+\.\d+\.\d+/)
   return match ? match[0] : null
 }
 
-function niceDate (string) {
+const niceDate = (string) => {
   const date = new Date(string)
   const day = date.getUTCDate()
   const month = MONTH_NAMES[date.getUTCMonth()]
@@ -48,19 +48,19 @@ function niceDate (string) {
   return `${day} ${month} ${year}`
 }
 
-function isLink (string) {
+const isLink = (string) => {
   return /^http/.test(string)
 }
 
-function parseLimit (limit) {
+const parseLimit = (limit) => {
   return limit === 'false' ? false : parseInt(limit, 10)
 }
 
-function encodeHTML (string) {
+const encodeHTML = (string) => {
   return string.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-function replaceText (string, options) {
+const replaceText = (string, options) => {
   if (!options.replaceText) {
     return string
   }
@@ -74,25 +74,25 @@ const createCallback = (resolve, reject) => (err, data) => {
   else resolve(data)
 }
 
-function readFile (path) {
+const readFile = (path) => {
   return new Promise((resolve, reject) => {
     fs.readFile(path, 'utf-8', createCallback(resolve, reject))
   })
 }
 
-function writeFile (path, data) {
+const writeFile = (path, data) => {
   return new Promise((resolve, reject) => {
     fs.writeFile(path, data, createCallback(resolve, reject))
   })
 }
 
-function fileExists (path) {
+const fileExists = (path) => {
   return new Promise(resolve => {
     fs.access(path, err => resolve(!err))
   })
 }
 
-async function readJson (path) {
+const readJson = async (path) => {
   if (await fileExists(path) === false) {
     return null
   }

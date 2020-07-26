@@ -9,11 +9,11 @@ const COMPILE_OPTIONS = {
   noEscape: true
 }
 
-Handlebars.registerHelper('json', function (object) {
+Handlebars.registerHelper('json', (object) => {
   return new Handlebars.SafeString(JSON.stringify(object, null, 2))
 })
 
-Handlebars.registerHelper('commit-list', function (context, options) {
+Handlebars.registerHelper('commit-list', (context, options) => {
   if (!context || context.length === 0) {
     return ''
   }
@@ -52,7 +52,7 @@ Handlebars.registerHelper('matches', function (val, pattern, options) {
   return r.test(val) ? options.fn(this) : options.inverse(this)
 })
 
-async function getTemplate (template) {
+const getTemplate = async template => {
   if (MATCH_URL.test(template)) {
     const response = await fetch(template)
     return response.text()
@@ -67,7 +67,7 @@ async function getTemplate (template) {
   return readFile(path)
 }
 
-function cleanTemplate (template) {
+const cleanTemplate = template => {
   return template
     // Remove indentation
     .replace(/\n +/g, '\n')
@@ -77,7 +77,8 @@ function cleanTemplate (template) {
     .replace(/\n\n$/, '\n')
 }
 
-async function compileTemplate ({ template, handlebarsSetup }, data) {
+const compileTemplate = async (releases, options) => {
+  const { template, handlebarsSetup } = options
   if (handlebarsSetup) {
     const setup = require(join(process.cwd(), handlebarsSetup))
     if (typeof setup === 'function') {
@@ -86,9 +87,9 @@ async function compileTemplate ({ template, handlebarsSetup }, data) {
   }
   const compile = Handlebars.compile(await getTemplate(template), COMPILE_OPTIONS)
   if (template === 'json') {
-    return compile(data)
+    return compile({ releases, options })
   }
-  return cleanTemplate(compile(data))
+  return cleanTemplate(compile({ releases, options }))
 }
 
 module.exports = {

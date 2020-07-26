@@ -18,15 +18,11 @@ const getMerge = __get__('getMerge')
 const getSubject = __get__('getSubject')
 const getLogFormat = __get__('getLogFormat')
 
-const options = {
-  tagPrefix: ''
-}
-
 describe('fetchCommits', () => {
   it('fetches commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
     mock('cmd', () => gitLog)
-    expect(await fetchCommits('', remotes.github, options)).to.deep.equal(commits)
+    expect(await fetchCommits('', remotes.github)).to.deep.equal(commits)
     unmock('cmd')
   })
 })
@@ -34,12 +30,12 @@ describe('fetchCommits', () => {
 describe('parseCommits', () => {
   it('parses commits', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
-    expect(parseCommits(gitLog, remotes.github, options)).to.deep.equal(commits)
+    expect(parseCommits(gitLog, remotes.github)).to.deep.equal(commits)
   })
 
   it('parses commits without remote', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
-    expect(parseCommits(gitLog, remotes.null, options)).to.deep.equal(commitsNoRemote)
+    expect(parseCommits(gitLog, remotes.null)).to.deep.equal(commitsNoRemote)
   })
 
   it('parses bitbucket commits', async () => {
@@ -50,8 +46,11 @@ describe('parseCommits', () => {
 
   it('supports breakingPattern option', async () => {
     const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
-    const options = { breakingPattern: 'Some breaking change' }
-    const result = parseCommits(gitLog, remotes.github, options)
+    const options = {
+      breakingPattern: 'Some breaking change',
+      ...remotes.github
+    }
+    const result = parseCommits(gitLog, options)
     expect(result.filter(c => c.breaking)).to.have.length(1)
   })
 
@@ -60,9 +59,10 @@ describe('parseCommits', () => {
     const options = {
       replaceText: {
         breaking: '**BREAKING**'
-      }
+      },
+      ...remotes.github
     }
-    const result = parseCommits(gitLog, remotes.github, options)
+    const result = parseCommits(gitLog, options)
     expect(result.filter(c => c.subject === 'Some **BREAKING** change')).to.have.length(1)
   })
 })
@@ -142,20 +142,22 @@ describe('getFixes', () => {
 
   it('supports issuePattern parameter', () => {
     const options = {
-      issuePattern: '[A-Z]+-\\d+'
+      issuePattern: '[A-Z]+-\\d+',
+      ...remotes.github
     }
     const message = 'Commit message\n\nCloses ABC-1234'
-    expect(getFixes(message, 'Commit Author', remotes.github, options)).to.deep.equal([
+    expect(getFixes(message, 'Commit Author', options)).to.deep.equal([
       { id: 'ABC-1234', href: 'https://github.com/user/repo/issues/ABC-1234', author: 'Commit Author' }
     ])
   })
 
   it('supports issuePattern parameter with capture group', () => {
     const options = {
-      issuePattern: '[Ff]ixes ([A-Z]+-\\d+)'
+      issuePattern: '[Ff]ixes ([A-Z]+-\\d+)',
+      ...remotes.github
     }
     const message = 'Commit message\n\nFixes ABC-1234 and fixes ABC-2345 but not BCD-2345'
-    expect(getFixes(message, 'Commit Author', remotes.github, options)).to.deep.equal([
+    expect(getFixes(message, 'Commit Author', options)).to.deep.equal([
       { id: 'ABC-1234', href: 'https://github.com/user/repo/issues/ABC-1234', author: 'Commit Author' },
       { id: 'ABC-2345', href: 'https://github.com/user/repo/issues/ABC-2345', author: 'Commit Author' }
     ])
@@ -275,11 +277,12 @@ describe('getMerge', () => {
 
   it('supports mergePattern parameter', () => {
     const options = {
-      mergePattern: 'PR #(\\d+) from .+\\n\\n.+\\n(.+)'
+      mergePattern: 'PR #(\\d+) from .+\\n\\n.+\\n(.+)',
+      ...remotes.github
     }
 
     const message = 'PR #37 from repo/branch\n\ncommit sha512\nPull request title'
-    expect(getMerge(EXAMPLE_COMMIT, message, remotes.github, options)).to.deep.equal({
+    expect(getMerge(EXAMPLE_COMMIT, message, options)).to.deep.equal({
       id: '37',
       message: 'Pull request title',
       href: 'https://github.com/user/repo/pull/37',
@@ -293,9 +296,10 @@ describe('getMerge', () => {
     const options = {
       replaceText: {
         '(..l)': '_$1_'
-      }
+      },
+      ...remotes.github
     }
-    expect(getMerge(EXAMPLE_COMMIT, message, remotes.github, options)).to.deep.equal({
+    expect(getMerge(EXAMPLE_COMMIT, message, options)).to.deep.equal({
       id: '3',
       message: '_Pul_l request t_itl_e',
       href: 'https://github.com/user/repo/pull/3',
