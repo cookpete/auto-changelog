@@ -64,7 +64,8 @@ function getSubject (message) {
   if (!message) {
     return '_No commit message_'
   }
-  return message.match(/[^\n]+/)[0]
+  const match = message.match(/[^\n]+/);
+  return match && match[0]
 }
 
 function getStats (stats) {
