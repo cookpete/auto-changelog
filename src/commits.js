@@ -37,7 +37,7 @@ function parseCommits (string, remote, options = {}) {
     .map(commit => parseCommit(commit, remote, options))
 }
 
-function parseCommit (commit, remote, options = {}) {
+function parseCommit (commit, remote, options = {}) {kivervinicius:patch-1
   const [, hash, date, author, email, tail] = commit.match(MATCH_COMMIT)
   const [body, stats] = tail.split(MESSAGE_SEPARATOR)
   const message = encodeHTML(body)
@@ -65,7 +65,7 @@ function getSubject (message) {
     return '_No commit message_'
   }
   const match = message.match(/[^\n]+/);
-  return match && match[0]
+  return !!match ? match[0] : "";
 }
 
 function getStats (stats) {
