@@ -60,6 +60,8 @@ const sortCommits = ({ sortCommits }) => (a, b) => {
   if (a.breaking && !b.breaking) return -1
   if (sortCommits === 'date') return new Date(a.date) - new Date(b.date)
   if (sortCommits === 'date-desc') return new Date(b.date) - new Date(a.date)
+  if (sortCommits === 'subject') return a.subject.localeCompare(b.subject)
+  if (sortCommits === 'subject-desc') return b.subject.localeCompare(a.subject)
   return (b.insertions + b.deletions) - (a.insertions + a.deletions)
 }
 
