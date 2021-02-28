@@ -6,12 +6,21 @@ const MATCH_V = /^v\d/
 
 const fetchTags = async (options, remote) => {
   const format = `%(refname:short)${DIVIDER}%(creatordate:short)`
-  const tags = (await cmd(`git tag -l --sort=-creatordate --format=${format}`))
-    .trim()
-    .split('\n')
-    .map(parseTag(options))
-    .filter(isValidTag(options))
-    .sort(sortTags(options))
+  let tags;
+  if (options.sortTags === "semver") {
+    tags = (await cmd(`git tag -l --sort=-creatordate --format=${format}`))
+      .trim()
+      .split('\n')
+      .map(parseTag(options))
+      .filter(isValidTag(options))
+      .sort(sortTags(options))
+  } else {
+    tags = (await cmd(`git tag -l --sort=${options.sortTags} --format=${format}`))
+      .trim()
+      .split('\n')
+      .map(parseTag(options))
+      .filter(isValidTag(options))
+  }
 
   const { latestVersion, unreleased, unreleasedOnly, getCompareLink } = options
   if (latestVersion || unreleased || unreleasedOnly) {

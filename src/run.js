@@ -13,6 +13,7 @@ const DEFAULT_OPTIONS = {
   commitLimit: 3,
   backfillLimit: 3,
   tagPrefix: '',
+  sortTags: 'semver',
   sortCommits: 'relevance',
   appendGitLog: '',
   config: '.auto-changelog'
@@ -43,6 +44,7 @@ const getOptions = async argv => {
     .option('--ignore-commit-pattern <regex>', 'pattern to ignore when parsing commits')
     .option('--tag-pattern <regex>', 'override regex pattern for version tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
+    .option('--sort-tags <property>', `sort commits by property 'semver' or git fields, default: ${DEFAULT_OPTIONS.sortTags}`)
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--release-summary', 'use tagged commit message body as release summary')
