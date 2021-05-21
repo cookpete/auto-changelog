@@ -15,8 +15,8 @@ const fetchTags = async (options, remote) => {
 
   const { latestVersion, unreleased, unreleasedOnly, getCompareLink } = options
   if (latestVersion || unreleased || unreleasedOnly) {
-    const v = !MATCH_V.test(latestVersion) && tags.some(({ version }) => MATCH_V.test(version)) ? 'v' : ''
     const previous = tags[0]
+    const v = !MATCH_V.test(latestVersion) && previous && MATCH_V.test(previous.version) ? 'v' : ''
     const compareTo = latestVersion ? `${v}${latestVersion}` : 'HEAD'
     tags.unshift({
       tag: null,

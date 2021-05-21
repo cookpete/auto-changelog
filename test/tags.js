@@ -121,6 +121,27 @@ describe('fetchTags', () => {
     ])
   })
 
+  it('supports --latest-version without v prefix', async () => {
+    mock('cmd', () => Promise.resolve([
+      '0.1.0---2000-02-01',
+      '0.2.0---2000-03-01',
+      '0.2.1---2000-03-02',
+      '0.2.2---2000-03-03',
+      '0.3.0---2000-04-01',
+      '1.0.0---2001-01-01'
+    ].join('\n')))
+    const tags = await fetchTags({ ...options, latestVersion: '2.0.0' })
+    expect(tags.map(t => t.title)).to.deep.equal([
+      '2.0.0',
+      '1.0.0',
+      '0.3.0',
+      '0.2.2',
+      '0.2.1',
+      '0.2.0',
+      '0.1.0'
+    ])
+  })
+
   it('ignores invalid semver tags', async () => {
     mock('cmd', () => Promise.resolve([
       'v0.1.0---2000-02-01',
