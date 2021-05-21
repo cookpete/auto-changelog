@@ -62,7 +62,7 @@ const parseCommit = (commit, options = {}) => {
 }
 
 const getSubject = (message) => {
-  if (!message) {
+  if (!message.trim()) {
     return '_No commit message_'
   }
   return message.match(/[^\n]+/)[0]
