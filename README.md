@@ -41,7 +41,7 @@ Options:
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --starting-version [tag]        # specify earliest version to include in changelog
-      --sort-commits [property]       # sort commits by property [relevance, date, date-desc], default: relevance
+      --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc], default: relevance
       --release-summary               # display tagged commit message body as release summary
       --unreleased-only               # only output unreleased changes
       --hide-credit                   # hide auto-changelog credit
