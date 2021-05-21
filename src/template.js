@@ -80,7 +80,8 @@ const cleanTemplate = template => {
 const compileTemplate = async (releases, options) => {
   const { template, handlebarsSetup } = options
   if (handlebarsSetup) {
-    const setup = require(join(process.cwd(), handlebarsSetup))
+    const path = /^\//.test(handlebarsSetup) ? handlebarsSetup : join(process.cwd(), handlebarsSetup)
+    const setup = require(path)
     if (typeof setup === 'function') {
       setup(Handlebars)
     }
