@@ -27,12 +27,11 @@ const fetchTags = async (options, remote) => {
     })
   }
 
-  return tags
-    .map(enrichTag(options))
-    .slice(0, getLimit(tags, options))
+  const enriched = tags.map(enrichTag(options))
+  return enriched.slice(0, getLimit(enriched, options))
 }
 
-const getLimit = (tags, { unreleasedOnly, startingVersion }) => {
+const getLimit = (tags, { unreleasedOnly, startingVersion, startingDate }) => {
   if (unreleasedOnly) {
     return 1
   }
@@ -41,6 +40,9 @@ const getLimit = (tags, { unreleasedOnly, startingVersion }) => {
     if (index !== -1) {
       return index + 1
     }
+  }
+  if (startingDate) {
+    return tags.filter(t => t.isoDate >= startingDate).length
   }
   return tags.length
 }

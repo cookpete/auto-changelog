@@ -44,6 +44,7 @@ const getOptions = async argv => {
     .option('--tag-pattern <regex>', 'override regex pattern for version tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')
+    .option('--starting-date <yyyy-mm-dd>', 'specify earliest date to include in changelog')
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--unreleased-only', 'only output unreleased changes')
