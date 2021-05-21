@@ -22,7 +22,7 @@ const fetchTags = async (options, remote) => {
       tag: null,
       title: latestVersion ? `${v}${latestVersion}` : 'Unreleased',
       date: new Date().toISOString(),
-      diff: previous ? `${previous.tag}..` : '',
+      diff: previous ? `${previous.tag}..` : 'HEAD',
       href: previous ? getCompareLink(previous.tag, compareTo) : null
     })
   }
