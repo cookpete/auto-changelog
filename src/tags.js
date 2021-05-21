@@ -69,14 +69,11 @@ const enrichTag = ({ getCompareLink, tagPattern }) => (t, index, tags) => {
       semver.diff(t.version, previous.version) === 'major'
     ),
     minor: Boolean(
-			previous &&
-			semver.valid(t.version) &&
-			semver.valid(previous.version) &&
-			(
-       semver.diff(t.version, previous.version) === "minor" ||
-       semver.diff(t.version, previous.version) === "preminor"
-      )
-		),
+      previous &&
+      semver.valid(t.version) &&
+      semver.valid(previous.version) &&
+      ['minor', 'preminor'].includes(semver.diff(t.version, previous.version))
+    ),
     ...t
   }
 }
