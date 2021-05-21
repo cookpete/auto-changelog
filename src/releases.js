@@ -13,7 +13,7 @@ const parseReleases = async (tags, options, onParsed) => {
     const { message } = commits[0] || { message: null }
     const breakingCount = commits.filter(c => c.breaking).length
     const filteredCommits = commits
-      .filter(filterCommits(options, merges))
+      .filter(filterCommits(merges))
       .sort(sortCommits(options))
       .slice(0, getCommitLimit(options, emptyRelease, breakingCount))
 
@@ -29,16 +29,13 @@ const parseReleases = async (tags, options, onParsed) => {
   }))
 }
 
-const filterCommits = ({ ignoreCommitPattern }, merges) => commit => {
+const filterCommits = merges => commit => {
   if (commit.fixes || commit.merge) {
     // Filter out commits that already appear in fix or merge lists
     return false
   }
   if (commit.breaking) {
     return true
-  }
-  if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
-    return false
   }
   if (semver.valid(commit.subject)) {
     // Filter out version commits
