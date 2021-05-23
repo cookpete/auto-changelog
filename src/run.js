@@ -15,6 +15,7 @@ const DEFAULT_OPTIONS = {
   tagPrefix: '',
   sortCommits: 'relevance',
   appendGitLog: '',
+  appendGitTag: '',
   config: '.auto-changelog'
 }
 
@@ -52,6 +53,7 @@ const getOptions = async argv => {
     .option('--hide-credit', 'hide auto-changelog credit')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
+    .option('--append-git-tag <string>', 'string to append to git tag command')
     .option('--prepend', 'prepend changelog to output file')
     .option('--stdout', 'output changelog to stdout')
     .version(version)
