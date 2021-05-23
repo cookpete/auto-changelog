@@ -58,6 +58,7 @@ const getOptions = async argv => {
     .option('--stdout', 'output changelog to stdout')
     .version(version)
     .parse(argv)
+    .opts()
 
   const pkg = await readJson(PACKAGE_FILE)
   const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null
