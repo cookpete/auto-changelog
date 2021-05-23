@@ -45,6 +45,7 @@ Options:
       --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc], default: relevance
       --release-summary               # display tagged commit message body as release summary
       --unreleased-only               # only output unreleased changes
+      --hide-empty-releases           # hide empty releases
       --hide-credit                   # hide auto-changelog credit
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command

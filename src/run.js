@@ -48,6 +48,7 @@ const getOptions = async argv => {
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--unreleased-only', 'only output unreleased changes')
+    .option('--hide-empty-releases', 'hide empty releases')
     .option('--hide-credit', 'hide auto-changelog credit')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')

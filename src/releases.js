@@ -5,7 +5,7 @@ const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
 const parseReleases = async (tags, options, onParsed) => {
-  return Promise.all(tags.map(async tag => {
+  const releases = await Promise.all(tags.map(async tag => {
     const commits = await fetchCommits(tag.diff, options)
     const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
     const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
@@ -27,6 +27,7 @@ const parseReleases = async (tags, options, onParsed) => {
       fixes
     }
   }))
+  return releases.filter(filterReleases(options))
 }
 
 const filterCommits = merges => commit => {
@@ -78,6 +79,13 @@ const getSummary = (message, { releaseSummary }) => {
     return message.match(COMMIT_MESSAGE_PATTERN)[1]
   }
   return null
+}
+
+const filterReleases = options => ({ merges, fixes, commits }) => {
+  if (options.hideEmptyReleases && (merges.length + fixes.length + commits.length) === 0) {
+    return false
+  }
+  return true
 }
 
 module.exports = {

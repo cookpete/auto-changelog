@@ -117,4 +117,15 @@ describe('parseReleases', () => {
     expect(releases[0].commits).to.have.lengthOf(1)
     expect(releases[0].commits[0]).to.include({ subject: 'First commit' })
   })
+
+  it('hides empty releases', async () => {
+    const map = {
+      'v1.0.0': []
+    }
+    mock('fetchCommits', diff => Promise.resolve(map[diff]))
+    const options = { hideEmptyReleases: true }
+    const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }]
+    const releases = await parseReleases(tags, options)
+    expect(releases).to.have.lengthOf(0)
+  })
 })
