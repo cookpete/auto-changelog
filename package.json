@@ -45,7 +45,6 @@
   "dependencies": {
     "commander": "^5.0.0",
     "handlebars": "^4.7.3",
-    "lodash.uniqby": "^4.7.0",
     "node-fetch": "^2.6.0",
     "parse-github-url": "^1.0.2",
     "semver": "^6.3.0"
