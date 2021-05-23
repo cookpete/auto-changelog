@@ -38,7 +38,8 @@ describe('fetchTags', () => {
       niceDate: '1 January 2001',
       diff: 'v0.3.0..v1.0.0',
       href: 'https://github.com/user/repo/compare/v0.3.0...v1.0.0',
-      major: true
+      major: true,
+      minor: false
     },
     {
       tag: 'v0.3.0',
@@ -49,7 +50,8 @@ describe('fetchTags', () => {
       niceDate: '1 April 2000',
       diff: 'v0.2.2..v0.3.0',
       href: 'https://github.com/user/repo/compare/v0.2.2...v0.3.0',
-      major: false
+      major: false,
+      minor: true
     },
     {
       tag: 'v0.2.2',
@@ -60,7 +62,8 @@ describe('fetchTags', () => {
       niceDate: '3 March 2000',
       diff: 'v0.2.1..v0.2.2',
       href: 'https://github.com/user/repo/compare/v0.2.1...v0.2.2',
-      major: false
+      major: false,
+      minor: false
     },
     {
       tag: 'v0.2.1',
@@ -71,7 +74,8 @@ describe('fetchTags', () => {
       niceDate: '2 March 2000',
       diff: 'v0.2.0..v0.2.1',
       href: 'https://github.com/user/repo/compare/v0.2.0...v0.2.1',
-      major: false
+      major: false,
+      minor: false
     },
     {
       tag: 'v0.2.0',
@@ -82,7 +86,8 @@ describe('fetchTags', () => {
       niceDate: '1 March 2000',
       diff: 'v0.1.0..v0.2.0',
       href: 'https://github.com/user/repo/compare/v0.1.0...v0.2.0',
-      major: false
+      major: false,
+      minor: true
     },
     {
       tag: 'v0.1.0',
@@ -93,7 +98,8 @@ describe('fetchTags', () => {
       niceDate: '1 February 2000',
       diff: 'v0.1.0',
       href: null,
-      major: false
+      major: false,
+      minor: false
     }])
   })
 
