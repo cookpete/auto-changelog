@@ -16,6 +16,7 @@ const DEFAULT_OPTIONS = {
   sortTags: 'semver',
   sortCommits: 'relevance',
   appendGitLog: '',
+  appendGitTag: '',
   config: '.auto-changelog'
 }
 
@@ -46,16 +47,20 @@ const getOptions = async argv => {
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
     .option('--sort-tags <property>', `sort commits by property 'semver' or git fields, default: ${DEFAULT_OPTIONS.sortTags}`)
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')
+    .option('--starting-date <yyyy-mm-dd>', 'specify earliest date to include in changelog')
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)
     .option('--release-summary', 'use tagged commit message body as release summary')
     .option('--unreleased-only', 'only output unreleased changes')
+    .option('--hide-empty-releases', 'hide empty releases')
     .option('--hide-credit', 'hide auto-changelog credit')
     .option('--handlebars-setup <file>', 'handlebars setup file')
     .option('--append-git-log <string>', 'string to append to git log command')
+    .option('--append-git-tag <string>', 'string to append to git tag command')
     .option('--prepend', 'prepend changelog to output file')
     .option('--stdout', 'output changelog to stdout')
     .version(version)
     .parse(argv)
+    .opts()
 
   const pkg = await readJson(PACKAGE_FILE)
   const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null

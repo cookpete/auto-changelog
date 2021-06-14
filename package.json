@@ -1,6 +1,6 @@
 {
   "name": "auto-changelog",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Command line tool for generating a changelog from git tags and commit history",
   "main": "./src/index.js",
   "bin": {
@@ -43,26 +43,25 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "commander": "^5.0.0",
-    "handlebars": "^4.7.3",
-    "lodash.uniqby": "^4.7.0",
-    "node-fetch": "^2.6.0",
+    "commander": "^7.2.0",
+    "handlebars": "^4.7.7",
+    "node-fetch": "^2.6.1",
     "parse-github-url": "^1.0.2",
-    "semver": "^6.3.0"
+    "semver": "^7.3.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/register": "^7.9.0",
+    "@babel/core": "^7.14.3",
+    "@babel/register": "^7.13.16",
     "babel-plugin-istanbul": "^6.0.0",
     "babel-plugin-rewire": "^1.2.0",
-    "chai": "^4.2.0",
-    "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
-    "markdownlint-cli": "^0.22.0",
-    "mocha": "^7.1.1",
-    "nyc": "^15.0.0",
-    "snazzy": "^8.0.0",
-    "standard": "^14.3.3"
+    "chai": "^4.3.4",
+    "codecov": "^3.8.2",
+    "cross-env": "^7.0.3",
+    "markdownlint-cli": "^0.27.1",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
+    "snazzy": "^9.0.0",
+    "standard": "^16.0.3"
   },
   "babel": {
     "env": {

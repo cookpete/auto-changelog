@@ -41,12 +41,15 @@ Options:
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --starting-version [tag]        # specify earliest version to include in changelog
-      --sort-commits [property]       # sort commits by property [relevance, date, date-desc], default: relevance
+      --starting-date [yyyy-mm-dd]    # specify earliest date to include in changelog
+      --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc], default: relevance
       --release-summary               # display tagged commit message body as release summary
       --unreleased-only               # only output unreleased changes
+      --hide-empty-releases           # hide empty releases
       --hide-credit                   # hide auto-changelog credit
       --handlebars-setup [file]       # handlebars setup file
       --append-git-log [string]       # string to append to git log command
+      --append-git-tag [string]       # string to append to git tag command
       --prepend                       # prepend changelog to output file
       --stdout                        # output changelog to stdout
   -V, --version                       # output the version number

@@ -35,6 +35,7 @@ const parseCommits = (string, options = {}) => {
     .split(COMMIT_SEPARATOR)
     .slice(1)
     .map(commit => parseCommit(commit, options))
+    .filter(commit => filterCommit(commit, options))
 }
 
 const parseCommit = (commit, options = {}) => {
@@ -61,7 +62,7 @@ const parseCommit = (commit, options = {}) => {
 }
 
 const getSubject = (message) => {
-  if (!message) {
+  if (!message.trim()) {
     return '_No commit message_'
   }
   return message.match(/[^\n]+/)[0]
@@ -131,6 +132,13 @@ const getMerge = (commit, message, options = {}) => {
     }
   }
   return null
+}
+
+const filterCommit = (commit, { ignoreCommitPattern }) => {
+  if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
+    return false
+  }
+  return true
 }
 
 module.exports = {
