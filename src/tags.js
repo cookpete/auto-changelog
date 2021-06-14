@@ -6,8 +6,8 @@ const MATCH_V = /^v\d/
 
 const fetchTags = async (options, remote) => {
   const format = `%(refname:short)${DIVIDER}%(creatordate:short)`
-  let tags;
-  if (options.sortTags === "semver") {
+  let tags
+  if (options.sortTags === 'semver') {
     tags = (await cmd(`git tag -l --format=${format} ${options.appendGitTag}`))
       .trim()
       .split('\n')
