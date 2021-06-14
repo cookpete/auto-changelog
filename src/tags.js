@@ -13,7 +13,7 @@ const fetchTags = async (options, remote) => {
       .split('\n')
       .map(parseTag(options))
       .filter(isValidTag(options))
-      .sort(sortTags(options))
+      .sort(sortTags)
   } else {
     tags = (await cmd(`git tag -l --sort=${options.sortTags} --format=${format} ${options.appendGitTag}`))
       .trim()
