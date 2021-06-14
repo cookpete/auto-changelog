@@ -20,7 +20,7 @@ const fetchTags = async (options, remote) => {
       .split('\n')
       .map(parseTag(options))
       .filter(isValidTag(options))
-  } master
+  }
 
   const { latestVersion, unreleased, unreleasedOnly, getCompareLink } = options
   if (latestVersion || unreleased || unreleasedOnly) {
