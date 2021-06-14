@@ -9,6 +9,7 @@ const {
 
 const options = {
   tagPrefix: '',
+  sortTags: 'semver'
   ...remotes.github
 }
 
