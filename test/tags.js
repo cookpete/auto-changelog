@@ -114,6 +114,18 @@ describe('fetchTags', () => {
     expect(await fetchTags({ ...options, startingDate: '2000-05-01' })).to.have.lengthOf(1)
   })
 
+  it('supports --sort-tags=semver', async () => {
+    const tags = await fetchTags({ ...options, sortTags: 'semver' })
+    expect(tags.map(t => t.version)).to.deep.equal([
+      'v1.0.0',
+      'v0.3.0',
+      'v0.2.2',
+      'v0.2.1',
+      'v0.2.0',
+      'v0.1.0'
+    ])
+  })
+
   // with --sort-tags, we shouldn't sort by semver, keep git command's order.
   it('supports --sort-tags', async () => {
     mock('cmd', () => Promise.resolve([
