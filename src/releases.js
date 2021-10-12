@@ -81,7 +81,7 @@ const getSummary = (message, { releaseSummary }) => {
   return null
 }
 
-const filterReleases = (options) => ({ tag, merges, fixes, commits }) => {
+const filterReleases = options => ({ tag, merges, fixes, commits }) => {
   if (options.hideEmptyReleases && (merges.length + fixes.length + commits.length) === 0) {
     return false
   }
