@@ -128,4 +128,23 @@ describe('parseReleases', () => {
     const releases = await parseReleases(tags, options)
     expect(releases).to.have.lengthOf(0)
   })
+
+  it('ignores releases with pattern', async () => {
+    const map = {
+      'v1.0.0': [],
+      'v1.0.0-rc-1': generateCommits(['Second commit', 'First commit']),
+      'v1.0.0-rc-3': generateCommits(['Second commit', 'First commit']),
+      'v1.3.1': generateCommits(['Second commit', 'First commit'])
+    }
+    mock('fetchCommits', diff => Promise.resolve(map[diff]))
+    const options = { ignoreReleasePattern: '^.*-rc-.*$' }
+    const tags = [
+      { tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' },
+      { tag: 'v1.0.0-rc-1', date: '2000-01-01', diff: 'v1.0.0-rc-1' },
+      { tag: 'v1.0.0-rc-3', date: '2000-01-01', diff: 'v1.0.0-rc-3' },
+      { tag: 'v1.3.1', date: '2000-01-01', diff: 'v1.0.0' }
+    ]
+    const releases = await parseReleases(tags, options)
+    expect(releases).to.have.lengthOf(2)
+  })
 })
