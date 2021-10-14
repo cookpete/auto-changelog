@@ -235,43 +235,20 @@ If you aren’t happy with the default templates or want to tweak something, you
 Save `changelog-template.hbs` somewhere in your repo:
 
 ```hbs
-### Changelog My custom changelog template. Don’t worry about indentation here;
-it is automatically removed from the output.
+### Changelog
+My custom changelog template. Don’t worry about indentation here; it is automatically removed from the output.
 
 {{#each releases}}
-  Every release has a
-  {{title}}
-  and a
-  {{href}}
-  you can use to link to the commit diff. It also has an
-  {{isoDate}}
-  and a
-  {{niceDate}}
-  you might want to use.
+  Every release has a {{title}} and a {{href}} you can use to link to the commit diff.
+  It also has an {{isoDate}} and a {{niceDate}} you might want to use.
   {{#each merges}}
-    - A merge has a
-    {{message}}, an
-    {{id}}
-    and a
-    {{href}}
-    to the PR.
+    - A merge has a {{message}}, an {{id}} and a {{href}} to the PR.
   {{/each}}
   {{#each fixes}}
-    - Each fix has a
-    {{commit}}
-    with a
-    {{commit.subject}}, an
-    {{id}}
-    and a
-    {{href}}
-    to the fixed issue.
+    - Each fix has a {{commit}} with a {{commit.subject}}, an {{id}} and a {{href}} to the fixed issue.
   {{/each}}
   {{#each commits}}
-    - Commits have a
-    {{shorthash}}, a
-    {{subject}}
-    and a
-    {{href}}, amongst other things.
+    - Commits have a {{shorthash}}, a {{subject}} and a {{href}}, amongst other things.
   {{/each}}
 {{/each}}
 ```
@@ -303,36 +280,23 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
   ### [{{title}}]({{href}})
 
   {{! List commits with `Breaking change: ` somewhere in the message }}
-  {{#commit-list
-    commits
-    heading="### Breaking Changes"
-    message="Breaking change: "
-  }}
-    -
-    {{subject}}
-    [`{{shorthash}}`]({{href}})
+  {{#commit-list commits heading='### Breaking Changes' message='Breaking change: '}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
   {{/commit-list}}
 
   {{! List commits that add new features, but not those already listed above }}
-  {{#commit-list
-    commits
-    heading="### New Features"
-    message="feat: "
-    exclude="Breaking change: "
-  }}
-    -
-    {{subject}}
-    [`{{shorthash}}`]({{href}})
+  {{#commit-list commits heading='### New Features' message='feat: ' exclude='Breaking change: '}}
+    - {{subject}} [`{{shorthash}}`]({{href}})
   {{/commit-list}}
 {{/each}}
 ```
 
-| Option    | Description                                                                                   |
-| --------- | --------------------------------------------------------------------------------------------- |
-| `heading` | A heading for the list, only renders if at least one commit matches                           |
-| `message` | A regex pattern to match against the entire commit message                                    |
-| `subject` | A regex pattern to match against the commit subject only                                      |
-| `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
+| Option    | Description |
+| --------- | ----------- |
+| `heading` | A heading for the list, only renders if at least one commit matches |
+| `message` | A regex pattern to match against the entire commit message |
+| `subject` | A regex pattern to match against the commit subject only |
+| `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
 
 #### Replacing text
 
