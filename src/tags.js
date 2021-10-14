@@ -94,13 +94,13 @@ const sortTags = ({ version: a }, { version: b }) => {
   return a < b ? 1 : -1
 }
 
-const inferSemver = (tag, {tagPrefix, tagParserPattern, tagParserReplacement}) => {
+const inferSemver = (tag, { tagPrefix, tagParserPattern, tagParserReplacement }) => {
   if (!!tagParserPattern && !!tagParserReplacement) {
     return tag.replace(new RegExp(tagParserPattern), tagParserReplacement)
   }
 
   if (!!tagPrefix && tag.startsWith(tagPrefix)) {
-    tag = tag.replace(new RegExp(`^${tagPrefix}`), "")
+    tag = tag.replace(new RegExp(`^${tagPrefix}`), '')
   }
 
   if (/^v?\d+$/.test(tag)) {
@@ -112,7 +112,7 @@ const inferSemver = (tag, {tagPrefix, tagParserPattern, tagParserReplacement}) =
     // v1.0 becomes v1.0.0
     return `${tag}.0`
   }
-  
+
   return tag
 }
 
