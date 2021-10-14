@@ -192,7 +192,7 @@ Alternatively, if you have an unconventional tagging pattern, you can provide a 
 auto-changelog --tag-parser-pattern "^my-package@(\d+)\.(\d+) build(\d+)$" --tag-parser-replacement "\$1.\$2.0-build.\$3"
 ```
 
-Note, both options need to be supplied for this to work. Also note, `$` signs in the replacement string must be escaped.
+Note, both options need to be supplied for this to work. Also note, `$` signs in the replacement string must be escaped (not applicable when configuring through package.json).
 
 #### Breaking changes
 
