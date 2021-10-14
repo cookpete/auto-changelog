@@ -44,6 +44,8 @@ const getOptions = async argv => {
     .option('--ignore-commit-pattern <regex>', 'pattern to ignore when parsing commits')
     .option('--tag-pattern <regex>', 'override regex pattern for version tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
+    .option('--tag-parser-pattern <regex>', 'pattern used to capture values in tags for replacement')
+    .option('--tag-parser-replacement <string>', 'replaces captures supplied in the --tag-parser-pattern option to create valid semver tags')
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')
     .option('--starting-date <yyyy-mm-dd>', 'specify earliest date to include in changelog')
     .option('--sort-commits <property>', `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}`)

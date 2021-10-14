@@ -166,4 +166,19 @@ describe('fetchTags', () => {
       'v0.1.0'
     ])
   })
+
+  it('supports tag parsing through --tag-parser-pattern and --tag-parser-replacement', async () => {
+    mock('cmd', () => Promise.resolve([
+      'version 0.1.0 || build 2345---2000-02-01',
+      'version 2.1.0 || build 2355---2000-02-01',
+      'version 3.2.1 || build 2367---2000-02-01'
+    ].join('\n')))
+
+    const tags = await fetchTags({ ...options, tagParserPattern: '^version (\\d+)\\.(\\d+)\\.(\\d+) \\|\\| build (\\d+)$', tagParserReplacement: '$1.$2.$3-build.$4' })
+    expect(tags.map(t => t.version)).to.deep.equal([
+      '3.2.1-build.2367',
+      '2.1.0-build.2355',
+      '0.1.0-build.2345'
+    ])
+  })
 })

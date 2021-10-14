@@ -21,39 +21,41 @@ Usage: auto-changelog [options]
 
 Options:
 
-  -o, --output [file]                 # output file, default: CHANGELOG.md
-  -c, --config [file]                 # config file location, default: .auto-changelog
-  -t, --template [template]           # specify template to use [compact, keepachangelog, json], default: compact
-  -r, --remote [remote]               # specify git remote to use for links, default: origin
-  -p, --package                       # use version from package.json as latest release
-  -v, --latest-version [version]      # use specified version as latest release
-  -u, --unreleased                    # include section for unreleased changes
-  -l, --commit-limit [count]          # number of commits to display per release, default: 3
-  -b, --backfill-limit [count]        # number of commits to backfill empty releases with, default: 3
-      --commit-url [url]              # override url for commits, use {id} for commit id
-      --issue-url [url]               # override url for issues, use {id} for issue id
-      --merge-url [url]               # override url for merges, use {id} for merge id
-      --compare-url [url]             # override url for compares, use {from} and {to} for tags
-      --issue-pattern [regex]         # override regex pattern for issues in commit messages
-      --breaking-pattern [regex]      # regex pattern for breaking change commits
-      --merge-pattern [regex]         # add custom regex pattern for merge commits
-      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
-      --tag-pattern [regex]           # override regex pattern for version tags
-      --tag-prefix [prefix]           # prefix used in version tags, default: v
-      --starting-version [tag]        # specify earliest version to include in changelog
-      --starting-date [yyyy-mm-dd]    # specify earliest date to include in changelog
-      --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc], default: relevance
-      --release-summary               # display tagged commit message body as release summary
-      --unreleased-only               # only output unreleased changes
-      --hide-empty-releases           # hide empty releases
-      --hide-credit                   # hide auto-changelog credit
-      --handlebars-setup [file]       # handlebars setup file
-      --append-git-log [string]       # string to append to git log command
-      --append-git-tag [string]       # string to append to git tag command
-      --prepend                       # prepend changelog to output file
-      --stdout                        # output changelog to stdout
-  -V, --version                       # output the version number
-  -h, --help                          # output usage information
+  -o, --output [file]                   # output file, default: CHANGELOG.md
+  -c, --config [file]                   # config file location, default: .auto-changelog
+  -t, --template [template]             # specify template to use [compact, keepachangelog, json], default: compact
+  -r, --remote [remote]                 # specify git remote to use for links, default: origin
+  -p, --package                         # use version from package.json as latest release
+  -v, --latest-version [version]        # use specified version as latest release
+  -u, --unreleased                      # include section for unreleased changes
+  -l, --commit-limit [count]            # number of commits to display per release, default: 3
+  -b, --backfill-limit [count]          # number of commits to backfill empty releases with, default: 3
+      --commit-url [url]                # override url for commits, use {id} for commit id
+      --issue-url [url]                 # override url for issues, use {id} for issue id
+      --merge-url [url]                 # override url for merges, use {id} for merge id
+      --compare-url [url]               # override url for compares, use {from} and {to} for tags
+      --issue-pattern [regex]           # override regex pattern for issues in commit messages
+      --breaking-pattern [regex]        # regex pattern for breaking change commits
+      --merge-pattern [regex]           # add custom regex pattern for merge commits
+      --ignore-commit-pattern [regex]   # pattern to ignore when parsing commits
+      --tag-pattern [regex]             # override regex pattern for version tags
+      --tag-prefix [prefix]             # prefix used in version tags, default: v
+      --tag-parser-pattern [regex]      # pattern used to capture values in tags for replacement
+      --tag-parser-replacement [string] # replaces captures supplied in the --tag-parser-pattern option to create valid semver tags
+      --starting-version [tag]          # specify earliest version to include in changelog
+      --starting-date [yyyy-mm-dd]      # specify earliest date to include in changelog
+      --sort-commits [property]         # sort commits by property [relevance, date, date-desc, subject, subject-desc], default: relevance
+      --release-summary                 # display tagged commit message body as release summary
+      --unreleased-only                 # only output unreleased changes
+      --hide-empty-releases             # hide empty releases
+      --hide-credit                     # hide auto-changelog credit
+      --handlebars-setup [file]         # handlebars setup file
+      --append-git-log [string]         # string to append to git log command
+      --append-git-tag [string]         # string to append to git tag command
+      --prepend                         # prepend changelog to output file
+      --stdout                          # output changelog to stdout
+  -V, --version                         # output the version number
+  -h, --help                            # output usage information
 
 
 # Write log to CHANGELOG.md in current directory
@@ -158,15 +160,6 @@ You can also store config options in an `.auto-changelog` file in your project r
 
 Note that any options set in `package.json` will take precedence over any set in `.auto-changelog`.
 
-#### Tag prefixes
-
-Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
-
-```bash
-# When all versions are tagged like my-package/1.2.3
-auto-changelog --tag-prefix my-package/
-```
-
 #### Tag patterns
 
 By default, `auto-changelog` looks for valid semver tags to build a list of releases. If you are using another format (or want to include all tags), use `--tag-pattern [regex]`:
@@ -178,6 +171,28 @@ auto-changelog --tag-pattern build-\d+
 # Include any tag as a release
 auto-changelog --tag-pattern .+
 ```
+
+Including tags using this method does not gurantee correct tag order however since the sorting compares semver versions rather than their date or alphabetical order. For proper custom tag order, please refer to the [Tag parsing](#tag-parsing) section. Note, if a tag can be properly coerced into a valid semver string via the parsing options, the `--tag-pattern` is no longer needed.
+
+#### Tag parsing
+
+There are 2 mechanisms that help auto-changelog properly parse your tags.
+
+Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
+
+```bash
+# When all versions are tagged like "my-package/1.2.3"
+auto-changelog --tag-prefix my-package/
+```
+
+Alternatively, if you have an unconventional tagging pattern, you can provide a capture pattern and a replacement string through the `--tag-parser-pattern [regex]` and `--tag-parser-replacement [string]` options.
+
+```bash
+# When all versions are tagged like "my-package@1.2 build123"
+auto-changelog --tag-parser-pattern "^my-package@(\d+)\.(\d+) build(\d+)$" --tag-parser-replacement "\$1.\$2.0-build.\$3"
+```
+
+Note, both options need to be supplied for this to work. Also note, `$` signs in the replacement string must be escaped (not applicable when configuring through package.json).
 
 #### Breaking changes
 
@@ -283,7 +298,7 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
 | `heading` | A heading for the list, only renders if at least one commit matches |
 | `message` | A regex pattern to match against the entire commit message |
 | `subject` | A regex pattern to match against the commit subject only |
-| `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
+| `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
 
 #### Replacing text
 
