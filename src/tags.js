@@ -47,17 +47,17 @@ const getLimit = (tags, { unreleasedOnly, startingVersion, startingDate }) => {
   return tags.length
 }
 
-const parseTag = ({ tagPrefix }) => string => {
+const parseTag = (options) => string => {
   const [tag, date] = string.split(DIVIDER)
   return {
     tag,
     date,
     title: tag,
-    version: inferSemver(tag.replace(tagPrefix, ''))
+    version: inferSemver(tag, options)
   }
 }
 
-const enrichTag = ({ getCompareLink, tagPattern }) => (t, index, tags) => {
+const enrichTag = ({ getCompareLink }) => (t, index, tags) => {
   const previous = tags[index + 1]
   return {
     isoDate: t.date.slice(0, 10),
@@ -94,15 +94,25 @@ const sortTags = ({ version: a }, { version: b }) => {
   return a < b ? 1 : -1
 }
 
-const inferSemver = tag => {
+const inferSemver = (tag, {tagPrefix, tagParserPattern, tagParserReplacement}) => {
+  if (!!tagParserPattern && !!tagParserReplacement) {
+    return tag.replace(new RegExp(tagParserPattern), tagParserReplacement)
+  }
+
+  if (!!tagPrefix && tag.startsWith(tagPrefix)) {
+    tag = tag.replace(new RegExp(`^${tagPrefix}`), "")
+  }
+
   if (/^v?\d+$/.test(tag)) {
     // v1 becomes v1.0.0
     return `${tag}.0.0`
   }
+
   if (/^v?\d+\.\d+$/.test(tag)) {
     // v1.0 becomes v1.0.0
     return `${tag}.0`
   }
+  
   return tag
 }
 
