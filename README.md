@@ -158,15 +158,6 @@ You can also store config options in an `.auto-changelog` file in your project r
 
 Note that any options set in `package.json` will take precedence over any set in `.auto-changelog`.
 
-#### Tag prefixes
-
-Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
-
-```bash
-# When all versions are tagged like my-package/1.2.3
-auto-changelog --tag-prefix my-package/
-```
-
 #### Tag patterns
 
 By default, `auto-changelog` looks for valid semver tags to build a list of releases. If you are using another format (or want to include all tags), use `--tag-pattern [regex]`:
@@ -178,6 +169,28 @@ auto-changelog --tag-pattern build-\d+
 # Include any tag as a release
 auto-changelog --tag-pattern .+
 ```
+
+Including tags using this method does not gurantee correct tag order however since the sorting compares semver versions rather than their date or alphabetical order. For proper custom tag order, please refer to the [Tag parsing](#tag-parsing) section. Note, if a tag can be properly coerced into a valid semver string via the parsing options, the `--tag-pattern` is no longer needed.
+
+#### Tag parsing
+
+There are 2 mechanisms that help auto-changelog properly parse your tags.
+
+Use `--tag-prefix [prefix]` if you prefix your version tags with a certain string:
+
+```bash
+# When all versions are tagged like "my-package/1.2.3"
+auto-changelog --tag-prefix my-package/
+```
+
+Alternatively, if you have an unconventional tagging pattern, you can provide a capture pattern and a replacement string through the `--tag-parser-pattern [regex]` and `--tag-parser-replacement [string]` options.
+
+```bash
+# When all versions are tagged like "my-package@1.2 build123"
+auto-changelog --tag-parser-pattern "^my-package@(\d+)\.(\d+) build(\d+)$" --tag-parser-replacement "\$1.\$2.0-build.\$3"
+```
+
+Note, both options need to be supplied for this to work. Also note, `$` signs in the replacement string must be escaped.
 
 #### Breaking changes
 
@@ -222,20 +235,43 @@ If you aren’t happy with the default templates or want to tweak something, you
 Save `changelog-template.hbs` somewhere in your repo:
 
 ```hbs
-### Changelog
-My custom changelog template. Don’t worry about indentation here; it is automatically removed from the output.
+### Changelog My custom changelog template. Don’t worry about indentation here;
+it is automatically removed from the output.
 
 {{#each releases}}
-  Every release has a {{title}} and a {{href}} you can use to link to the commit diff.
-  It also has an {{isoDate}} and a {{niceDate}} you might want to use.
+  Every release has a
+  {{title}}
+  and a
+  {{href}}
+  you can use to link to the commit diff. It also has an
+  {{isoDate}}
+  and a
+  {{niceDate}}
+  you might want to use.
   {{#each merges}}
-    - A merge has a {{message}}, an {{id}} and a {{href}} to the PR.
+    - A merge has a
+    {{message}}, an
+    {{id}}
+    and a
+    {{href}}
+    to the PR.
   {{/each}}
   {{#each fixes}}
-    - Each fix has a {{commit}} with a {{commit.subject}}, an {{id}} and a {{href}} to the fixed issue.
+    - Each fix has a
+    {{commit}}
+    with a
+    {{commit.subject}}, an
+    {{id}}
+    and a
+    {{href}}
+    to the fixed issue.
   {{/each}}
   {{#each commits}}
-    - Commits have a {{shorthash}}, a {{subject}} and a {{href}}, amongst other things.
+    - Commits have a
+    {{shorthash}}, a
+    {{subject}}
+    and a
+    {{href}}, amongst other things.
   {{/each}}
 {{/each}}
 ```
@@ -267,22 +303,35 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
   ### [{{title}}]({{href}})
 
   {{! List commits with `Breaking change: ` somewhere in the message }}
-  {{#commit-list commits heading='### Breaking Changes' message='Breaking change: '}}
-    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{#commit-list
+    commits
+    heading="### Breaking Changes"
+    message="Breaking change: "
+  }}
+    -
+    {{subject}}
+    [`{{shorthash}}`]({{href}})
   {{/commit-list}}
 
   {{! List commits that add new features, but not those already listed above }}
-  {{#commit-list commits heading='### New Features' message='feat: ' exclude='Breaking change: '}}
-    - {{subject}} [`{{shorthash}}`]({{href}})
+  {{#commit-list
+    commits
+    heading="### New Features"
+    message="feat: "
+    exclude="Breaking change: "
+  }}
+    -
+    {{subject}}
+    [`{{shorthash}}`]({{href}})
   {{/commit-list}}
 {{/each}}
 ```
 
-| Option    | Description |
-| --------- | ----------- |
-| `heading` | A heading for the list, only renders if at least one commit matches |
-| `message` | A regex pattern to match against the entire commit message |
-| `subject` | A regex pattern to match against the commit subject only |
+| Option    | Description                                                                                   |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `heading` | A heading for the list, only renders if at least one commit matches                           |
+| `message` | A regex pattern to match against the entire commit message                                    |
+| `subject` | A regex pattern to match against the commit subject only                                      |
 | `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
 
 #### Replacing text
