@@ -9,26 +9,41 @@ const MATCH_V = /^v\d/;
 
 const DEPENDENCIES = { cmd };
 
-function inferSemver(tag) {
+function inferSemver(rawTag, {
+	tagPrefix,
+	tagParserPattern,
+	tagParserReplacement,
+} = {}) {
+	if (!!tagParserPattern && !!tagParserReplacement) {
+		return rawTag.replace(new RegExp(tagParserPattern), tagParserReplacement);
+	}
+
+	const tag = !!tagPrefix && rawTag.startsWith(tagPrefix)
+		? rawTag.replace(new RegExp(`^${tagPrefix}`), '')
+		: rawTag;
+
 	if ((/^v?\d+$/).test(tag)) {
 		// v1 becomes v1.0.0
 		return `${tag}.0.0`;
 	}
+
 	if ((/^v?\d+\.\d+$/).test(tag)) {
 		// v1.0 becomes v1.0.0
 		return `${tag}.0`;
 	}
+
 	return tag;
 }
 
-function parseTag({ tagPrefix, stripTagPrefix }) {
+function parseTag(options) {
+	const { tagPrefix, stripTagPrefix } = options;
 	return (string) => {
 		const [tag, date] = string.split(DIVIDER);
 		return {
 			tag,
 			date,
 			title: stripTagPrefix ? tag.replace(tagPrefix, '') : tag,
-			version: inferSemver(tag.replace(tagPrefix, '')),
+			version: inferSemver(tag, options),
 		};
 	};
 }

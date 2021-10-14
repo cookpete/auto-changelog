@@ -293,6 +293,18 @@ async function getOptions(argv, overrides) {
 				placeholder: 'prefix',
 				description: 'prefix used in version tags',
 			},
+			'tag-parser-pattern': {
+				group: 'Releases',
+				type: 'string',
+				placeholder: 'regex',
+				description: 'pattern used to capture values in tags for replacement',
+			},
+			'tag-parser-replacement': {
+				group: 'Releases',
+				type: 'string',
+				placeholder: 'string',
+				description: 'replaces captures supplied in the --tag-parser-pattern option to create valid semver tags',
+			},
 			'strip-tag-prefix': {
 				group: 'Releases',
 				type: 'boolean',

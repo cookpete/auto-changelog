@@ -378,3 +378,20 @@ test('fetchTags: --ending-version respects build metadata', async (t) => {
 		'4.9.0',
 	]);
 });
+
+test('fetchTags: supports tag parsing through --tag-parser-pattern and --tag-parser-replacement', async (t) => {
+	const tags = await fetchTags({
+		...options,
+		tagParserPattern: '^version (\\d+)\\.(\\d+)\\.(\\d+) \\|\\| build (\\d+)$',
+		tagParserReplacement: '$1.$2.$3-build.$4',
+	}, gitTags([
+		'version 0.1.0 || build 2345---2000-02-01',
+		'version 2.1.0 || build 2355---2000-02-01',
+		'version 3.2.1 || build 2367---2000-02-01',
+	].join('\n')));
+	t.deepEqual(tags.map((tag) => tag.version), [
+		'3.2.1-build.2367',
+		'2.1.0-build.2355',
+		'0.1.0-build.2345',
+	]);
+});

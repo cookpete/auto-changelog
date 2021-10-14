@@ -44,6 +44,8 @@ Releases:
   -u, --unreleased                    # include section for unreleased changes
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags
+      --tag-parser-pattern [regex]    # pattern used to capture values in tags for replacement
+      --tag-parser-replacement [string] # replaces captures supplied in the --tag-parser-pattern option to create valid semver tags
       --strip-tag-prefix              # strip the tag prefix from release titles (default: on for a detected monorepo package)
       --no-strip-tag-prefix           # keep the tag prefix in release titles
       --autodetect-monorepo-disabled  # disable monorepo autodetection
@@ -293,6 +295,19 @@ auto-changelog --tag-pattern build-\d+
 # Include any tag as a release
 auto-changelog --tag-pattern .+
 ```
+
+Including tags using this method does not guarantee correct tag order, however, since the sorting compares semver versions rather than their date or alphabetical order. For proper custom tag order, please refer to the [Tag parsing](#tag-parsing) section. Note, if a tag can be properly coerced into a valid semver string via the parsing options, the `--tag-pattern` is no longer needed.
+
+#### Tag parsing
+
+If you have an unconventional tagging pattern, you can provide a capture pattern and a replacement string through the `--tag-parser-pattern [regex]` and `--tag-parser-replacement [string]` options.
+
+```bash
+# When all versions are tagged like "my-package@1.2 build123"
+auto-changelog --tag-parser-pattern "^my-package@(\d+)\.(\d+) build(\d+)$" --tag-parser-replacement "\$1.\$2.0-build.\$3"
+```
+
+Note, both options need to be supplied for this to work. Also note, `$` signs in the replacement string must be escaped (not applicable when configuring through package.json).
 
 #### Breaking changes
 
