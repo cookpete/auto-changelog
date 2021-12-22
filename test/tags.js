@@ -104,7 +104,13 @@ describe('fetchTags', () => {
   })
 
   it('supports --starting-version', async () => {
-    expect(await fetchTags({ ...options, startingVersion: 'v0.2.2' })).to.have.lengthOf(3)
+    expect(await fetchTags({ ...options, startingVersion: 'v0.3' })).to.have.lengthOf(2)
+    // abreviated tag inferred via semver
+    expect(await fetchTags({ ...options, startingVersion: 'v1' })).to.have.lengthOf(1)
+    // inexistant tag in the past
+    expect(await fetchTags({ ...options, startingVersion: 'v0.2.8' })).to.have.lengthOf(2)
+    // inexistant tag in the future
+    expect(await fetchTags({ ...options, startingVersion: 'v2.0.0' })).to.have.lengthOf(0)
   })
 
   it('supports --ending-version', async () => {
