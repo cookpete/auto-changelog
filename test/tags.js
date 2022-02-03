@@ -107,6 +107,14 @@ describe('fetchTags', () => {
     expect(await fetchTags({ ...options, startingVersion: 'v0.2.2' })).to.have.lengthOf(3)
   })
 
+  it('supports --ending-version', async () => {
+    expect(await fetchTags({ ...options, endingVersion: 'v0.2.2' })).to.have.lengthOf(4)
+  })
+
+  it('supports --starting-version and --ending-version', async () => {
+    expect(await fetchTags({ ...options, startingVersion: 'v0.2.1', endingVersion: 'v0.2.2' })).to.have.lengthOf(2)
+  })
+
   it('supports --starting-date', async () => {
     expect(await fetchTags({ ...options, startingDate: '2000-03-01' })).to.have.lengthOf(5)
     expect(await fetchTags({ ...options, startingDate: '2000-03-02' })).to.have.lengthOf(4)
@@ -151,10 +159,6 @@ describe('fetchTags', () => {
       '0.2.2',
       '1.0.0'
     ])
-  })
-
-  it('supports --ending-version', async () => {
-    expect(await fetchTags({ ...options, endingVersion: 'v0.2.2' })).to.have.lengthOf(3)
   })
 
   it('supports partial semver tags', async () => {
