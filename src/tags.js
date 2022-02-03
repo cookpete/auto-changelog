@@ -41,15 +41,20 @@ const getStartIndex = (tags, { endingVersion }) => {
   return 0
 }
 
-const getEndIndex = (tags, { unreleasedOnly, startingVersion, startingDate }) => {
+const getEndIndex = (tags, { unreleasedOnly, startingVersion, startingDate, tagPrefix }) => {
   if (unreleasedOnly) {
     return 1
   }
   if (startingVersion) {
-    const index = tags.findIndex(({ tag }) => tag === startingVersion)
+    const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''))
+    const index = tags.findIndex(({ tag }) => {
+      return tag === startingVersion || tag === semverStartingVersion
+    })
     if (index !== -1) {
       return index + 1
     }
+    // Fall back to nearest version lower than startingVersion
+    return tags.findIndex(({ version }) => semver.lt(version, semverStartingVersion))
   }
   if (startingDate) {
     return tags.filter(t => t.isoDate >= startingDate).length
