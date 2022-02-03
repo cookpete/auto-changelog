@@ -66,7 +66,7 @@ const getSubject = (message) => {
   if (!message.trim()) {
     return '_No commit message_'
   }
-  return message.match(/[^\n]+/)[0]
+  return message.match(/[^\n]+/)[0].trim()
 }
 
 const getStats = (stats) => {

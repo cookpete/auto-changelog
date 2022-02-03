@@ -311,7 +311,7 @@ describe('getMerge', () => {
 
 describe('getSubject', () => {
   it('returns commit subject', () => {
-    const message = 'Commit message\n\nCloses ABC-1234'
+    const message = ' Commit message\n\nCloses ABC-1234'
     expect(getSubject(message)).to.equal('Commit message')
   })
 
