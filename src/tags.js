@@ -11,7 +11,7 @@ const fetchTags = async (options, remote) => {
     .split('\n')
     .map(parseTag(options))
     .filter(isValidTag(options))
-    .sort(sortTags)
+    .sort(sortTags(options))
 
   const { latestVersion, unreleased, unreleasedOnly, getCompareLink } = options
   if (latestVersion || unreleased || unreleasedOnly) {
@@ -87,7 +87,10 @@ const isValidTag = ({ tagPattern }) => ({ tag, version }) => {
   return semver.valid(version)
 }
 
-const sortTags = ({ version: a }, { version: b }) => {
+const sortTags = ({ appendGitTag }) => ({ version: a }, { version: b }) => {
+  if (/--sort/.test(appendGitTag)) {
+    return 0
+  }
   if (semver.valid(a) && semver.valid(b)) {
     return semver.rcompare(a, b)
   }
