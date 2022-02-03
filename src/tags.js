@@ -46,23 +46,15 @@ const getEndIndex = (tags, { unreleasedOnly, startingVersion, startingDate, tagP
     return 1
   }
   if (startingVersion) {
-    // check for literal match first, this allows matching non-semver tags
-    let index = tags.findIndex(({ tag }) => tag === startingVersion)
+    const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''))
+    const index = tags.findIndex(({ tag }) => {
+      return tag === startingVersion || tag === semverStartingVersion
+    })
     if (index !== -1) {
       return index + 1
-    } else {
-      // infer semver from startingVersion & compare with other tag's inferred versions
-      startingVersion = inferSemver(startingVersion.replace(tagPrefix, ''))
-      index = tags.findIndex(({ version }) => version === startingVersion)
-      // check for literal match first
-      if (index !== -1) {
-        return index + 1
-      // find nearest version that is lower than startingVersion
-      } else {
-        index = tags.findIndex(({ version }) => semver.gt(startingVersion, version))
-        return index
-      }
     }
+    // Fall back to nearest version lower than startingVersion
+    return tags.findIndex(({ version }) => semver.lt(version, semverStartingVersion))
   }
   if (startingDate) {
     return tags.filter(t => t.isoDate >= startingDate).length
