@@ -48,7 +48,7 @@ const parseCommit = (commit, options = {}) => {
     author,
     email,
     date: new Date(date).toISOString(),
-    niceDate: niceDate(new Date(date)),
+    niceDate: niceDate(date),
     subject: replaceText(getSubject(message), options),
     message: message.trim(),
     fixes: getFixes(message, author, options),
