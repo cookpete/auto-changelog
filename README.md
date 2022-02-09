@@ -236,7 +236,7 @@ My custom changelog template. Don’t worry about indentation here; it is automa
     - Each fix has a {{commit}} with a {{commit.subject}}, an {{id}} and a {{href}} to the fixed issue.
   {{/each}}
   {{#each commits}}
-    - Commits have a {{shorthash}}, a {{subject}} and a {{href}}, amongst other things.
+    - Commits have a {{shorthash}}, a {{subject}} and a {{href}}, {{author}} amongst other things.
   {{/each}}
 {{/each}}
 ```
