@@ -11,7 +11,7 @@ const fetchTags = async (options, remote) => {
     .split('\n')
     .map(parseTag(options))
     .filter(isValidTag(options))
-    .sort(sortTags)
+    .sort(sortTags(options))
 
   const { latestVersion, unreleased, unreleasedOnly, getCompareLink } = options
   if (latestVersion || unreleased || unreleasedOnly) {
@@ -28,18 +28,33 @@ const fetchTags = async (options, remote) => {
   }
 
   const enriched = tags.map(enrichTag(options))
-  return enriched.slice(0, getLimit(enriched, options))
+  return enriched.slice(getStartIndex(enriched, options), getEndIndex(enriched, options))
 }
 
-const getLimit = (tags, { unreleasedOnly, startingVersion, startingDate }) => {
+const getStartIndex = (tags, { endingVersion }) => {
+  if (endingVersion) {
+    const index = tags.findIndex(({ tag }) => tag === endingVersion)
+    if (index !== -1) {
+      return index
+    }
+  }
+  return 0
+}
+
+const getEndIndex = (tags, { unreleasedOnly, startingVersion, startingDate, tagPrefix }) => {
   if (unreleasedOnly) {
     return 1
   }
   if (startingVersion) {
-    const index = tags.findIndex(({ tag }) => tag === startingVersion)
+    const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''))
+    const index = tags.findIndex(({ tag }) => {
+      return tag === startingVersion || tag === semverStartingVersion
+    })
     if (index !== -1) {
       return index + 1
     }
+    // Fall back to nearest version lower than startingVersion
+    return tags.findIndex(({ version }) => semver.lt(version, semverStartingVersion))
   }
   if (startingDate) {
     return tags.filter(t => t.isoDate >= startingDate).length
@@ -87,7 +102,10 @@ const isValidTag = ({ tagPattern }) => ({ tag, version }) => {
   return semver.valid(version)
 }
 
-const sortTags = ({ version: a }, { version: b }) => {
+const sortTags = ({ appendGitTag }) => ({ version: a }, { version: b }) => {
+  if (/--sort/.test(appendGitTag)) {
+    return 0
+  }
   if (semver.valid(a) && semver.valid(b)) {
     return semver.rcompare(a, b)
   }

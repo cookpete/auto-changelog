@@ -1,5 +1,5 @@
 const semver = require('semver')
-const { cmd, isLink, encodeHTML, replaceText, getGitVersion } = require('./utils')
+const { cmd, isLink, encodeHTML, niceDate, replaceText, getGitVersion } = require('./utils')
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__'
 const MESSAGE_SEPARATOR = '__AUTO_CHANGELOG_MESSAGE_SEPARATOR__'
@@ -48,6 +48,7 @@ const parseCommit = (commit, options = {}) => {
     author,
     email,
     date: new Date(date).toISOString(),
+    niceDate: niceDate(date),
     subject: replaceText(getSubject(message), options),
     message: message.trim(),
     fixes: getFixes(message, author, options),
@@ -65,7 +66,7 @@ const getSubject = (message) => {
   if (!message.trim()) {
     return '_No commit message_'
   }
-  return message.match(/[^\n]+/)[0]
+  return message.match(/[^\n]+/)[0].trim()
 }
 
 const getStats = (stats) => {

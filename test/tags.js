@@ -104,13 +104,64 @@ describe('fetchTags', () => {
   })
 
   it('supports --starting-version', async () => {
-    expect(await fetchTags({ ...options, startingVersion: 'v0.2.2' })).to.have.lengthOf(3)
+    expect(await fetchTags({ ...options, startingVersion: 'v0.3' })).to.have.lengthOf(2)
+    expect(await fetchTags({ ...options, startingVersion: 'v1' })).to.have.lengthOf(1) // Inferred semver
+    expect(await fetchTags({ ...options, startingVersion: 'v0.2.8' })).to.have.lengthOf(2) // Non-existent tag from the past
+    expect(await fetchTags({ ...options, startingVersion: 'v2.0.0' })).to.have.lengthOf(0) // Non-existent tag from the future
+  })
+
+  it('supports --ending-version', async () => {
+    expect(await fetchTags({ ...options, endingVersion: 'v0.2.2' })).to.have.lengthOf(4)
+  })
+
+  it('supports --starting-version and --ending-version', async () => {
+    expect(await fetchTags({ ...options, startingVersion: 'v0.2.1', endingVersion: 'v0.2.2' })).to.have.lengthOf(2)
   })
 
   it('supports --starting-date', async () => {
     expect(await fetchTags({ ...options, startingDate: '2000-03-01' })).to.have.lengthOf(5)
     expect(await fetchTags({ ...options, startingDate: '2000-03-02' })).to.have.lengthOf(4)
     expect(await fetchTags({ ...options, startingDate: '2000-05-01' })).to.have.lengthOf(1)
+  })
+
+  it('sorts tags using semver', async () => {
+    mock('cmd', () => Promise.resolve([
+      '0.1.0---2000-02-01',
+      '0.2.0---2000-03-01',
+      '0.3.0---2000-04-01',
+      '0.2.1---2000-03-02',
+      '0.2.2---2000-03-03',
+      '1.0.0---2001-01-01'
+    ].join('\n')))
+    const tags = await fetchTags(options)
+    expect(tags.map(t => t.title)).to.deep.equal([
+      '1.0.0',
+      '0.3.0',
+      '0.2.2',
+      '0.2.1',
+      '0.2.0',
+      '0.1.0'
+    ])
+  })
+
+  it('does not sort when sorting via --append-git-tag', async () => {
+    mock('cmd', () => Promise.resolve([
+      '0.1.0---2000-02-01',
+      '0.2.0---2000-03-01',
+      '0.3.0---2000-04-01',
+      '0.2.1---2000-03-02',
+      '0.2.2---2000-03-03',
+      '1.0.0---2001-01-01'
+    ].join('\n')))
+    const tags = await fetchTags({ ...options, appendGitTag: '--sort=v:refname' })
+    expect(tags.map(t => t.title)).to.deep.equal([
+      '0.1.0',
+      '0.2.0',
+      '0.3.0',
+      '0.2.1',
+      '0.2.2',
+      '1.0.0'
+    ])
   })
 
   it('supports partial semver tags', async () => {
