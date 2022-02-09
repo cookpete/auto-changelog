@@ -9,6 +9,7 @@ Introduction
 • The text 'Breaking:' or 'Breaking changes:' can be located anywhere in the commit.
 • The types feat:, fix:, chore:, docs:, refactor:, test:, style:, perf: must be at the beginning of the commit subject with an : on end.
    • They can optionally have a scope set to outline the module or component that is affected eg feat(bldAssess):
+• There is a short hash on the end of every commit that is currently commented out so that change log did not grow too long (due to some system's file size limitations).  You can uncomment if you wish [`{{shorthash}}`]({{href}})
 
 Example Definitions
 • feat: A new feature
@@ -95,39 +96,39 @@ Example Definitions
 
   {{! List commits organised under a heading, but not those already listed in the breaking section }}
       {{#commit-list commits heading='#### New Features' message='^[fF]eat:|[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Fixes' message='^[fF]ix:|^[fF]ix\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Chores And Housekeeping' message='^[cC]hore:|^[cC]hore\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Documentation Changes' message='^[dD]ocs:|^[dD]ocs\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Refactoring and Updates' message='^[rR]efactor:|^[rR]efactor\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Changes to Test Assests' message='^[tT]est:|^[tT]est\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Tidying of Code eg Whitespace' message='^[sS]tyle:|^[sS]tyle\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### Performance Improvments' message='^[pP]erf:|^[pP]erf\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
       {{#commit-list commits heading='#### General Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\('}}
-        - {{subject}} @{{author}}
+        - {{subject}} @{{author}} <!--[`{{shorthash}}`]({{href}}) -->
       {{/commit-list}}
 
 {{/each}}
