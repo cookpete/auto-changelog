@@ -20,7 +20,7 @@
     "version": "node src/index.js --package && git add CHANGELOG.md",
     "generate-test-data": "cross-env NODE_ENV=test node scripts/generate-test-data.js"
   },
-  "author": "Pete Cook <pete@cookpete.com> (https://github.com/cookpete)",
+  "author": "Pete Cook (https://github.com/cookpete)",
   "homepage": "https://github.com/CookPete/auto-changelog",
   "repository": {
     "type": "git",
