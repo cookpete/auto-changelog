@@ -44,7 +44,15 @@ Handlebars.registerHelper('commit-list', (context, options) => {
     return ''
   }
 
-  return `${options.hash.heading}\n\n${list}`
+  if ( typeof options.hash.heading !== 'undefined' && options.hash.heading )
+  {
+    return `${options.hash.heading}\n\n${list}`
+  }
+  else
+  {
+    return `${list}`
+  }
+
 })
 
 Handlebars.registerHelper('matches', function (val, pattern, options) {

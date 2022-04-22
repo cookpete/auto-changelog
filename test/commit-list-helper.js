@@ -6,13 +6,15 @@ describe('commit-list helper', () => {
   const commits = [
     { subject: 'Commit 1', message: 'Commit 1\n\nThis is commit 1, nothing special' },
     { subject: 'Commit 2', message: 'Commit 2\n\nBREAKING CHANGE: This commit breaks something' },
-    { subject: 'feat: Commit 3', message: 'feat: Commit 3\n\nThis commit adds a feature' }
+    { subject: 'feat: Commit 3', message: 'feat: Commit 3\n\nThis commit adds a fieature' },
+    { subject: 'fix: Commit 1', message: 'fix: Commit 1\n\nThis commit adds a fix' }
   ]
 
   const merges = [
     { commit: { subject: 'Commit 1', message: 'Commit 1\n\nThis is commit 1, nothing special' } },
     { commit: { subject: 'Commit 2', message: 'Commit 2\n\nBREAKING CHANGE: This commit breaks something' } },
-    { commit: { subject: 'feat: Commit 3', message: 'feat: Commit 3\n\nThis commit adds a feature' } }
+    { commit: { subject: 'feat: Commit 3', message: 'feat: Commit 3\n\nThis commit adds a feature' } },
+    { commit: { subject: 'fix: Commit 2', message: 'fix: Commit 2\n\nThis commit adds another fix' } }
   ]
 
   it('returns nothing with no commits', () => {
@@ -35,7 +37,9 @@ describe('commit-list helper', () => {
       '# Heading\n\n' +
       '- Commit 1\n' +
       '- Commit 2\n' +
-      '- feat: Commit 3\n'
+      '- feat: Commit 3\n' +
+      '- fix: Commit 1\n'
+
     expect(compile({ commits })).to.equal(expected)
   })
 
@@ -63,6 +67,21 @@ describe('commit-list helper', () => {
     expect(compile({ merges })).to.equal(expected)
   })
 
+  it('supports combining commit-list with previous one if heading is not given', () => {
+  const compile = Handlebars.compile(
+      '{{#commit-list merges heading="# Heading" subject="^feat: "}}\n' +
+        '- {{commit.subject}}\n' +
+      '{{/commit-list}}\n' +
+      '{{#commit-list commits heading="# Heading" subject="^feat: "}}\n' +
+        '- {{commit.subject}}\n' +
+      '{{/commit-list}}\n'
+    )
+    const expected =
+      '# Heading\n\n' +
+      '- fix: Commit 1\n'+
+      '- fix: Commit 2\n'
+ })
+
   it('supports message pattern matching', () => {
     const compile = Handlebars.compile(
       '{{#commit-list commits heading="# Breaking Changes" message="^BREAKING CHANGE: "}}\n' +
@@ -84,7 +103,8 @@ describe('commit-list helper', () => {
     const expected =
       '# Heading\n\n' +
       '- Commit 1\n' +
-      '- feat: Commit 3\n'
+      '- feat: Commit 3\n' +
+      '- fix: Commit 1\n'
     expect(compile({ commits })).to.equal(expected)
   })
 
