@@ -68,19 +68,21 @@ describe('commit-list helper', () => {
   })
 
   it('supports combining commit-list with previous one if heading is not given', () => {
-  const compile = Handlebars.compile(
-      '{{#commit-list merges heading="# Heading" subject="^feat: "}}\n' +
+    const compile = Handlebars.compile(
+      '{{#commit-list merges heading="# Heading" subject="^fix: "}}\n' +
         '- {{commit.subject}}\n' +
       '{{/commit-list}}\n' +
-      '{{#commit-list commits heading="# Heading" subject="^feat: "}}\n' +
-        '- {{commit.subject}}\n' +
+      '{{#commit-list commits subject="^fix: "}}\n' +
+        '- {{subject}}\n' +
       '{{/commit-list}}\n'
     )
-    const expected =
+    const expectedMerges =
       '# Heading\n\n' +
-      '- fix: Commit 1\n'+
       '- fix: Commit 2\n'
- })
+    const expectedCommits = '- fix: Commit 1\n'
+    expect(compile({ merges })).to.equal(expectedMerges)
+    expect(compile({ commits })).to.equal(expectedCommits)
+  })
 
   it('supports message pattern matching', () => {
     const compile = Handlebars.compile(
