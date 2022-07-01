@@ -1,14 +1,29 @@
 const semver = require('semver')
+const importCwd = require('import-cwd')
 const { fetchCommits } = require('./commits')
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
 const parseReleases = async (tags, options, onParsed) => {
+  let plugins = options.plugin || []
+  plugins = plugins.map(p => importCwd(`auto-changelog-${p}`))
+
   const releases = await Promise.all(tags.map(async tag => {
     const commits = await fetchCommits(tag.diff, options)
     const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
     const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
+
+    for (const plugin of plugins) {
+      if (plugin.processCommits) {
+        await plugin.processCommits(commits)
+      }
+
+      if (plugin.processMerges) {
+        await plugin.processMerges(merges)
+      }
+    }
+
     const emptyRelease = merges.length === 0 && fixes.length === 0
     const { message } = commits[0] || { message: null }
     const breakingCount = commits.filter(c => c.breaking).length
@@ -27,6 +42,13 @@ const parseReleases = async (tags, options, onParsed) => {
       fixes
     }
   }))
+
+  for (const plugin of plugins) {
+    if (plugin.processReleases) {
+      await plugin.processReleases(releases)
+    }
+  }
+
   return releases.filter(filterReleases(options))
 }
 
