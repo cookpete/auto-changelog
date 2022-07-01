@@ -16,7 +16,8 @@ const DEFAULT_OPTIONS = {
   sortCommits: 'relevance',
   appendGitLog: '',
   appendGitTag: '',
-  config: '.auto-changelog'
+  config: '.auto-changelog',
+  plugin: []
 }
 
 const PACKAGE_FILE = 'package.json'
@@ -57,6 +58,7 @@ const getOptions = async argv => {
     .option('--append-git-tag <string>', 'string to append to git tag command')
     .option('--prepend', 'prepend changelog to output file')
     .option('--stdout', 'output changelog to stdout')
+    .option('--plugin [name...]', 'use a plugin to augment commit information')
     .version(version)
     .parse(argv)
     .opts()
