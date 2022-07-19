@@ -73,7 +73,7 @@ const parseTag = ({ tagPrefix }) => string => {
 }
 
 const enrichTag = ({ getCompareLink, tagPattern }) => (t, index, tags) => {
-  const previous = tags[index + 1]
+  const previous = tags[index - 1]
   return {
     isoDate: t.date.slice(0, 10),
     niceDate: niceDate(t.date),
