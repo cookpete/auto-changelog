@@ -31,7 +31,7 @@ const fetchTags = async (options, remote) => {
   return enriched.slice(getStartIndex(enriched, options), getEndIndex(enriched, options))
 }
 
-const getStartIndex = (tags, { startingVersion, endingVersion }) => {
+const getStartIndex = (tags, { startingVersion, endingVersion, tagPrefix }) => {
   if (endingVersion) {
     const index = tags.findIndex(({ tag }) => tag === endingVersion)
     if (index !== -1) {
