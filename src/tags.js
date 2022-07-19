@@ -77,8 +77,8 @@ const enrichTag = ({ getCompareLink, tagPattern }) => (t, index, tags) => {
   return {
     isoDate: t.date.slice(0, 10),
     niceDate: niceDate(t.date),
-    diff: previous ? `${previous.tag}...${t.tag}` : t.tag,
-    href: previous ? getCompareLink(previous.tag, t.tag || 'HEAD') : null,
+    diff: previous ? `${t.tag}...${previous.tag}` : t.tag,
+    href: previous ? getCompareLink(t.tag, previous.tag || 'HEAD') : null,
     major: Boolean(
       previous &&
       semver.valid(t.version) &&
