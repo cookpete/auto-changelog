@@ -38,6 +38,13 @@ const getStartIndex = (tags, { endingVersion }) => {
       return index
     }
   }
+  if (startingVersion) {
+    const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''))
+    const index = tags.findIndex(({ tag }) => {
+      return tag === startingVersion || tag === semverStartingVersion
+    })
+    return index
+  }
   return 0
 }
 
