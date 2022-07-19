@@ -46,10 +46,10 @@ const filterCommits = merges => commit => {
     // Filter out merge commits
     return false
   }
-  if (merges.findIndex(m => m.message === commit.subject) !== -1) {
+  //if (merges.findIndex(m => m.message === commit.subject) !== -1) {
     // Filter out commits with the same message as an existing merge
-    return false
-  }
+    //return false
+  //}
   return true
 }
 
