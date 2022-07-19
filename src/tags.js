@@ -22,7 +22,7 @@ const fetchTags = async (options, remote) => {
       tag: null,
       title: latestVersion ? `${v}${latestVersion}` : 'Unreleased',
       date: new Date().toISOString(),
-      diff: previous ? `${previous.tag}..` : 'HEAD',
+      diff: previous ? `${previous.tag}...` : 'HEAD',
       href: previous ? getCompareLink(previous.tag, compareTo) : null
     })
   }
@@ -77,7 +77,7 @@ const enrichTag = ({ getCompareLink, tagPattern }) => (t, index, tags) => {
   return {
     isoDate: t.date.slice(0, 10),
     niceDate: niceDate(t.date),
-    diff: previous ? `${previous.tag}..${t.tag}` : t.tag,
+    diff: previous ? `${previous.tag}...${t.tag}` : t.tag,
     href: previous ? getCompareLink(previous.tag, t.tag || 'HEAD') : null,
     major: Boolean(
       previous &&
