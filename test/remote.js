@@ -57,6 +57,19 @@ const TEST_DATA = [
   },
   {
     remotes: [
+      'https://gitlab.com/organisation/group/subgroup/repo',
+      'https://gitlab.com/organisation/group/subgroup/repo.git',
+      'git@gitlab.com:organisation/group/subgroup/repo.git'
+    ],
+    expected: {
+      commit: 'https://gitlab.com/organisation/group/subgroup/repo/commit/123',
+      issue: 'https://gitlab.com/organisation/group/subgroup/repo/issues/123',
+      merge: 'https://gitlab.com/organisation/group/subgroup/repo/merge_requests/123',
+      compare: 'https://gitlab.com/organisation/group/subgroup/repo/compare/v1.2.3...v2.0.0'
+    }
+  },
+  {
+    remotes: [
       'https://bitbucket.org/user/repo',
       'git@bitbucket.org:user/repo.git'
     ],
