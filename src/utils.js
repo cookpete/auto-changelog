@@ -3,6 +3,7 @@ const fs = require('fs')
 const { spawn } = require('child_process')
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const REGEX_FLAGS = new Set(["g", "i", "m", "d", "s", "u", "y"])
 
 const updateLog = (string, clearLine = true) => {
   if (clearLine) {
@@ -61,11 +62,16 @@ const encodeHTML = (string) => {
 }
 
 const replaceText = (string, options) => {
+  let defaultFlags = 'g'
+
   if (!options.replaceText) {
     return string
   }
+  if (options.flags && typeof options.flags === 'string') {
+    defaultFlags = filterRegexFlags(defaultFlags + options.flags);
+  }
   return Object.keys(options.replaceText).reduce((string, pattern) => {
-    return string.replace(new RegExp(pattern, 'g'), options.replaceText[pattern])
+    return string.replace(new RegExp(pattern, defaultFlags), options.replaceText[pattern])
   }, string)
 }
 
@@ -99,6 +105,19 @@ const readJson = async (path) => {
   return JSON.parse(await readFile(path))
 }
 
+const filterRegexFlags = (flags) => {
+  const finalFlags = new Set()
+
+  flags.split("").forEach((item) => {
+    if (REGEX_FLAGS.has(item)) {
+      finalFlags.add(item)
+    }
+  })
+
+  return Array.from(finalFlags).join("")
+}
+
+
 module.exports = {
   updateLog,
   formatBytes,
@@ -112,5 +131,6 @@ module.exports = {
   readFile,
   writeFile,
   fileExists,
-  readJson
+  readJson,
+  filterRegexFlags
 }

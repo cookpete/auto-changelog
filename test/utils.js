@@ -10,6 +10,7 @@ const {
   writeFile,
   fileExists,
   readJson,
+  filterRegexFlags,
   __Rewire__: mock,
   __ResetDependency__: unmock
 } = require('../src/utils')
@@ -101,5 +102,17 @@ describe('readJson', () => {
     })
     expect(await readJson()).to.deep.equal({ abc: 123 })
     unmock('fs')
+  })
+})
+
+describe('filterRegexFlags', () => {
+  it('filter available input regex flags', () => {
+    expect(filterRegexFlags('i')).to.equal('i')
+    expect(filterRegexFlags('gi')).to.equal('gi')
+  })
+
+  it('filter unavailable input regex flags', () => {
+    expect(filterRegexFlags('ixyz')).to.equal('iy')
+    expect(filterRegexFlags('gixyzm')).to.equal('giym')
   })
 })
