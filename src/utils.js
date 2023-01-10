@@ -3,6 +3,7 @@ const fs = require('fs')
 const { spawn } = require('child_process')
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const REGEX_FLAGS = new Set(["g", "i", "m", "d", "s", "u", "y"])
 
 const updateLog = (string, clearLine = true) => {
   if (clearLine) {
@@ -67,7 +68,7 @@ const replaceText = (string, options) => {
     return string
   }
   if (options.flags && typeof options.flags === 'string') {
-    defaultFlags = filterRegexFlags(defaultFlags.concat(String(options.flags)));
+    defaultFlags = filterRegexFlags(defaultFlags + options.flags);
   }
   return Object.keys(options.replaceText).reduce((string, pattern) => {
     return string.replace(new RegExp(pattern, defaultFlags), options.replaceText[pattern])
@@ -106,10 +107,9 @@ const readJson = async (path) => {
 
 const filterRegexFlags = (flags) => {
   const finalFlags = new Set()
-  let mainFlags = ["g", "i", "m", "d", "s", "u", "y"]
 
   flags.split("").forEach((item) => {
-    if (mainFlags.includes(item)) {
+    if (REGEX_FLAGS.has(item)) {
       finalFlags.add(item)
     }
   })
