@@ -61,11 +61,16 @@ const encodeHTML = (string) => {
 }
 
 const replaceText = (string, options) => {
+  let defaultFlags = 'g'
+
   if (!options.replaceText) {
     return string
   }
+  if (options.flags && typeof options.flags === 'string') {
+    defaultFlags = filterRegexFlags(defaultFlags.concat(String(options.flags)));
+  }
   return Object.keys(options.replaceText).reduce((string, pattern) => {
-    return string.replace(new RegExp(pattern, 'g'), options.replaceText[pattern])
+    return string.replace(new RegExp(pattern, defaultFlags), options.replaceText[pattern])
   }, string)
 }
 
@@ -99,6 +104,20 @@ const readJson = async (path) => {
   return JSON.parse(await readFile(path))
 }
 
+const filterRegexFlags = (flags) => {
+  const finalFlags = new Set()
+  let mainFlags = ["g", "i", "m", "d", "s", "u", "y"]
+
+  flags.split("").forEach((item) => {
+    if (mainFlags.includes(item)) {
+      finalFlags.add(item)
+    }
+  })
+
+  return Array.from(finalFlags).join("")
+}
+
+
 module.exports = {
   updateLog,
   formatBytes,
@@ -112,5 +131,6 @@ module.exports = {
   readFile,
   writeFile,
   fileExists,
-  readJson
+  readJson,
+  filterRegexFlags
 }
