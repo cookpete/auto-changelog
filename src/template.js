@@ -77,7 +77,7 @@ const cleanTemplate = template => {
     .replace(/\n\n$/, '\n')
 }
 
-const compileTemplate = async (releases, options) => {
+const compileTemplate = async (releases, metadata, options) => {
   const { template, handlebarsSetup } = options
   if (handlebarsSetup) {
     const path = /^\//.test(handlebarsSetup) ? handlebarsSetup : join(process.cwd(), handlebarsSetup)
@@ -88,9 +88,9 @@ const compileTemplate = async (releases, options) => {
   }
   const compile = Handlebars.compile(await getTemplate(template), COMPILE_OPTIONS)
   if (template === 'json') {
-    return compile({ releases, options })
+    return compile({ releases, metadata, options })
   }
-  return cleanTemplate(compile({ releases, options }))
+  return cleanTemplate(compile({ releases, metadata, options }))
 }
 
 module.exports = {
