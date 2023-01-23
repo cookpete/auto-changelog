@@ -102,11 +102,9 @@ const run = async argv => {
   const tags = await fetchTags(options, options)
   log('Fetching metadata…')
   const metadata = await getMetadata(options)
-  console.log('!--->', metadata, options)
   log(`${tags.length} version tags found…`)
   const onParsed = ({ title }) => log(`Fetched ${title}…`)
   const releases = await parseReleases(tags, options, onParsed)
-  console.log("OPTI", releases, options)
   const changelog = await compileTemplate(releases, metadata, options)
   await write(changelog, options, log)
 }

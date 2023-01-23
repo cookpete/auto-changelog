@@ -258,6 +258,20 @@ To see exactly what data is passed in to the templates, you can generate a JSON 
 ```bash
 auto-changelog --template json --output changelog-data.json
 ```
+#### templates metadata
+
+The metadata option set to true (by default false) allows you to get the information from `git config -l` and the information from `package.json`, which can be accessed from the metadata object in the template.
+
+```js
+{
+  "name": "my-awesome-package",
+  "auto-changelog": {
+    "metadata": true
+    }
+  }
+}
+```
+
 
 #### `commit-list` helper
 

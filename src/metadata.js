@@ -3,7 +3,7 @@ const { cmd, dotNotationToObject, readJson, niceDate } = require('./utils')
 
 const DIVIDER = '=';
 
-const getGitConfig = async () => {
+const fetchGitConfig = async () => {
     const config = (await cmd(`git config -l`))
 
     return config
@@ -17,14 +17,12 @@ const getGitConfig = async () => {
 }
 
 const getMetadata = async (options) => {
-    console.log("rree--->", options.metadata)
-
-    if (!options.metadata) {
-        return null
+    if (options.metadata !== true) {
+        return {}
     }
 
     const PACKAGE_FILE = 'package.json'
-    const config = await getGitConfig();
+    const config = await fetchGitConfig();
 
     const pkg = await readJson(PACKAGE_FILE)
 

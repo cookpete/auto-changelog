@@ -3,6 +3,7 @@ const { expect } = require('chai')
 const { join } = require('path')
 const { readFile } = require('../src/utils')
 const releases = require('./data/releases')
+const metadata = require('./data/metadata')
 const { compileTemplate } = require('../src/template')
 
 describe('compileTemplate', () => {
@@ -45,6 +46,13 @@ describe('compileTemplate', () => {
     expect(await compileTemplate(releases, {}, {
       template: path,
       handlebarsSetup: './test/data/handlebars-setup.js'
+    })).to.equal(expected)
+  })
+
+  it('compiles using metadata template', async () => {
+    const expected = await readFile(join(__dirname, 'data', 'template-metadata.md'))
+    expect(await compileTemplate(releases, metadata, {
+      template: 'metadata',
     })).to.equal(expected)
   })
 })
