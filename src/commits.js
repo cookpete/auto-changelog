@@ -144,20 +144,12 @@ const getMerge = (commit, message, options = {}) => {
 }
 
 const excludeCommit = (commit, { ignoreCommitPattern }) => {
-  if (new RegExp(ignoreCommitPattern).test(commit.subject)) {
-    return false
-  }
+  if (new RegExp(ignoreCommitPattern).test(commit.subject)) return false
   return true
 }
 
 const includeCommit = (commit, { includeCommitPattern, strictInclude, mergePattern }) => {
   if (new RegExp(includeCommitPattern).test(commit.subject)) return true
-  if (!strictInclude) {
-    const patterns = getMergePatterns({ mergePattern })
-    for (const pattern of patterns) {
-      if (pattern.test(commit.message)) return true
-    }
-  }
   return false
 }
 
