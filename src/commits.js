@@ -35,8 +35,8 @@ const parseCommits = (string, options = {}) => {
     .split(COMMIT_SEPARATOR)
     .slice(1)
     .map(commit => parseCommit(commit, options))
-    .filter(commit => blacklistCommits(commit, options))
-    .filter(commit => whitelistCommits(commit, options))
+    .filter(commit => excludeCommit(commit, options))
+    .filter(commit => includeCommit(commit, options))
 }
 
 const parseCommit = (commit, options = {}) => {
@@ -136,18 +136,18 @@ const getMerge = (commit, message, options = {}) => {
   return null
 }
 
-const blacklistCommits = (commit, { blacklistCommitPattern }) => {
-  if (blacklistCommitPattern && new RegExp(blacklistCommitPattern).test(commit.subject)) {
+const excludeCommit = (commit, { excludeCommitPattern }) => {
+  if (excludeCommitPattern && new RegExp(excludeCommitPattern).test(commit.subject)) {
     return false
   }
   return true
 }
 
-const whitelistCommits = (commit, { whitelistCommitPattern, strictWhitelist, mergePattern }) => {
-  if (whitelistCommitPattern) {
-    if (new RegExp(whitelistCommitPattern).test(commit.subject)) return true
-    if (!strictWhitelist) {
-      const patterns = getMergePatterns({mergePattern})
+const includeCommit = (commit, { includeCommitPattern, strictInclude, mergePattern }) => {
+  if (includeCommitPattern) {
+    if (new RegExp(includeCommitPattern).test(commit.subject)) return true
+    if (!strictInclude) {
+      const patterns = getMergePatterns({ mergePattern })
       for (const pattern of patterns) {
         if (pattern.test(commit.message)) return true
       }
