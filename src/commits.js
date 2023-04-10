@@ -31,12 +31,18 @@ const getLogFormat = async () => {
 }
 
 const parseCommits = (string, options = {}) => {
-  return string
-    .split(COMMIT_SEPARATOR)
-    .slice(1)
-    .map(commit => parseCommit(commit, options))
-    .filter(commit => excludeCommit(commit, options))
-    .filter(commit => includeCommit(commit, options))
+  if (options.ignoreCommitPattern && options.includeCommitPattern) {
+    throw new Error(
+      "'ignore commit pattern' and 'include commit pattern' cannot co-exist, please provide only either of them!"
+    )
+  } else {
+    return string
+      .split(COMMIT_SEPARATOR)
+      .slice(1)
+      .map(commit => parseCommit(commit, options))
+      .filter(commit => excludeCommit(commit, options))
+      .filter(commit => includeCommit(commit, options))
+  }
 }
 
 const parseCommit = (commit, options = {}) => {
