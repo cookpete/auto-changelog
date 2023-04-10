@@ -37,7 +37,7 @@ Options:
       --issue-pattern [regex]           # override regex pattern for issues in commit messages
       --breaking-pattern [regex]        # regex pattern for breaking change commits
       --merge-pattern [regex]           # add custom regex pattern for merge commits
-      --exclude-commit-pattern [regex]  # pattern to exclude when parsing commits
+      --ignore-commit-pattern [regex]   # pattern to ignore when parsing commits
       --include-commit-pattern [regex]  # pattern to include when parsing commits, merge commits are be included by default unless "--strict-include" is checked
       --strict-include                  # strictly include only commits that match the pattern by --include-commits-pattern
       --tag-pattern [regex]             # override regex pattern for version tags
