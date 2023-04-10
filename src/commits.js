@@ -149,7 +149,7 @@ const whitelistCommits = (commit, { whitelistCommitPattern, strictWhitelist, mer
     if (!strictWhitelist) {
       const patterns = getMergePatterns({mergePattern})
       for (const pattern of patterns) {
-        if (pattern.test(commit.subject)) return true
+        if (pattern.test(commit.message)) return true
       }
     }
     return false
