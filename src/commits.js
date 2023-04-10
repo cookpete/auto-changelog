@@ -33,7 +33,7 @@ const getLogFormat = async () => {
 const parseCommits = (string, options = {}) => {
   if (options.ignoreCommitPattern && options.includeCommitPattern) {
     throw new Error(
-      "'ignore commit pattern' and 'include commit pattern' cannot co-exist, please provide only either of them!"
+      "'ignore commit pattern' and 'include commit pattern' are mutually exclusive"
     )
   } else {
     const commits = string
