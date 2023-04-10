@@ -36,12 +36,13 @@ const parseCommits = (string, options = {}) => {
       "'ignore commit pattern' and 'include commit pattern' cannot co-exist, please provide only either of them!"
     )
   } else {
-    return string
+    const commits = string
       .split(COMMIT_SEPARATOR)
       .slice(1)
       .map(commit => parseCommit(commit, options))
-      .filter(commit => excludeCommit(commit, options))
-      .filter(commit => includeCommit(commit, options))
+    if (options.ignoreCommitPattern) return commits.filter(commit => excludeCommit(commit, options))
+    if (options.includeCommitPattern) return commits.filter(commit => includeCommit(commit, options))
+    return commits
   }
 }
 
@@ -143,24 +144,21 @@ const getMerge = (commit, message, options = {}) => {
 }
 
 const excludeCommit = (commit, { ignoreCommitPattern }) => {
-  if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
+  if (new RegExp(ignoreCommitPattern).test(commit.subject)) {
     return false
   }
   return true
 }
 
 const includeCommit = (commit, { includeCommitPattern, strictInclude, mergePattern }) => {
-  if (includeCommitPattern) {
-    if (new RegExp(includeCommitPattern).test(commit.subject)) return true
-    if (!strictInclude) {
-      const patterns = getMergePatterns({ mergePattern })
-      for (const pattern of patterns) {
-        if (pattern.test(commit.message)) return true
-      }
+  if (new RegExp(includeCommitPattern).test(commit.subject)) return true
+  if (!strictInclude) {
+    const patterns = getMergePatterns({ mergePattern })
+    for (const pattern of patterns) {
+      if (pattern.test(commit.message)) return true
     }
-    return false
   }
-  return true
+  return false
 }
 
 module.exports = {
