@@ -11,7 +11,8 @@ const {
   fileExists,
   readJson,
   __Rewire__: mock,
-  __ResetDependency__: unmock
+  __ResetDependency__: unmock,
+  dotNotationToObject
 } = require('../src/utils')
 
 describe('updateLog', () => {
@@ -101,5 +102,27 @@ describe('readJson', () => {
     })
     expect(await readJson()).to.deep.equal({ abc: 123 })
     unmock('fs')
+  })
+})
+
+describe('dotNotationToObject', () => {
+  it('create the object from a string', () => {
+    const dotString = 'user.name';
+    const value = 'John Doe'
+
+    const expected = {
+      user: {name: value}
+    }
+   
+    expect(dotNotationToObject(dotString, value)).to.deep.equal(expected)
+   
+  })
+
+    it('show error when parameter is not a string value', () => {
+    const dotString = 32
+    const value = 'John Doe'
+   
+    expect(()=> dotNotationToObject(dotString, value)).to.throw()
+   
   })
 })

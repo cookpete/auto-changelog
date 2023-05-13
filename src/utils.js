@@ -99,6 +99,23 @@ const readJson = async (path) => {
   return JSON.parse(await readFile(path))
 }
 
+const dotNotationToObject = (str, value) => {
+  const props = str.split('.');
+  const last = props.pop()
+
+  let ref = {}
+  const object = ref;
+  props.forEach(prop => {
+    ref[prop] = {};
+    ref = ref[prop];
+  });
+
+  ref[last] = value;
+
+  return object
+}
+
+
 module.exports = {
   updateLog,
   formatBytes,
@@ -112,5 +129,6 @@ module.exports = {
   readFile,
   writeFile,
   fileExists,
-  readJson
+  readJson,
+  dotNotationToObject
 }

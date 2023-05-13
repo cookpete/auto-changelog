@@ -4,7 +4,8 @@ const { fetchRemote } = require('./remote')
 const { fetchTags } = require('./tags')
 const { parseReleases } = require('./releases')
 const { compileTemplate } = require('./template')
-const { parseLimit, readFile, readJson, writeFile, fileExists, updateLog, formatBytes } = require('./utils')
+const { getMetadata } = require('./metadata')
+const { parseLimit, readFile, readJson, writeFile, fileExists, updateLog, formatBytes, niceDate, cmd } = require('./utils')
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -99,11 +100,13 @@ const run = async argv => {
   const options = await getOptions(argv)
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching tags…')
-  const tags = await fetchTags(options)
+  const tags = await fetchTags(options, options)
+  log('Fetching metadata…')
+  const metadata = await getMetadata(options)
   log(`${tags.length} version tags found…`)
   const onParsed = ({ title }) => log(`Fetched ${title}…`)
   const releases = await parseReleases(tags, options, onParsed)
-  const changelog = await compileTemplate(releases, options)
+  const changelog = await compileTemplate(releases, metadata, options)
   await write(changelog, options, log)
 }
 
