@@ -31,19 +31,11 @@ const getLogFormat = async () => {
 }
 
 const parseCommits = (string, options = {}) => {
-  if (options.ignoreCommitPattern && options.includeCommitPattern) {
-    throw new Error(
-      "'ignore commit pattern' and 'include commit pattern' are mutually exclusive"
-    )
-  } else {
-    const commits = string
-      .split(COMMIT_SEPARATOR)
-      .slice(1)
-      .map(commit => parseCommit(commit, options))
-    if (options.ignoreCommitPattern) return commits.filter(commit => excludeCommit(commit, options))
-    if (options.includeCommitPattern) return commits.filter(commit => includeCommit(commit, options))
-    return commits
-  }
+  return string
+    .split(COMMIT_SEPARATOR)
+    .slice(1)
+    .map(commit => parseCommit(commit, options))
+    .filter(commit => filterCommit(commit, options))
 }
 
 const parseCommit = (commit, options = {}) => {
@@ -143,14 +135,14 @@ const getMerge = (commit, message, options = {}) => {
   return null
 }
 
-const excludeCommit = (commit, { ignoreCommitPattern }) => {
-  if (new RegExp(ignoreCommitPattern).test(commit.subject)) return false
+const filterCommit = (commit, { ignoreCommitPattern, commitPattern }) => {
+  if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
+    return false
+  }
+  if (commitPattern) {
+    return new RegExp(commitPattern).test(commit.subject)
+  }
   return true
-}
-
-const includeCommit = (commit, { includeCommitPattern, strictInclude, mergePattern }) => {
-  if (new RegExp(includeCommitPattern).test(commit.subject)) return true
-  return false
 }
 
 module.exports = {
