@@ -41,6 +41,7 @@ const getOptions = async argv => {
     .option('--issue-pattern <regex>', 'override regex pattern for issues in commit messages')
     .option('--breaking-pattern <regex>', 'regex pattern for breaking change commits')
     .option('--merge-pattern <regex>', 'add custom regex pattern for merge commits')
+    .option('--commit-pattern <regex>', 'pattern to include when parsing commits')
     .option('--ignore-commit-pattern <regex>', 'pattern to ignore when parsing commits')
     .option('--tag-pattern <regex>', 'override regex pattern for version tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')

@@ -37,6 +37,7 @@ Options:
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
+      --commit-pattern [regex]        # pattern to include when parsing commits
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v

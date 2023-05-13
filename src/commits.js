@@ -135,9 +135,12 @@ const getMerge = (commit, message, options = {}) => {
   return null
 }
 
-const filterCommit = (commit, { ignoreCommitPattern }) => {
+const filterCommit = (commit, { ignoreCommitPattern, commitPattern }) => {
   if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
     return false
+  }
+  if (commitPattern) {
+    return new RegExp(commitPattern).test(commit.subject)
   }
   return true
 }
