@@ -1,4 +1,5 @@
 const { Command } = require('commander')
+const importCwd = require('import-cwd')
 const { version } = require('../package.json')
 const { fetchRemote } = require('./remote')
 const { fetchTags } = require('./tags')
@@ -17,7 +18,7 @@ const DEFAULT_OPTIONS = {
   appendGitLog: '',
   appendGitTag: '',
   config: '.auto-changelog',
-  plugin: []
+  plugins: []
 }
 
 const PACKAGE_FILE = 'package.json'
@@ -58,7 +59,7 @@ const getOptions = async argv => {
     .option('--append-git-tag <string>', 'string to append to git tag command')
     .option('--prepend', 'prepend changelog to output file')
     .option('--stdout', 'output changelog to stdout')
-    .option('--plugin [name...]', 'use a plugin to augment commit information')
+    .option('--plugins [name...]', 'use plugins to augment commit/merge/release information')
     .version(version)
     .parse(argv)
     .opts()
@@ -77,7 +78,8 @@ const getOptions = async argv => {
   return {
     ...options,
     ...remote,
-    latestVersion
+    latestVersion,
+    plugins: options.plugins.map(p => importCwd(`auto-changelog-${p}`))
   }
 }
 

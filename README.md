@@ -53,6 +53,7 @@ Options:
       --append-git-tag [string]       # string to append to git tag command
       --prepend                       # prepend changelog to output file
       --stdout                        # output changelog to stdout
+      --plugins [...name]             # use plugins to augment commit/merge/release information
   -V, --version                       # output the version number
   -h, --help                          # output usage information
 
