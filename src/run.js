@@ -45,6 +45,7 @@ const getOptions = async argv => {
     .option('--merge-pattern <regex>', 'add custom regex pattern for merge commits')
     .option('--commit-pattern <regex>', 'pattern to include when parsing commits')
     .option('--ignore-commit-pattern <regex>', 'pattern to ignore when parsing commits')
+    .option('--ignore-releases-pattern <regex>', 'pattern to ignore when parsing releasess')
     .option('--tag-pattern <regex>', 'override regex pattern for version tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')

@@ -39,6 +39,7 @@ Options:
       --merge-pattern [regex]         # add custom regex pattern for merge commits
       --commit-pattern [regex]        # pattern to include when parsing commits
       --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
+      --ignore-release-pattern [regex] # pattern to ignore when parsing releases
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --starting-version [tag]        # specify earliest version to include in changelog
