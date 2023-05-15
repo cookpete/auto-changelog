@@ -9,6 +9,13 @@ const parseReleases = async (tags, options, onParsed) => {
     const commits = await fetchCommits(tag.diff, options)
     const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
     const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
+
+    for (const plugin of options.plugins) {
+      if (plugin.processCommits) await plugin.processCommits(commits)
+      if (plugin.processMerges) await plugin.processMerges(merges)
+      if (plugin.processFixes) await plugin.processFixes(merges)
+    }
+
     const emptyRelease = merges.length === 0 && fixes.length === 0
     const { message } = commits[0] || { message: null }
     const breakingCount = commits.filter(c => c.breaking).length
@@ -27,6 +34,11 @@ const parseReleases = async (tags, options, onParsed) => {
       fixes
     }
   }))
+
+  for (const plugin of options.plugins) {
+    if (plugin.processReleases) await plugin.processReleases(releases)
+  }
+
   return releases.filter(filterReleases(options))
 }
 
