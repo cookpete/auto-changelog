@@ -27,7 +27,6 @@ const getRemote = (remoteURL, options = {}) => {
 
   const IS_BITBUCKET = /bitbucket/.test(hostname)
   const IS_GITLAB = /gitlab/.test(hostname)
-  const IS_GITLAB_SUBGROUP = /\.git$/.test(remote.branch)
   const IS_AZURE = /dev\.azure/.test(hostname)
   const IS_VISUAL_STUDIO = /visualstudio/.test(hostname)
 
@@ -43,9 +42,7 @@ const getRemote = (remoteURL, options = {}) => {
   }
 
   if (IS_GITLAB) {
-    const url = IS_GITLAB_SUBGROUP
-      ? `${protocol}//${hostname}/${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
-      : `${protocol}//${hostname}/${remote.repo}`
+    const url = `${protocol}//${hostname}/${remote.pathname.replace(/git@.*:/, '').replace(/\.git$/, '')}`
     return {
       getCommitLink: id => `${url}/commit/${id}`,
       getIssueLink: id => `${url}/issues/${id}`,
