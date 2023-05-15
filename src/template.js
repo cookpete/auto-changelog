@@ -18,21 +18,23 @@ Handlebars.registerHelper('commit-list', (context, options) => {
     return ''
   }
 
+  const { exclude, message, subject, heading } = options.hash
+
   const list = context
     .filter(item => {
       const commit = item.commit || item
-      if (options.hash.exclude) {
-        const pattern = new RegExp(options.hash.exclude, 'm')
+      if (exclude) {
+        const pattern = new RegExp(exclude, 'm')
         if (pattern.test(commit.message)) {
           return false
         }
       }
-      if (options.hash.message) {
-        const pattern = new RegExp(options.hash.message, 'm')
+      if (message) {
+        const pattern = new RegExp(message, 'm')
         return pattern.test(commit.message)
       }
-      if (options.hash.subject) {
-        const pattern = new RegExp(options.hash.subject)
+      if (subject) {
+        const pattern = new RegExp(subject)
         return pattern.test(commit.subject)
       }
       return true
@@ -44,11 +46,11 @@ Handlebars.registerHelper('commit-list', (context, options) => {
     return ''
   }
 
-  if (typeof options.hash.heading !== 'undefined' && options.hash.heading) {
-    return `${options.hash.heading}\n\n${list}`
-  } else {
-    return `${list}`
+  if (!heading) {
+    return list
   }
+
+  return `${heading}\n\n${list}`
 })
 
 Handlebars.registerHelper('matches', function (val, pattern, options) {
