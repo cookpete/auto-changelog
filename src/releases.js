@@ -10,7 +10,7 @@ const parseReleases = async (tags, options, onParsed) => {
     const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
     const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
 
-    for (const plugin of Array.from(options.plugins || [])) {
+    for (const plugin of [].concat(options.plugins || [])) {
       if (plugin.processCommits) await plugin.processCommits(commits)
       if (plugin.processMerges) await plugin.processMerges(merges)
       if (plugin.processFixes) await plugin.processFixes(merges)
@@ -35,7 +35,7 @@ const parseReleases = async (tags, options, onParsed) => {
     }
   }))
 
-  for (const plugin of Array.from(options.plugins || [])) {
+  for (const plugin of [].concat(options.plugins || [])) {
     if (plugin.processReleases) await plugin.processReleases(releases)
   }
 
