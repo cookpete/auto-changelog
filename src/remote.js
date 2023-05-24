@@ -47,10 +47,10 @@ const getRemote = (remoteURL, options = {}) => {
       ? `${protocol}//${hostname}/${remote.repo}/${remote.branch.replace(/\.git$/, '')}`
       : `${protocol}//${hostname}/${remote.repo}`
     return {
-      getCommitLink: id => `${url}/commit/${id}`,
-      getIssueLink: id => `${url}/issues/${id}`,
-      getMergeLink: id => `${url}/merge_requests/${id}`,
-      getCompareLink: (from, to) => `${url}/compare/${from}...${to}`,
+      getCommitLink: id => `${url}/-/commit/${id}`,
+      getIssueLink: id => `${url}/-/issues/${id}`,
+      getMergeLink: id => `${url}/-/merge_requests/${id}`,
+      getCompareLink: (from, to) => `${url}/-/compare/${from}...${to}`,
       ...overrides
     }
   }
