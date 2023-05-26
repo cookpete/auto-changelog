@@ -77,6 +77,7 @@ const cleanTemplate = template => {
   return template
     // Remove indentation
     .replace(/\n +/g, '\n')
+    .replace(/\t/g, '')
     .replace(/^ +/, '')
     // Fix multiple blank lines
     .replace(/\n\n\n+/g, '\n\n')
