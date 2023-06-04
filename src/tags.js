@@ -54,7 +54,7 @@ const getEndIndex = (tags, { unreleasedOnly, startingVersion, startingDate, tagP
       return index + 1
     }
     // Fall back to nearest version lower than startingVersion
-    return tags.findIndex(({ version }) => semver.lt(version, semverStartingVersion))
+    return tags.findIndex(({ version }) => version && semver.lt(version, semverStartingVersion))
   }
   if (startingDate) {
     return tags.filter(t => t.isoDate >= startingDate).length
