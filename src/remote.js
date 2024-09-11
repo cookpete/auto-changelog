@@ -44,10 +44,10 @@ const getRemote = (remoteURL, options = {}) => {
   if (IS_GITLAB) {
     const url = `${protocol}//${hostname}/${remote.pathname.replace(/git@.*:/, '').replace(/\.git$/, '')}`
     return {
-      getCommitLink: id => `${url}/commit/${id}`,
-      getIssueLink: id => `${url}/issues/${id}`,
-      getMergeLink: id => `${url}/merge_requests/${id}`,
-      getCompareLink: (from, to) => `${url}/compare/${from}...${to}`,
+      getCommitLink: id => `${url}/-/commit/${id}`,
+      getIssueLink: id => `${url}/-/issues/${id}`,
+      getMergeLink: id => `${url}/-/merge_requests/${id}`,
+      getCompareLink: (from, to) => `${url}/-/compare/${from}...${to}`,
       ...overrides
     }
   }
