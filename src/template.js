@@ -1,7 +1,25 @@
 const { join } = require('path')
+const { get } = require('https')
 const Handlebars = require('handlebars')
-const fetch = require('node-fetch')
 const { readFile, fileExists } = require('./utils')
+
+function fetchText (url) {
+  return new Promise((resolve, reject) => {
+    get(url, (response) => {
+      let data = ''
+
+      // Continuously update stream with data
+      response.on('data', (chunk) => {
+        data += chunk
+      })
+
+      // Resolve once the response is complete
+      response.on('end', () => {
+        resolve(data)
+      })
+    }).on('error', reject)
+  })
+}
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
 const MATCH_URL = /^https?:\/\/.+/
@@ -60,8 +78,7 @@ Handlebars.registerHelper('matches', function (val, pattern, options) {
 
 const getTemplate = async template => {
   if (MATCH_URL.test(template)) {
-    const response = await fetch(template)
-    return response.text()
+    return await fetchText(template)
   }
   if (await fileExists(template)) {
     return readFile(template)
