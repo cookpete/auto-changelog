@@ -37,10 +37,10 @@ const TEST_DATA = [
       'git@gitlab.com:user/repo.git'
     ],
     expected: {
-      commit: 'https://gitlab.com/user/repo/-/commit/123',
-      issue: 'https://gitlab.com/user/repo/-/issues/123',
-      merge: 'https://gitlab.com/user/repo/-/merge_requests/123',
-      compare: 'https://gitlab.com/user/repo/-/compare/v1.2.3...v2.0.0'
+      commit: 'https://gitlab.com/user/repo/commit/123',
+      issue: 'https://gitlab.com/user/repo/issues/123',
+      merge: 'https://gitlab.com/user/repo/merge_requests/123',
+      compare: 'https://gitlab.com/user/repo/compare/v1.2.3...v2.0.0'
     }
   },
   {
@@ -49,10 +49,10 @@ const TEST_DATA = [
       'git@gitlab.com:user/repo/subgroup.git'
     ],
     expected: {
-      commit: 'https://gitlab.com/user/repo/subgroup/-/commit/123',
-      issue: 'https://gitlab.com/user/repo/subgroup/-/issues/123',
-      merge: 'https://gitlab.com/user/repo/subgroup/-/merge_requests/123',
-      compare: 'https://gitlab.com/user/repo/subgroup/-/compare/v1.2.3...v2.0.0'
+      commit: 'https://gitlab.com/user/repo/subgroup/commit/123',
+      issue: 'https://gitlab.com/user/repo/subgroup/issues/123',
+      merge: 'https://gitlab.com/user/repo/subgroup/merge_requests/123',
+      compare: 'https://gitlab.com/user/repo/subgroup/compare/v1.2.3...v2.0.0'
     }
   },
   {

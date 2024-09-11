@@ -226,7 +226,7 @@ describe('getMerge', () => {
       expect(getMerge(EXAMPLE_COMMIT, message, remotes.gitlab)).to.deep.equal({
         id: '15007',
         message: 'Memoize GitLab logger to reduce open file descriptors',
-        href: 'https://gitlab.com/user/repo/-/merge_requests/15007',
+        href: 'https://gitlab.com/user/repo/merge_requests/15007',
         author: 'Commit Author',
         commit: EXAMPLE_COMMIT
       })
@@ -237,7 +237,7 @@ describe('getMerge', () => {
       expect(getMerge(EXAMPLE_COMMIT, message, remotes.gitlabSubgroup)).to.deep.equal({
         id: '15007',
         message: 'Memoize GitLab logger to reduce open file descriptors',
-        href: 'https://gitlab.com/user/repo/subgroup/-/merge_requests/15007',
+        href: 'https://gitlab.com/user/repo/subgroup/merge_requests/15007',
         author: 'Commit Author',
         commit: EXAMPLE_COMMIT
       })
