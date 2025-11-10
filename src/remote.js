@@ -82,7 +82,7 @@ function getRemote(remoteURL, options = {}) {
 		};
 	}
 
-	const url = `${protocol}//${hostname}/${remote.repo}`;
+	const url = `${protocol}//${hostname}/${path}`;
 	return {
 		getCommitLink: (id) => `${url}/commit/${id}`,
 		getIssueLink: (id) => `${url}/issues/${id}`,
