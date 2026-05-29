@@ -68,7 +68,7 @@ const getRemote = (remoteURL, options = {}) => {
     }
   }
 
-  const url = `${protocol}//${hostname}/${remote.repo}`
+  const url = `${protocol}//${hostname}/${remote.pathname.replace(/git@.*:/, '').replace(/\.git$/, '')}`
   return {
     getCommitLink: id => `${url}/commit/${id}`,
     getIssueLink: id => `${url}/issues/${id}`,

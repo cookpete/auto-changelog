@@ -68,6 +68,52 @@ const TEST_DATA = [
   },
   {
     remotes: [
+      'https://git.example.com/foo/bar/baz/project.git',
+      'git@git.example.com:foo/bar/baz/project.git'
+    ],
+    expected: {
+      commit: 'https://git.example.com/foo/bar/baz/project/commit/123',
+      issue: 'https://git.example.com/foo/bar/baz/project/issues/123',
+      merge: 'https://git.example.com/foo/bar/baz/project/pull/123',
+      compare: 'https://git.example.com/foo/bar/baz/project/compare/v1.2.3...v2.0.0'
+    }
+  },
+  {
+    remotes: [
+      'http://git.example.com/foo/bar/baz/project.git'
+    ],
+    expected: {
+      commit: 'http://git.example.com/foo/bar/baz/project/commit/123',
+      issue: 'http://git.example.com/foo/bar/baz/project/issues/123',
+      merge: 'http://git.example.com/foo/bar/baz/project/pull/123',
+      compare: 'http://git.example.com/foo/bar/baz/project/compare/v1.2.3...v2.0.0'
+    }
+  },
+  {
+    remotes: [
+      'https://github.company.com/user/repo.git',
+      'git@github.company.com:user/repo.git'
+    ],
+    expected: {
+      commit: 'https://github.company.com/user/repo/commit/123',
+      issue: 'https://github.company.com/user/repo/issues/123',
+      merge: 'https://github.company.com/user/repo/pull/123',
+      compare: 'https://github.company.com/user/repo/compare/v1.2.3...v2.0.0'
+    }
+  },
+  {
+    remotes: [
+      'https://gitlab.company.com/team/subteam/project.git'
+    ],
+    expected: {
+      commit: 'https://gitlab.company.com/team/subteam/project/commit/123',
+      issue: 'https://gitlab.company.com/team/subteam/project/issues/123',
+      merge: 'https://gitlab.company.com/team/subteam/project/merge_requests/123',
+      compare: 'https://gitlab.company.com/team/subteam/project/compare/v1.2.3...v2.0.0'
+    }
+  },
+  {
+    remotes: [
       'https://bitbucket.org/user/repo',
       'git@bitbucket.org:user/repo.git'
     ],
