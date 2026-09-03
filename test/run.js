@@ -121,6 +121,47 @@ test('getOptions: does not autodetect a monorepo by default', async t => {
   }
 })
 
+test('getOptions: --no-autodetect-monorepo-disabled enables autodetection', async t => {
+  mock('readJson', file => (file === 'package.json'
+    ? { name: 'my-package', repository: { directory: 'packages/my-package' } }
+    : null))
+  try {
+    const options = await getOptions(['', '', '--no-autodetect-monorepo-disabled'])
+    t.equal(options.autodetectMonorepoDisabled, false)
+    t.equal(options.tagPrefix, 'my-package@')
+    t.ok(options.stripTagPrefix)
+  } finally {
+    unmock('readJson')
+  }
+})
+
+test('getOptions: --autodetect-monorepo-disabled still disables autodetection', async t => {
+  mock('readJson', file => (file === 'package.json'
+    ? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false } }
+    : null))
+  try {
+    const options = await getOptions(['', '', '--autodetect-monorepo-disabled'])
+    t.equal(options.autodetectMonorepoDisabled, true)
+    t.equal(options.tagPrefix, '')
+    t.notOk(options.stripTagPrefix)
+  } finally {
+    unmock('readJson')
+  }
+})
+
+test('getOptions: neither flag leaves in-repo config in charge', async t => {
+  mock('readJson', file => (file === 'package.json'
+    ? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false } }
+    : null))
+  try {
+    const options = await getOptions(['', ''])
+    t.equal(options.autodetectMonorepoDisabled, false)
+    t.equal(options.tagPrefix, 'my-package@')
+  } finally {
+    unmock('readJson')
+  }
+})
+
 test('run: generates a changelog', async t => {
   setup()
   try {

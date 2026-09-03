@@ -114,6 +114,9 @@ const getOptions = async argv => {
     .option('--tag-pattern <regex>', 'override regex pattern for version tags')
     .option('--tag-prefix <prefix>', 'prefix used in version tags')
     .option('--autodetect-monorepo-disabled', 'disable detecting a monorepo package and stripping its name-based tag prefix from release titles')
+    // declared alongside the positive form, not instead of it: a lone `--no-` option would put
+    // `true` in the parsed options on every run, overriding in-repo config that never asked for it.
+    .option('--no-autodetect-monorepo-disabled', 'enable monorepo autodetection, overriding in-repo config')
     .option('--starting-version <tag>', 'specify earliest version to include in changelog')
     .option('--starting-date <yyyy-mm-dd>', 'specify earliest date to include in changelog')
     .option('--ending-version <tag>', 'specify latest version to include in changelog')

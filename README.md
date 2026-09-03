@@ -42,6 +42,7 @@ Options:
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --autodetect-monorepo-disabled  # disable monorepo autodetection, default: true (will default to false in the next major)
+      --no-autodetect-monorepo-disabled # enable monorepo autodetection
       --starting-version [tag]        # specify earliest version to include in changelog
       --starting-date [yyyy-mm-dd]    # specify earliest date to include in changelog
       --ending-version [tag]          # specify latest version to include in changelog
@@ -199,7 +200,7 @@ In a monorepo, each package's version tags are typically prefixed with the packa
 - derives the [tag prefix](#tag-prefixes) from the `name` in `package.json` (so you don't have to set `--tag-prefix` for every package), unless one is already configured, and
 - strips that prefix from the release titles in the changelog (so headings read `## [1.2.3]` rather than `## [my-package@1.2.3]`), while still using the full tags for the compare links.
 
-Autodetection is controlled by `--autodetect-monorepo-disabled`, which defaults to `true`. To opt in today, set it to `false`:
+Autodetection is controlled by `--autodetect-monorepo-disabled`, which defaults to `true`. To opt in for a single run, pass `--no-autodetect-monorepo-disabled`. To opt in for the project, set it to `false`:
 
 ```json
 {
