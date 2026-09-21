@@ -82,28 +82,13 @@
       "test/data/"
     ]
   },
-  "nyc": {
-    "all": true,
-    "include": "src",
-    "exclude": "src/index.js",
-    "sourceMap": false,
-    "instrument": false,
-    "report-dir": "./coverage",
-    "temp-dir": "./coverage/.nyc_output",
-    "require": [
-      "@babel/register"
-    ],
-    "reporter": [
-      "text",
-      "html"
-    ]
-  },
   "auto-changelog": {
     "breakingPattern": "Breaking change"
   },
   "publishConfig": {
     "ignore": [
       ".github",
+      ".nycrc",
       "coverage",
       "scripts",
       "test",
