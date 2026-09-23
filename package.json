@@ -21,8 +21,7 @@
     "test-coverage": "cross-env NODE_ENV=test nyc tape -r @babel/register 'test/*.js'",
     "report-coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
     "preversion": "npm run lint && npm run test",
-    "version": "node src/index.js --package && git add CHANGELOG.md",
-    "generate-test-data": "cross-env NODE_ENV=test node scripts/generate-test-data.js"
+    "version": "node src/index.js --package && git add CHANGELOG.md"
   },
   "author": "Pete Cook (https://github.com/cookpete)",
   "homepage": "https://github.com/CookPete/auto-changelog",
