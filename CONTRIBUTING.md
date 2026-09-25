@@ -24,7 +24,7 @@ yarn lint # or npm run lint
 
 ## Testing
 
-This project uses [mocha](https://github.com/mochajs/mocha) and [chai](https://github.com/chaijs/chai) for testing. Be sure to run tests after making changes and, if you’re feeling generous, add some tests of your own.
+This project uses [tape](https://github.com/tape-testing/tape) for testing, and [nyc](https://github.com/istanbuljs/nyc) for coverage. Be sure to run tests after making changes and, if you’re feeling generous, add some tests of your own.
 
 ```bash
 yarn test # or npm test
