@@ -24,6 +24,13 @@ const DEFAULT_OPTIONS = {
 const PACKAGE_FILE = 'package.json'
 const PACKAGE_OPTIONS_KEY = 'auto-changelog'
 
+const DEPENDENCIES = {
+  fetchRemote,
+  readJson,
+  fileExists,
+  importCwd
+}
+
 // The in-repo config sources
 // (`.auto-changelog` and the package.json `auto-changelog` key) are untrusted:
 // auto-changelog is occasionally run over repository content the user does not control,
@@ -87,7 +94,8 @@ async function isMonorepoPackage (pkg, readJson) {
   return false
 }
 
-async function getOptions (argv) {
+async function getOptions (argv, overrides) {
+  const { fetchRemote, readJson, fileExists, importCwd } = { ...DEPENDENCIES, ...overrides }
   const commandOptions = new Command()
     .option('-o, --output <file>', `output file, default: ${DEFAULT_OPTIONS.output}`)
     .option('-c, --config <file>', `config file location, default: ${DEFAULT_OPTIONS.config}`)

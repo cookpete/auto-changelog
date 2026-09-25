@@ -1,9 +1,5 @@
 const test = require('tape')
-const {
-  fetchRemote,
-  __Rewire__: mock,
-  __ResetDependency__: unmock
-} = require('../src/remote')
+const { fetchRemote } = require('../src/remote')
 
 const TEST_DATA = [
   {
@@ -106,38 +102,32 @@ for (const { remotes, expected } of TEST_DATA) {
   for (const remote of remotes) {
     test(`fetchRemote: parses ${remote}`, async t => {
       // `git config --get` emits a trailing newline; mirror that here.
-      mock('cmd', () => `${remote}\n`)
-      const result = await fetchRemote({})
+      const result = await fetchRemote({}, { cmd: () => `${remote}\n` })
       t.equal(result.getCommitLink('123'), expected.commit)
       t.equal(result.getIssueLink('123'), expected.issue)
       t.equal(result.getMergeLink('123'), expected.merge)
       t.equal(result.getCompareLink('v1.2.3', 'v2.0.0'), expected.compare)
-      unmock('cmd')
     })
   }
 }
 
 test('fetchRemote: supports overrides', async t => {
-  mock('cmd', () => '')
   const result = await fetchRemote({
     commitUrl: 'https://example.com/commit/{id}',
     issueUrl: 'https://example.com/issue/{id}',
     mergeUrl: 'https://example.com/merge/{id}',
     compareUrl: 'https://example.com/compare/{from}-{to}'
-  })
+  }, { cmd: () => '' })
   t.equal(result.getCommitLink('123'), 'https://example.com/commit/123')
   t.equal(result.getIssueLink('123'), 'https://example.com/issue/123')
   t.equal(result.getMergeLink('123'), 'https://example.com/merge/123')
   t.equal(result.getCompareLink('v1.2.3', 'v2.0.0'), 'https://example.com/compare/v1.2.3-v2.0.0')
-  unmock('cmd')
 })
 
 test('fetchRemote: returns null functions', async t => {
-  mock('cmd', () => '')
-  const result = await fetchRemote({})
+  const result = await fetchRemote({}, { cmd: () => '' })
   t.equal(result.getCommitLink('123'), null)
   t.equal(result.getIssueLink('123'), null)
   t.equal(result.getMergeLink('123'), null)
   t.equal(result.getCompareLink('v1.2.3', 'v2.0.0'), null)
-  unmock('cmd')
 })

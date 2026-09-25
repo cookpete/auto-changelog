@@ -5,7 +5,10 @@ const { niceDate } = require('./utils')
 const DIVIDER = '---'
 const MATCH_V = /^v\d/
 
-const fetchTags = async (options, remote) => {
+const DEPENDENCIES = { cmd }
+
+const fetchTags = async (options, overrides) => {
+  const { cmd } = { ...DEPENDENCIES, ...overrides }
   const format = `%(refname:short)${DIVIDER}%(creatordate:short)`
   const tags = (await cmd(`git tag -l --format=${format} ${options.appendGitTag}`))
     .trim()

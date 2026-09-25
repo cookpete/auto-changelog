@@ -12,8 +12,17 @@ const {
 
 const PREPEND_TOKEN = '<!-- auto-changelog-above -->'
 
-async function run (argv) {
-  const options = await getOptions(argv)
+const DEPENDENCIES = {
+  fetchTags,
+  parseReleases,
+  readFile,
+  writeFile,
+  fileExists
+}
+
+async function run (argv, overrides) {
+  const { fetchTags, parseReleases } = { ...DEPENDENCIES, ...overrides }
+  const options = await getOptions(argv, overrides)
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching tags…')
   const tags = await fetchTags(options)
@@ -21,10 +30,11 @@ async function run (argv) {
   const onParsed = ({ title }) => log(`Fetched ${title}…`)
   const releases = await parseReleases(tags, options, onParsed)
   const changelog = await compileTemplate(releases, options)
-  await write(changelog, options, log)
+  await write(changelog, options, log, overrides)
 }
 
-async function write (changelog, options, log) {
+async function write (changelog, options, log, overrides) {
+  const { readFile, writeFile, fileExists } = { ...DEPENDENCIES, ...overrides }
   if (options.stdout) {
     process.stdout.write(changelog)
     return

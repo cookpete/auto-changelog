@@ -4,41 +4,16 @@ const { readFile } = require('../src/utils')
 const remotes = require('./data/remotes')
 const releases = require('./data/releases')
 const { tags } = require('./data/commits-map')
-const {
-  run,
-  __Rewire__: mockRun,
-  __ResetDependency__: unmockRun
-} = require('../src/run')
+const { run } = require('../src/run')
 const getOptions = require('../src/options')
-const {
-  __Rewire__: mockOptions,
-  __ResetDependency__: unmockOptions
-} = getOptions
 
-// `getOptions` moved to its own module, so a name is mocked on whichever module
-// owns it; everything else in this file still reaches `run.js`.
-const OPTIONS_NAMES = ['fetchRemote', 'readJson', 'fileExists', 'importCwd']
-const mock = (name, value) => (OPTIONS_NAMES.includes(name) ? mockOptions : mockRun)(name, value)
-const unmock = name => (OPTIONS_NAMES.includes(name) ? unmockOptions : unmockRun)(name)
-
-function setup () {
-  mock('fileExists', () => false)
-  mock('readJson', () => null)
-  mock('fetchRemote', () => remotes.github)
-  mock('fetchTags', () => Promise.resolve(tags))
-  mock('parseReleases', () => Promise.resolve(releases))
-  mock('writeFile', () => {})
-  mock('log', () => {})
-}
-
-function teardown () {
-  unmock('fileExists')
-  unmock('readJson')
-  unmock('fetchRemote')
-  unmock('fetchTags')
-  unmock('parseReleases')
-  unmock('writeFile')
-  unmock('log')
+const deps = {
+  fileExists: () => false,
+  readJson: () => null,
+  fetchRemote: () => remotes.github,
+  fetchTags: () => Promise.resolve(tags),
+  parseReleases: () => Promise.resolve(releases),
+  writeFile: () => {}
 }
 
 test('getOptions: parses commit limit correctly', async t => {
@@ -62,288 +37,220 @@ test('getOptions: parses -i correctly when given -i', async t => {
 })
 
 test('getOptions: autodetects a monorepo via repository.directory and derives the tag prefix', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false } }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.tagPrefix, 'my-package@')
-    t.equal(options.stripTagPrefix, true)
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.tagPrefix, 'my-package@')
+  t.equal(options.stripTagPrefix, true)
 })
 
 test('getOptions: autodetects a monorepo via an ancestor workspaces field', async t => {
-  mock('readJson', file => {
+  const readJson = file => {
     if (file === 'package.json') return { name: 'my-package', 'auto-changelog': { autodetectMonorepoDisabled: false } }
     if (file.endsWith('package.json')) return { workspaces: ['packages/*'] }
     return null
-  })
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.tagPrefix, 'my-package@')
-    t.equal(options.stripTagPrefix, true)
-  } finally {
-    unmock('readJson')
   }
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.tagPrefix, 'my-package@')
+  t.equal(options.stripTagPrefix, true)
 })
 
 test('getOptions: does not override an explicitly configured tag prefix', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false, tagPrefix: 'custom/' } }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.tagPrefix, 'custom/')
-    t.equal(options.stripTagPrefix, true)
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.tagPrefix, 'custom/')
+  t.equal(options.stripTagPrefix, true)
 })
 
 test('getOptions: does not autodetect when the package is not in a monorepo', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', 'auto-changelog': { autodetectMonorepoDisabled: false } }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.tagPrefix, '')
-    t.notOk(options.stripTagPrefix)
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.tagPrefix, '')
+  t.notOk(options.stripTagPrefix)
 })
 
 test('getOptions: does not autodetect a monorepo by default', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', repository: { directory: 'packages/my-package' } }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.autodetectMonorepoDisabled, true)
-    t.equal(options.tagPrefix, '')
-    t.notOk(options.stripTagPrefix)
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.autodetectMonorepoDisabled, true)
+  t.equal(options.tagPrefix, '')
+  t.notOk(options.stripTagPrefix)
 })
 
 test('getOptions: --no-autodetect-monorepo-disabled enables autodetection', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', repository: { directory: 'packages/my-package' } }
-    : null))
-  try {
-    const options = await getOptions(['', '', '--no-autodetect-monorepo-disabled'])
-    t.equal(options.autodetectMonorepoDisabled, false)
-    t.equal(options.tagPrefix, 'my-package@')
-    t.ok(options.stripTagPrefix)
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', '', '--no-autodetect-monorepo-disabled'], { readJson })
+  t.equal(options.autodetectMonorepoDisabled, false)
+  t.equal(options.tagPrefix, 'my-package@')
+  t.ok(options.stripTagPrefix)
 })
 
 test('getOptions: --autodetect-monorepo-disabled still disables autodetection', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false } }
-    : null))
-  try {
-    const options = await getOptions(['', '', '--autodetect-monorepo-disabled'])
-    t.equal(options.autodetectMonorepoDisabled, true)
-    t.equal(options.tagPrefix, '')
-    t.notOk(options.stripTagPrefix)
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', '', '--autodetect-monorepo-disabled'], { readJson })
+  t.equal(options.autodetectMonorepoDisabled, true)
+  t.equal(options.tagPrefix, '')
+  t.notOk(options.stripTagPrefix)
 })
 
 test('getOptions: neither flag leaves in-repo config in charge', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false } }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.autodetectMonorepoDisabled, false)
-    t.equal(options.tagPrefix, 'my-package@')
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.autodetectMonorepoDisabled, false)
+  t.equal(options.tagPrefix, 'my-package@')
 })
 
 test('run: generates a changelog', async t => {
-  setup()
-  try {
-    const expected = await readFile(join(__dirname, 'data', 'template-compact.md'))
+  const expected = await readFile(join(__dirname, 'data', 'template-compact.md'))
 
-    mock('writeFile', (output, log) => {
+  await run(['', ''], {
+    ...deps,
+    writeFile: (output, log) => {
       t.equal(output, 'CHANGELOG.md')
       t.equal(log, expected)
-    })
-
-    await run(['', ''])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test.skip('run: generates a changelog with no remote', async t => {
-  setup()
-  try {
-    const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'))
+  const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'))
 
-    mock('fetchRemote', () => remotes.null)
-    mock('fetchCommits', () => require('./data/commits-no-remote'))
-    mock('writeFile', (output, log) => {
+  await run(['', ''], {
+    ...deps,
+    fetchRemote: () => remotes.null,
+    fetchCommits: () => require('./data/commits-no-remote'),
+    writeFile: (output, log) => {
       t.equal(output, 'CHANGELOG.md')
       t.equal(log, expected)
-    })
-
-    await run(['', ''])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test('run: uses options from package.json', async t => {
-  setup()
-  try {
-    const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
+  const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
 
-    mock('fileExists', () => true)
-    mock('readJson', () => ({
+  await run(['', ''], {
+    ...deps,
+    fileExists: () => true,
+    readJson: () => ({
       'auto-changelog': {
         template: 'keepachangelog'
       }
-    }))
-    mock('writeFile', (output, log) => {
+    }),
+    writeFile: (output, log) => {
       t.equal(output, 'CHANGELOG.md')
       t.equal(log, expected)
-    })
-
-    await run(['', ''])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test.skip('run: uses version from package.json', async t => {
-  setup()
-  try {
-    mock('fileExists', () => true)
-    mock('readJson', () => ({
+  await run(['', '', '--package'], {
+    ...deps,
+    fileExists: () => true,
+    readJson: () => ({
       version: '2.0.0'
-    }))
-    mock('writeFile', (output, log) => {
+    }),
+    writeFile: (output, log) => {
       t.ok(log.includes('v2.0.0'))
-    })
-
-    await run(['', '', '--package'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test.skip('run: uses version from custom package file', async t => {
-  setup()
-  try {
-    mock('fileExists', () => true)
-    mock('readJson', file => {
+  await run(['', '', '--package', 'test.json'], {
+    ...deps,
+    fileExists: () => true,
+    readJson: file => {
       if (file === 'test.json') {
         return { version: '2.0.0' }
       }
       return {}
-    })
-    mock('writeFile', (output, log) => {
+    },
+    writeFile: (output, log) => {
       t.ok(log.includes('v2.0.0'))
-    })
-
-    await run(['', '', '--package', 'test.json'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test.skip('run: uses version from package.json with no prefix', async t => {
-  setup()
-  try {
-    mock('fileExists', () => true)
-    mock('readJson', () => ({
+  await run(['', '', '--package'], {
+    ...deps,
+    fileExists: () => true,
+    readJson: () => ({
       version: '2.0.0'
-    }))
-    mock('fetchTags', () => Promise.resolve(tags.map(tag => tag.replace('v', ''))))
-    mock('writeFile', (output, log) => {
+    }),
+    fetchTags: () => Promise.resolve(tags.map(tag => tag.replace('v', ''))),
+    writeFile: (output, log) => {
       t.ok(log.includes('2.0.0'))
       t.ok(!log.includes('v2.0.0'))
-    })
-
-    await run(['', '', '--package'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test('run: command line options override options from package.json', async t => {
-  setup()
-  try {
-    mock('fileExists', path => path === '.auto-changelog')
-    mock('readJson', () => ({
+  await run(['', '', '--output', 'should-be-this.md'], {
+    ...deps,
+    fileExists: path => path === '.auto-changelog',
+    readJson: () => ({
       'auto-changelog': {
         output: 'should-not-be-this.md'
       }
-    }))
-    mock('writeFile', (output, log) => {
+    }),
+    writeFile: (output, log) => {
       t.equal(output, 'should-be-this.md')
-    })
-
-    await run(['', '', '--output', 'should-be-this.md'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test('run: uses options from .auto-changelog', async t => {
-  setup()
-  try {
-    const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
-    mock('fileExists', path => path === '.auto-changelog')
-    mock('readJson', path => {
-      return path === '.auto-changelog' ? { template: 'keepachangelog' } : null
-    })
-    mock('writeFile', (output, log) => {
-      t.equal(log, expected)
-    })
+  const expected = await readFile(join(__dirname, 'data', 'template-keepachangelog.md'))
 
-    await run(['', ''])
-  } finally {
-    teardown()
-  }
+  await run(['', ''], {
+    ...deps,
+    fileExists: path => path === '.auto-changelog',
+    readJson: path => {
+      return path === '.auto-changelog' ? { template: 'keepachangelog' } : null
+    },
+    writeFile: (output, log) => {
+      t.equal(log, expected)
+    }
+  })
 })
 
 test('run: command line options override options from .auto-changelog', async t => {
-  setup()
-  try {
-    mock('fileExists', path => path === '.auto-changelog')
-    mock('readJson', (path) => {
+  await run(['', '', '--output', 'should-be-this.md'], {
+    ...deps,
+    fileExists: path => path === '.auto-changelog',
+    readJson: path => {
       return path === '.auto-changelog' ? { output: 'should-not-be-this.md' } : null
-    })
-    mock('writeFile', (output, log) => {
+    },
+    writeFile: (output, log) => {
       t.equal(output, 'should-be-this.md')
-    })
-
-    await run(['', '', '--output', 'should-be-this.md'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 const rejectsConfig = (label, config, fromPackage = false) => {
   test(`getOptions: refuses to run when in-repo config ${label}`, t => {
     const value = fromPackage ? { 'auto-changelog': config } : config
-    mock('readJson', file => ((fromPackage ? file === 'package.json' : file === '.auto-changelog') ? value : null))
-    return getOptions(['', ''])
+    const readJson = file => ((fromPackage ? file === 'package.json' : file === '.auto-changelog') ? value : null)
+    return getOptions(['', ''], { readJson })
       .then(() => t.fail('should refuse to run'))
       .catch(() => t.pass('refused'))
-      .finally(() => unmock('readJson'))
   })
 }
 
@@ -357,52 +264,36 @@ rejectsConfig('sets an appendGitLog with --output', { appendGitLog: '--output=..
 rejectsConfig('sets an appendGitTag with --output', { appendGitTag: '--first-parent --output ../pwned' })
 
 test('getOptions: keeps a non-URL template from in-repo config', async t => {
-  mock('readJson', file => (file === '.auto-changelog'
+  const readJson = file => (file === '.auto-changelog'
     ? { template: 'keepachangelog' }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.template, 'keepachangelog')
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.template, 'keepachangelog')
 })
 
 test('getOptions: keeps a normal remote from in-repo config', async t => {
-  mock('readJson', file => (file === '.auto-changelog'
+  const readJson = file => (file === '.auto-changelog'
     ? { remote: 'upstream' }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.remote, 'upstream')
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.remote, 'upstream')
 })
 
 test('getOptions: keeps an in-repo output path from in-repo config', async t => {
-  mock('readJson', file => (file === '.auto-changelog'
+  const readJson = file => (file === '.auto-changelog'
     ? { output: 'docs/HISTORY.md' }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.output, 'docs/HISTORY.md')
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.output, 'docs/HISTORY.md')
 })
 
 test('getOptions: honors a safe appendGitLog and appendGitTag from in-repo config', async t => {
-  mock('readJson', file => (file === '.auto-changelog'
+  const readJson = file => (file === '.auto-changelog'
     ? { appendGitLog: '--first-parent', appendGitTag: '--sort=-creatordate' }
-    : null))
-  try {
-    const options = await getOptions(['', ''])
-    t.equal(options.appendGitLog, '--first-parent')
-    t.equal(options.appendGitTag, '--sort=-creatordate')
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', ''], { readJson })
+  t.equal(options.appendGitLog, '--first-parent')
+  t.equal(options.appendGitTag, '--sort=-creatordate')
 })
 
 test('getOptions: honors handlebarsSetup from the command line', async t => {
@@ -416,127 +307,90 @@ test('getOptions: honors a URL template from the command line', async t => {
 })
 
 test('getOptions: --unsafe-config honors unsafe options from in-repo config', async t => {
-  mock('readJson', file => (file === 'package.json'
+  const readJson = file => (file === 'package.json'
     ? { 'auto-changelog': { handlebarsSetup: 'setup.js', appendGitLog: '--output=anywhere' } }
-    : null))
-  try {
-    const options = await getOptions(['', '', '--unsafe-config'])
-    t.equal(options.handlebarsSetup, 'setup.js')
-    t.equal(options.appendGitLog, '--output=anywhere')
-  } finally {
-    unmock('readJson')
-  }
+    : null)
+  const options = await getOptions(['', '', '--unsafe-config'], { readJson })
+  t.equal(options.handlebarsSetup, 'setup.js')
+  t.equal(options.appendGitLog, '--output=anywhere')
 })
 
 test('getOptions: honors plugins from the command line', async t => {
-  mock('importCwd', name => name)
-  try {
-    const options = await getOptions(['', '', '--plugins', 'foo'])
-    t.deepEqual(options.plugins, ['auto-changelog-foo'])
-  } finally {
-    unmock('importCwd')
-  }
+  const options = await getOptions(['', '', '--plugins', 'foo'], { importCwd: name => name })
+  t.deepEqual(options.plugins, ['auto-changelog-foo'])
 })
 
 test('getOptions: throws a useful error for --plugins with no names', async t => {
-  mock('importCwd', name => name)
   try {
-    await getOptions(['', '', '--plugins'])
+    await getOptions(['', '', '--plugins'], { importCwd: name => name })
     t.fail('should throw')
   } catch (error) {
     t.match(error.message, /--plugins requires at least one plugin name/)
-  } finally {
-    unmock('importCwd')
   }
 })
 
 test.skip('run: supports unreleased option', async t => {
-  setup()
-  try {
-    mock('writeFile', (output, log) => {
+  await run(['', '', '--unreleased'], {
+    ...deps,
+    writeFile: (output, log) => {
       t.ok(log.includes('Unreleased'))
       t.ok(log.includes('https://github.com/user/repo/compare/v1.0.0...HEAD'))
-    })
-    await run(['', '', '--unreleased'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test.skip('run: supports breakingPattern option', async t => {
-  setup()
-  try {
-    const { commitsMap } = require('./data/commits-map')
-    const addBreakingFlag = commit => {
-      if (/Some breaking change/.test(commit.message)) {
-        return { ...commit, breaking: true }
-      }
-      return commit
+  const { commitsMap } = require('./data/commits-map')
+  const addBreakingFlag = commit => {
+    if (/Some breaking change/.test(commit.message)) {
+      return { ...commit, breaking: true }
     }
-    mock('fetchCommits', diff => Promise.resolve(commitsMap[diff].map(addBreakingFlag)))
-    mock('writeFile', (output, log) => {
-      t.ok(log.includes('**Breaking change:** Some breaking change'))
-    })
-    // No need to actually pass in the option here as we amend the commits
-    await run(['', '', '--commit-limit', '0'])
-  } finally {
-    teardown()
+    return commit
   }
+  // No need to actually pass in the option here as we amend the commits
+  await run(['', '', '--commit-limit', '0'], {
+    ...deps,
+    fetchCommits: diff => Promise.resolve(commitsMap[diff].map(addBreakingFlag)),
+    writeFile: (output, log) => {
+      t.ok(log.includes('**Breaking change:** Some breaking change'))
+    }
+  })
 })
 
 test.skip('run: supports releaseSummary option', async t => {
-  setup()
-  try {
-    mock('writeFile', (output, log) => {
+  await run(['', '', '--release-summary'], {
+    ...deps,
+    writeFile: (output, log) => {
       t.ok(log.includes('This is my major release description.\n\n- And a bullet point'))
-    })
-    await run(['', '', '--release-summary'])
-  } finally {
-    teardown()
-  }
+    }
+  })
 })
 
 test('run: does not error when using latest version option', async t => {
-  setup()
-  try {
-    await run(['', '', '--latest-version', 'v3.0.0'])
-    t.pass('did not error')
-  } finally {
-    teardown()
-  }
+  await run(['', '', '--latest-version', 'v3.0.0'], deps)
+  t.pass('did not error')
 })
 
 // For some reason is preventing the fetchTags test from running…?`
 test.skip('run: does not error when using stdout option', async t => {
-  setup()
-  try {
-    await run(['', '', '--stdout'])
-    t.pass('did not error')
-  } finally {
-    teardown()
-  }
+  await run(['', '', '--stdout'], deps)
+  t.pass('did not error')
 })
 
 test('run: throws an error when no package found', t => {
-  setup()
-  return run(['', '', '--package'])
+  return run(['', '', '--package'], deps)
     .then(() => t.fail('Should throw an error'))
     .catch(() => t.pass('threw'))
-    .finally(teardown)
 })
 
 test('run: throws an error when no custom package found', t => {
-  setup()
-  return run(['', '', '--package', 'does-not-exist.json'])
+  return run(['', '', '--package', 'does-not-exist.json'], deps)
     .then(() => t.fail('Should throw an error'))
     .catch(() => t.pass('threw'))
-    .finally(teardown)
 })
 
 test('run: throws an error when no template found', t => {
-  setup()
-  return run(['', '', '--template', 'not-found'])
+  return run(['', '', '--template', 'not-found'], deps)
     .then(() => t.fail('Should throw an error'))
     .catch(() => t.pass('threw'))
-    .finally(teardown)
 })

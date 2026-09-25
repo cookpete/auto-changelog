@@ -1,7 +1,10 @@
 const parseRepoURL = require('parse-github-url')
 const cmd = require('./cmd')
 
-const fetchRemote = async options => {
+const DEPENDENCIES = { cmd }
+
+const fetchRemote = async (options, overrides) => {
+  const { cmd } = { ...DEPENDENCIES, ...overrides }
   const remoteURL = await cmd(`git config --get remote.${options.remote}.url`)
   return getRemote(remoteURL.trim(), options)
 }

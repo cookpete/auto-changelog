@@ -4,6 +4,10 @@ const cmd = require('./cmd')
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+// Every function reaching outside the process takes a trailing overrides object, so
+// callers - tests above all - can substitute a collaborator without patching the module.
+const DEPENDENCIES = { cmd, fs }
+
 const updateLog = (string, clearLine = true) => {
   if (clearLine) {
     readline.clearLine(process.stdout)
@@ -16,7 +20,8 @@ const formatBytes = (bytes) => {
   return `${Math.max(1, Math.round(bytes / 1024))} kB`
 }
 
-const getGitVersion = async () => {
+const getGitVersion = async (overrides) => {
+  const { cmd } = { ...DEPENDENCIES, ...overrides }
   const output = await cmd('git --version')
   const match = output.match(/\d+\.\d+\.\d+/)
   return match ? match[0] : null
@@ -60,29 +65,32 @@ const createCallback = (resolve, reject) => (err, data) => {
   else resolve(data)
 }
 
-const readFile = (path) => {
+const readFile = (path, overrides) => {
+  const { fs } = { ...DEPENDENCIES, ...overrides }
   return new Promise((resolve, reject) => {
     fs.readFile(path, 'utf-8', createCallback(resolve, reject))
   })
 }
 
-const writeFile = (path, data) => {
+const writeFile = (path, data, overrides) => {
+  const { fs } = { ...DEPENDENCIES, ...overrides }
   return new Promise((resolve, reject) => {
     fs.writeFile(path, data, createCallback(resolve, reject))
   })
 }
 
-const fileExists = (path) => {
+const fileExists = (path, overrides) => {
+  const { fs } = { ...DEPENDENCIES, ...overrides }
   return new Promise(resolve => {
     fs.access(path, err => resolve(!err))
   })
 }
 
-const readJson = async (path) => {
-  if (await fileExists(path) === false) {
+const readJson = async (path, overrides) => {
+  if (await fileExists(path, overrides) === false) {
     return null
   }
-  return JSON.parse(await readFile(path))
+  return JSON.parse(await readFile(path, overrides))
 }
 
 module.exports = {

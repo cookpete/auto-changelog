@@ -8,9 +8,7 @@ const {
   readFile,
   writeFile,
   fileExists,
-  readJson,
-  __Rewire__: mock,
-  __ResetDependency__: unmock
+  readJson
 } = require('../src/utils')
 
 test('updateLog: doesn\'t error', t => {
@@ -53,40 +51,29 @@ test('isLink: returns false for non-links', t => {
 })
 
 test('getGitVersion: returns git version', async t => {
-  mock('cmd', () => 'git version 2.15.2 (Apple Git-101.1)')
-  t.equal(await getGitVersion(), '2.15.2')
-  unmock('cmd')
+  t.equal(await getGitVersion({ cmd: () => 'git version 2.15.2 (Apple Git-101.1)' }), '2.15.2')
 })
 
 test('getGitVersion: returns null', async t => {
-  mock('cmd', () => 'some sort of random output')
-  t.equal(await getGitVersion(), null)
-  unmock('cmd')
+  t.equal(await getGitVersion({ cmd: () => 'some sort of random output' }), null)
 })
 
 test('readFile: reads file', async t => {
-  mock('fs', { readFile: (path, type, cb) => cb(null, 'abc') })
-  t.equal(await readFile(), 'abc')
-  unmock('fs')
+  t.equal(await readFile(null, { fs: { readFile: (path, type, cb) => cb(null, 'abc') } }), 'abc')
 })
 
 test('writeFile: reads file', async t => {
-  mock('fs', { writeFile: (path, data, cb) => cb(null, 'abc') })
-  t.equal(await writeFile(), 'abc')
-  unmock('fs')
+  t.equal(await writeFile(null, null, { fs: { writeFile: (path, data, cb) => cb(null, 'abc') } }), 'abc')
 })
 
 test('fileExists: reads file', async t => {
-  mock('fs', { access: (path, cb) => cb(null) })
-  t.equal(await fileExists(), true)
-  unmock('fs')
+  t.equal(await fileExists(null, { fs: { access: (path, cb) => cb(null) } }), true)
 })
 
 test('readJson: reads file', async t => {
-  mock('fs', {
+  const fs = {
     readFile: (path, type, cb) => cb(null, '{"abc":123}'),
     access: (path, cb) => cb(null)
-  })
-  t.deepEqual(await readJson(), { abc: 123 })
-  unmock('fs')
+  }
+  t.deepEqual(await readJson(null, { fs }), { abc: 123 })
 })

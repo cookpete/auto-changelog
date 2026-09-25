@@ -4,7 +4,10 @@ const { fetchCommits } = require('./commits')
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
 
-const parseReleases = async (tags, options, onParsed) => {
+const DEPENDENCIES = { fetchCommits }
+
+const parseReleases = async (tags, options, onParsed, overrides) => {
+  const { fetchCommits } = { ...DEPENDENCIES, ...overrides }
   const releases = await Promise.all(tags.map(async tag => {
     const commits = await fetchCommits(tag.diff, options)
     const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
