@@ -3,12 +3,9 @@
     "include": "src",
     "exclude": "src/index.js",
     "sourceMap": false,
-    "instrument": false,
+    "instrument": true,
     "report-dir": "./coverage",
     "temp-dir": "./coverage/.nyc_output",
-    "require": [
-        "@babel/register"
-    ],
     "reporter": [
         "text",
         "lcov"
