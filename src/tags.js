@@ -1,5 +1,6 @@
 const semver = require('semver')
-const { cmd, niceDate } = require('./utils')
+const cmd = require('./cmd')
+const { niceDate } = require('./utils')
 
 const DIVIDER = '---'
 const MATCH_V = /^v\d/

@@ -1,6 +1,6 @@
 const readline = require('readline')
 const fs = require('fs')
-const { spawn } = require('child_process')
+const cmd = require('./cmd')
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
@@ -14,24 +14,6 @@ const updateLog = (string, clearLine = true) => {
 
 const formatBytes = (bytes) => {
   return `${Math.max(1, Math.round(bytes / 1024))} kB`
-}
-
-// Simple util for calling a child process
-const cmd = (string, onProgress) => {
-  const [cmd, ...args] = string.trim().split(' ')
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args)
-    let data = ''
-
-    child.stdout.on('data', buffer => {
-      data += buffer.toString()
-      if (onProgress) {
-        onProgress(data.length)
-      }
-    })
-    child.stdout.on('end', () => resolve(data))
-    child.on('error', reject)
-  })
 }
 
 const getGitVersion = async () => {

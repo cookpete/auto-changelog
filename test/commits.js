@@ -4,18 +4,17 @@ const { readFile } = require('../src/utils')
 const remotes = require('./data/remotes')
 const commits = require('./data/commits')
 const commitsNoRemote = require('./data/commits-no-remote')
+const { parseCommits, getFixes, getMerge, getSubject } = require('../src/parse-commits')
 const {
   fetchCommits,
-  __get__,
   __Rewire__: mock,
   __ResetDependency__: unmock
 } = require('../src/commits')
-
-const parseCommits = __get__('parseCommits')
-const getFixes = __get__('getFixes')
-const getMerge = __get__('getMerge')
-const getSubject = __get__('getSubject')
-const getLogFormat = __get__('getLogFormat')
+const getLogFormat = require('../src/log-format')
+const {
+  __Rewire__: mockLogFormat,
+  __ResetDependency__: unmockLogFormat
+} = getLogFormat
 
 test('fetchCommits: fetches commits', async t => {
   const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'))
@@ -335,19 +334,19 @@ test('getSubject: returns no commit message', t => {
 })
 
 test('getLogFormat: returns modern format', async t => {
-  mock('getGitVersion', () => Promise.resolve('1.7.2'))
+  mockLogFormat('getGitVersion', () => Promise.resolve('1.7.2'))
   t.equal(await getLogFormat(), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
-  unmock('getGitVersion')
+  unmockLogFormat('getGitVersion')
 })
 
 test('getLogFormat: returns fallback format', async t => {
-  mock('getGitVersion', () => Promise.resolve('1.7.1'))
+  mockLogFormat('getGitVersion', () => Promise.resolve('1.7.1'))
   t.equal(await getLogFormat(), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
-  unmock('getGitVersion')
+  unmockLogFormat('getGitVersion')
 })
 
 test('getLogFormat: returns fallback format when null', async t => {
-  mock('getGitVersion', () => Promise.resolve(null))
+  mockLogFormat('getGitVersion', () => Promise.resolve(null))
   t.equal(await getLogFormat(), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__')
-  unmock('getGitVersion')
+  unmockLogFormat('getGitVersion')
 })

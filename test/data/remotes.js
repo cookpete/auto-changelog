@@ -1,5 +1,4 @@
-const { __get__ } = require('../../src/remote')
-const getRemote = __get__('getRemote')
+const { getRemote } = require('../../src/remote')
 
 module.exports = {
   null: getRemote(null),

@@ -6,12 +6,20 @@ const releases = require('./data/releases')
 const { tags } = require('./data/commits-map')
 const {
   run,
-  __get__,
-  __Rewire__: mock,
-  __ResetDependency__: unmock
+  __Rewire__: mockRun,
+  __ResetDependency__: unmockRun
 } = require('../src/run')
+const getOptions = require('../src/options')
+const {
+  __Rewire__: mockOptions,
+  __ResetDependency__: unmockOptions
+} = getOptions
 
-const getOptions = __get__('getOptions')
+// `getOptions` moved to its own module, so a name is mocked on whichever module
+// owns it; everything else in this file still reaches `run.js`.
+const OPTIONS_NAMES = ['fetchRemote', 'readJson', 'fileExists', 'importCwd']
+const mock = (name, value) => (OPTIONS_NAMES.includes(name) ? mockOptions : mockRun)(name, value)
+const unmock = name => (OPTIONS_NAMES.includes(name) ? unmockOptions : unmockRun)(name)
 
 function setup () {
   mock('fileExists', () => false)
