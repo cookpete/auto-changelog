@@ -6,6 +6,30 @@
   "bin": {
     "auto-changelog": "./src/index.js"
   },
+  "exports": {
+    ".": "./src/index.js",
+    "./": "./src/index.js",
+    "./package": "./package.json",
+    "./package.json": "./package.json",
+    "./src": "./src/index.js",
+    "./src/": "./src/index.js",
+    "./src/commits": "./src/commits.js",
+    "./src/commits.js": "./src/commits.js",
+    "./src/index": "./src/index.js",
+    "./src/index.js": "./src/index.js",
+    "./src/releases": "./src/releases.js",
+    "./src/releases.js": "./src/releases.js",
+    "./src/remote": "./src/remote.js",
+    "./src/remote.js": "./src/remote.js",
+    "./src/run": "./src/run.js",
+    "./src/run.js": "./src/run.js",
+    "./src/tags": "./src/tags.js",
+    "./src/tags.js": "./src/tags.js",
+    "./src/template": "./src/template.js",
+    "./src/template.js": "./src/template.js",
+    "./src/utils": "./src/utils.js",
+    "./src/utils.js": "./src/utils.js"
+  },
   "engines": {
     "node": ">= 10"
   },
