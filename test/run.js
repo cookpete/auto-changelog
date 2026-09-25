@@ -394,3 +394,48 @@ test('run: throws an error when no template found', t => {
     .then(() => t.fail('Should throw an error'))
     .catch(() => t.pass('threw'))
 })
+
+// `help()` reports `--help`/`--version` through `console.log`, which is also how tape emits TAP,
+// so the capture has to be restored before any assertion or its result line is swallowed.
+const captureLog = t => {
+  const capture = t.capture(console, 'log')
+  return () => {
+    capture.restore?.()
+    return capture().map(call => call.args.join(' '))
+  }
+}
+
+test('getOptions: --help prints usage and parses no options', async t => {
+  const { exitCode } = process
+  const logs = captureLog(t)
+  const options = await getOptions(['', '', '--help'], deps)
+  const printed = logs()
+  process.exitCode = exitCode
+  t.equal(options, null, 'returns null so the caller stops')
+  t.ok(printed.join('\n').includes('Usage: auto-changelog'), 'prints the usage text')
+})
+
+test('getOptions: --version prints the bare version', async t => {
+  const { exitCode } = process
+  const logs = captureLog(t)
+  const options = await getOptions(['', '', '--version'], deps)
+  const printed = logs()
+  process.exitCode = exitCode
+  t.equal(options, null, 'returns null so the caller stops')
+  t.deepEqual(printed, [require('../package.json').version], 'prints the version with no `v` prefix')
+})
+
+test('run: does nothing when --help was handled', async t => {
+  const { exitCode } = process
+  const logs = captureLog(t)
+  const explode = name => () => t.fail(`${name} should not run`)
+  await run(['', '', '--help'], {
+    ...deps,
+    fetchTags: explode('fetchTags'),
+    parseReleases: explode('parseReleases'),
+    writeFile: explode('writeFile')
+  })
+  logs()
+  process.exitCode = exitCode
+  t.pass('returned without fetching or writing anything')
+})
