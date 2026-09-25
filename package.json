@@ -17,9 +17,7 @@
     "pretest": "npm run lint",
     "test": "npm run tests-only",
     "posttest": "npx npm@\">= 10.2\" audit --production",
-    "tests-only": "cross-env NODE_ENV=test tape -r @babel/register 'test/*.js'",
-    "test-coverage": "cross-env NODE_ENV=test nyc tape -r @babel/register 'test/*.js'",
-    "report-coverage": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
+    "tests-only": "cross-env NODE_ENV=test nyc tape -r @babel/register 'test/*.js'",
     "preversion": "npm run lint && npm run test",
     "version": "node src/index.js --package && git add CHANGELOG.md"
   },
@@ -57,7 +55,6 @@
     "@babel/register": "^7.29.7",
     "babel-plugin-istanbul": "^6.1.1",
     "babel-plugin-rewire": "^1.2.0",
-    "codecov": "^3.8.3",
     "cross-env": "^7.0.3",
     "markdownlint-cli": "^0.48.0",
     "npmignore": "^0.3.5",
