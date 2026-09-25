@@ -90,8 +90,6 @@ Install `auto-changelog` to dev dependencies:
 
 ```bash
 npm install auto-changelog --save-dev
-# or
-yarn add auto-changelog --dev
 ```
 
 Add `auto-changelog -p && git add CHANGELOG.md` to the `version` scripts in your `package.json`:
