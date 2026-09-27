@@ -23,6 +23,9 @@ const DEPENDENCIES = {
 async function run (argv, overrides) {
   const { fetchTags, parseReleases } = { ...DEPENDENCIES, ...overrides }
   const options = await getOptions(argv, overrides)
+  if (!options) {
+    return
+  }
   const log = string => options.stdout ? null : updateLog(string)
   log('Fetching tags…')
   const tags = await fetchTags(options)

@@ -68,9 +68,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "commander": "^7.2.0",
     "handlebars": "^4.7.9",
     "import-cwd": "^3.0.0",
+    "pargs": "^1.6.0",
     "parse-github-url": "^1.0.4",
     "semver": "^7.8.5"
   },
