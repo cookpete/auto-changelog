@@ -83,6 +83,9 @@
     "tape": "^5.10.2"
   },
   "standard": {
+    "globals": [
+      "fetch"
+    ],
     "ignore": [
       "test/data/"
     ]

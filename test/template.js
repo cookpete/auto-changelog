@@ -1,4 +1,5 @@
 const test = require('tape')
+const { createServer } = require('http')
 const { join } = require('path')
 const { readFile } = require('../src/utils')
 const releases = require('./data/releases')
@@ -25,10 +26,17 @@ test('compileTemplate: compiles using path to template file', async t => {
   t.equal(await compileTemplate(releases, { template: path }), expected)
 })
 
-test('compileTemplate: compiles using url path', { timeout: 10000 }, async t => {
-  const path = 'https://raw.githubusercontent.com/CookPete/auto-changelog/master/templates/compact.hbs'
+test('compileTemplate: compiles using url path', async t => {
+  const template = await readFile(join(__dirname, '..', 'templates', 'compact.hbs'))
   const expected = await readFile(join(__dirname, 'data', 'template-compact.md'))
-  t.equal(await compileTemplate(releases, { template: path }), expected)
+  const server = createServer((request, response) => response.end(template))
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  try {
+    const { port } = server.address()
+    t.equal(await compileTemplate(releases, { template: `http://127.0.0.1:${port}/compact.hbs` }), expected)
+  } finally {
+    server.close()
+  }
 })
 
 test('compileTemplate: throws an error when no template found', t => {

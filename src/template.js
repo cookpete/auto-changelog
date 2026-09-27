@@ -1,24 +1,10 @@
 const { join } = require('path')
-const { get } = require('https')
 const Handlebars = require('handlebars')
 const { readFile, fileExists, isURL } = require('./utils')
 
-function fetchText (url) {
-  return new Promise((resolve, reject) => {
-    get(url, (response) => {
-      let data = ''
-
-      // Continuously update stream with data
-      response.on('data', (chunk) => {
-        data += chunk
-      })
-
-      // Resolve once the response is complete
-      response.on('end', () => {
-        resolve(data)
-      })
-    }).on('error', reject)
-  })
+async function fetchText (url) {
+  const response = await fetch(url)
+  return response.text()
 }
 
 const TEMPLATES_DIR = join(__dirname, '..', 'templates')
