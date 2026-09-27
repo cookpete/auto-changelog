@@ -49,12 +49,10 @@ const hasTraversal = path => isAbsolute(path) || /(^|[\\/])\.\.([\\/]|$)/.test(p
 const hasOutputArg = value => value.split(/\s+/).some(token => /^--output(=|$)/.test(token))
 
 function assertRepoConfigSafe (config) {
-  const unsafe = []
-  for (const key of CODE_LOADING_OPTIONS) {
-    if (key in config) {
-      unsafe.push(`"${key}" loads code`)
-    }
-  }
+  const unsafe = CODE_LOADING_OPTIONS
+    .filter(x => x in config)
+    .map(key => `"${key}" loads code`)
+
   if (typeof config.template === 'string' && isURL(config.template)) {
     unsafe.push('"template" is a URL (makes a network request)')
   }
