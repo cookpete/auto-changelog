@@ -187,7 +187,6 @@ async function getOptions(argv, overrides) {
 			'latest-version': {
 				type: 'string',
 				placeholder: 'version',
-				short: 'v',
 				description: 'use specified version as latest release',
 			},
 			unreleased: {

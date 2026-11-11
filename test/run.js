@@ -69,6 +69,10 @@ test('getOptions: -i is not a short flag for --issue-url', async (t) => {
 	t.match(await rejectedWith(t, ['-i', 'https://test.issue.local/issues/{id}']), /Unknown option '-i'/);
 });
 
+test('getOptions: -v is not a short flag for --latest-version', async (t) => {
+	t.match(await rejectedWith(t, ['-v', '1.2.3']), /Unknown option '-v'/);
+});
+
 test('getOptions: autodetects a monorepo via repository.directory and derives the tag prefix', async (t) => {
 	function readJson(file) {
 		return file === 'package.json'

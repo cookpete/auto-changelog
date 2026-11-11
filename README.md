@@ -26,7 +26,7 @@ Options:
   -t, --template [template]           # specify template to use [compact, keepachangelog, json] (default: compact)
   -r, --remote [remote]               # specify git remote to use for links (default: origin)
   -p, --package                       # use version from package.json as latest release
-  -v, --latest-version [version]      # use specified version as latest release
+      --latest-version [version]      # use specified version as latest release
       --hide-credit                   # hide auto-changelog credit
       --handlebars-setup [file]       # handlebars setup file
       --prepend                       # prepend changelog to output file
