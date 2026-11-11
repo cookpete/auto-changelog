@@ -140,7 +140,7 @@ async function getOptions (argv, overrides) {
       'append-git-tag': { group: 'Releases', type: 'string', placeholder: 'string', description: 'string to append to git tag command' },
       prepend: { type: 'boolean', description: 'prepend changelog to output file' },
       stdout: { type: 'boolean', description: 'output changelog to stdout' },
-      plugins: { type: 'string', placeholder: 'name', variadic: true, optionalValue: true, description: 'use plugins to augment commit/merge/release information' },
+      plugins: { type: 'string', placeholder: 'name', multiple: true, optionalValue: true, description: 'use plugins to augment commit/merge/release information' },
       'unsafe-config': { type: 'boolean', description: 'trust in-repo config completely, honoring options that can load code, run git commands, or make network requests; do not use with untrusted repositories' }
     },
     // the binary and the entrypoint, as `process.argv` carries them

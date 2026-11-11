@@ -473,6 +473,15 @@ test('getOptions: --append-git-tag rejects a dash-leading value given separately
   t.match(await rejectedWith(t, ['--append-git-tag', '--merged']), /Option '--append-git-tag' argument is ambiguous/)
 })
 
+test('getOptions: honors repeated --plugins', async t => {
+  const options = await getOptions(['', '', '--plugins', 'foo', '--plugins=bar'], { importCwd: name => name })
+  t.deepEqual(options.plugins, ['auto-changelog-foo', 'auto-changelog-bar'])
+})
+
+test('getOptions: --plugins takes one name per flag', async t => {
+  t.match(await rejectedWith(t, ['--plugins', 'foo', 'bar']), /Unexpected argument 'bar'/)
+})
+
 test('run: does nothing when --help was handled', async t => {
   const { exitCode } = process
   const logs = captureLog(t)
