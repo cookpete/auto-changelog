@@ -27,18 +27,18 @@ Options:
   -r, --remote [remote]               # specify git remote to use for links (default: origin)
   -p, --package                       # use version from package.json as latest release
   -v, --latest-version [version]      # use specified version as latest release
+      --hide-credit                   # hide auto-changelog credit
+      --handlebars-setup [file]       # handlebars setup file
+      --prepend                       # prepend changelog to output file
+      --stdout                        # output changelog to stdout
+      --plugins [...name]             # use plugins to augment commit/merge/release information
+      --unsafe-config                 # trust unsafe options from in-repo config (see Security)
+  -V, --version                       # output the version number
+  -h, --help                          # output usage information
+
+Releases:
+
   -u, --unreleased                    # include section for unreleased changes
-  -l, --commit-limit [count]          # number of commits to display per release (default: 3)
-  -b, --backfill-limit [count]        # number of commits to backfill empty releases with (default: 3)
-      --commit-url [url]              # override url for commits, use {id} for commit id
-      --issue-url [url]               # override url for issues, use {id} for issue id
-      --merge-url [url]               # override url for merges, use {id} for merge id
-      --compare-url [url]             # override url for compares, use {from} and {to} for tags
-      --issue-pattern [regex]         # override regex pattern for issues in commit messages
-      --breaking-pattern [regex]      # regex pattern for breaking change commits
-      --merge-pattern [regex]         # add custom regex pattern for merge commits
-      --commit-pattern [regex]        # pattern to include when parsing commits
-      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
       --autodetect-monorepo-disabled  # disable monorepo autodetection, default: true (will default to false in the next major)
@@ -46,20 +46,29 @@ Options:
       --starting-version [tag]        # specify earliest version to include in changelog
       --starting-date [yyyy-mm-dd]    # specify earliest date to include in changelog
       --ending-version [tag]          # specify latest version to include in changelog
-      --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc] (default: relevance)
       --release-summary               # display tagged commit message body as release summary
       --unreleased-only               # only output unreleased changes
       --hide-empty-releases           # hide empty releases
-      --hide-credit                   # hide auto-changelog credit
-      --handlebars-setup [file]       # handlebars setup file
-      --append-git-log [string]       # string to append to git log command
       --append-git-tag [string]       # string to append to git tag command
-      --prepend                       # prepend changelog to output file
-      --stdout                        # output changelog to stdout
-      --plugins [...name]             # use plugins to augment commit/merge/release information
-      --unsafe-config                 # trust unsafe options from in-repo config (see Security)
-  -V, --version                       # output the version number
-  -h, --help                          # output usage information
+
+Commits:
+
+  -l, --commit-limit [count]          # number of commits to display per release (default: 3)
+  -b, --backfill-limit [count]        # number of commits to backfill empty releases with (default: 3)
+      --issue-pattern [regex]         # override regex pattern for issues in commit messages
+      --breaking-pattern [regex]      # regex pattern for breaking change commits
+      --merge-pattern [regex]         # add custom regex pattern for merge commits
+      --commit-pattern [regex]        # pattern to include when parsing commits
+      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
+      --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc] (default: relevance)
+      --append-git-log [string]       # string to append to git log command
+
+Links:
+
+      --commit-url [url]              # override url for commits, use {id} for commit id
+      --issue-url [url]               # override url for issues, use {id} for issue id
+      --merge-url [url]               # override url for merges, use {id} for merge id
+      --compare-url [url]             # override url for compares, use {from} and {to} for tags
 
 
 # Write log to CHANGELOG.md in current directory
