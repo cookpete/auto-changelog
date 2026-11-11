@@ -65,9 +65,8 @@ test('getOptions: parses --issue-url correctly when given --issue-url', async (t
 	t.equal(options.issueUrl, 'https://test.issue.local/issues/{id}');
 });
 
-test('getOptions: parses -i correctly when given -i', async (t) => {
-	const options = await getOptions(['', '', '-i', 'https://test.issue.local/issues/{id}']);
-	t.equal(options.issueUrl, 'https://test.issue.local/issues/{id}');
+test('getOptions: -i is not a short flag for --issue-url', async (t) => {
+	t.match(await rejectedWith(t, ['-i', 'https://test.issue.local/issues/{id}']), /Unknown option '-i'/);
 });
 
 test('getOptions: autodetects a monorepo via repository.directory and derives the tag prefix', async (t) => {

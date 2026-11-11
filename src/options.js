@@ -220,12 +220,10 @@ async function getOptions(argv, overrides) {
 				placeholder: 'url',
 				description: 'override url for commits, use {id} for commit id',
 			},
-			// -i kept for back compatibility
 			'issue-url': {
 				group: 'Links',
 				type: 'string',
 				placeholder: 'url',
-				short: 'i',
 				description: 'override url for issues, use {id} for issue id',
 			},
 			'merge-url': {
