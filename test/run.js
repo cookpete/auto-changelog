@@ -27,6 +27,11 @@ test('getOptions: --commit-limit and --backfill-limit take only an integer', asy
   t.match(await rejectedWith(t, ['--commit-limit', '1.5']), /Invalid integer value for option "commit-limit"/)
 })
 
+test('getOptions: --commit-limit and --backfill-limit reject an empty value', async t => {
+  t.match(await rejectedWith(t, ['--commit-limit=']), /Invalid integer value for option "commit-limit"/)
+  t.match(await rejectedWith(t, ['--backfill-limit', ' ']), /Invalid integer value for option "backfill-limit"/)
+})
+
 test('getOptions: parses --issue-url correctly when given --issue-url', async t => {
   const options = await getOptions(['', '', '--issue-url', 'https://test.issue.local/issues/{id}'])
   t.equal(options.issueUrl, 'https://test.issue.local/issues/{id}')
