@@ -1,0 +1,110 @@
+import nodeConfig from '@ljharb/eslint-config/flat/node/22';
+
+export default [
+	{
+		ignores: [
+			'coverage/',
+			'test/data/',
+		],
+	},
+	...nodeConfig,
+	{
+		files: ['**/*.js'],
+		rules: {
+			'array-bracket-newline': 'off',
+			'arrow-body-style': 'off',
+			'arrow-parens': 'off',
+			'comma-dangle': [
+				'error',
+				{
+					arrays: 'never',
+					exports: 'never',
+					functions: 'never',
+					imports: 'never',
+					objects: 'never',
+				},
+			],
+			'consistent-return': 'off',
+			curly: ['error', 'multi-line'],
+			'default-param-last': 'off',
+			'func-style': 'off',
+			'function-paren-newline': 'off',
+			'global-require': 'off',
+			'id-length': 'off',
+			indent: [
+				'error',
+				2,
+				{
+					ArrayExpression: 1,
+					CallExpression: { arguments: 1 },
+					flatTernaryExpressions: false,
+					FunctionDeclaration: { body: 1, parameters: 1 },
+					FunctionExpression: { body: 1, parameters: 1 },
+					ignoreComments: false,
+					ignoredNodes: ['TemplateLiteral *'],
+					ImportDeclaration: 1,
+					MemberExpression: 1,
+					ObjectExpression: 1,
+					offsetTernaryExpressions: true,
+					outerIIFEBody: 1,
+					SwitchCase: 1,
+					VariableDeclarator: 1,
+				},
+			],
+			'max-len': 'off',
+			'max-lines-per-function': 'off',
+			'max-params': 'off',
+			'multiline-comment-style': 'off',
+			'no-await-in-loop': 'off',
+			'no-confusing-arrow': 'off',
+			'no-param-reassign': 'off',
+			'no-promise-executor-return': 'off',
+			'no-return-await': 'off',
+			'no-shadow': 'off',
+			'no-unused-vars': [
+				'error',
+				{
+					args: 'none',
+					caughtErrors: 'none',
+					ignoreRestSiblings: true,
+					vars: 'all',
+				},
+			],
+			'no-use-before-define': [
+				'error',
+				{
+					classes: false,
+					functions: false,
+					variables: false,
+				},
+			],
+			'object-curly-newline': [
+				'error',
+				{
+					consistent: true,
+					multiline: true,
+				},
+			],
+			'object-shorthand': 'off',
+			'operator-linebreak': [
+				'error',
+				'after',
+				{
+					overrides: {
+						':': 'before',
+						'?': 'before',
+						'|>': 'before',
+					},
+				},
+			],
+			'prefer-named-capture-group': 'off',
+			'prefer-template': 'off',
+			radix: 'off',
+			semi: ['error', 'never'],
+			'sort-keys': 'off',
+			'space-before-function-paren': ['error', 'always'],
+			strict: 'off',
+			'wrap-regex': 'off',
+		},
+	},
+];

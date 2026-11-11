@@ -16,7 +16,7 @@ node src/index.js
 
 ## Linting
 
-This project uses [standard](https://github.com/feross/standard) code style. Be sure to lint the code after making changes and fix any issues that come up.
+This project uses [eslint](https://eslint.org) with [`@ljharb/eslint-config`](https://github.com/ljharb/eslint-config), configured in `eslint.config.mjs`. Be sure to lint the code after making changes and fix any issues that come up.
 
 ```bash
 npm run lint
