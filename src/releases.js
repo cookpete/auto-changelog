@@ -1,114 +1,124 @@
-const semver = require('semver')
-const { fetchCommits } = require('./commits')
+'use strict';
 
-const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/
-const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/
+const semver = require('semver');
+const { fetchCommits } = require('./commits');
 
-const DEPENDENCIES = { fetchCommits }
+const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/;
+const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/;
 
-const parseReleases = async (tags, options, onParsed, overrides) => {
-	const { fetchCommits } = { ...DEPENDENCIES, ...overrides }
-	const releases = await Promise.all(tags.map(async tag => {
-		const commits = await fetchCommits(tag.diff, options)
-		const merges = commits.filter(commit => commit.merge).map(commit => commit.merge)
-		const fixes = commits.filter(commit => commit.fixes).map(commit => ({ fixes: commit.fixes, commit }))
+const DEPENDENCIES = { fetchCommits };
+
+async function parseReleases(tags, options, onParsed, overrides) {
+	const { fetchCommits } = { ...DEPENDENCIES, ...overrides };
+	const releases = await Promise.all(tags.map(async (tag) => {
+		const commits = await fetchCommits(tag.diff, options);
+		const merges = commits.filter((commit) => commit.merge).map((commit) => commit.merge);
+		const fixes = commits.filter((commit) => commit.fixes).map((commit) => ({ fixes: commit.fixes, commit }));
 
 		for (const plugin of options.plugins || []) {
-			if (plugin.processCommits) await plugin.processCommits(commits)
-			if (plugin.processMerges) await plugin.processMerges(merges)
-			if (plugin.processFixes) await plugin.processFixes(fixes)
+			if (plugin.processCommits) { await plugin.processCommits(commits); }
+			if (plugin.processMerges) { await plugin.processMerges(merges); }
+			if (plugin.processFixes) { await plugin.processFixes(fixes); }
 		}
 
-		const emptyRelease = merges.length === 0 && fixes.length === 0
-		const { message } = commits[0] || { message: null }
-		const breakingCount = commits.filter(c => c.breaking).length
+		const emptyRelease = merges.length === 0 && fixes.length === 0;
+		const { message } = commits[0] || { message: null };
+		const breakingCount = commits.filter((c) => c.breaking).length;
 		const filteredCommits = commits
 			.filter(filterCommits(merges))
 			.sort(sortCommits(options))
-			.slice(0, getCommitLimit(options, emptyRelease, breakingCount))
+			.slice(0, getCommitLimit(options, emptyRelease, breakingCount));
 
-		if (onParsed) onParsed(tag)
+		if (onParsed) { onParsed(tag); }
 
 		return {
 			...tag,
 			summary: getSummary(message, options),
 			commits: filteredCommits,
 			merges,
-			fixes
-		}
-	}))
+			fixes,
+		};
+	}));
 
 	for (const plugin of options.plugins || []) {
-		if (plugin.processReleases) await plugin.processReleases(releases)
+		if (plugin.processReleases) { await plugin.processReleases(releases); }
 	}
 
-	return releases.filter(filterReleases(options))
+	return releases.filter(filterReleases(options));
 }
 
-const filterCommits = merges => commit => {
-	if (commit.fixes || commit.merge) {
-		// Filter out commits that already appear in fix or merge lists
-		return false
-	}
-	if (commit.breaking) {
-		return true
-	}
-	if (semver.valid(commit.subject)) {
-		// Filter out version commits
-		return false
-	}
-	if (MERGE_COMMIT_PATTERN.test(commit.subject)) {
-		// Filter out merge commits
-		return false
-	}
-	if (merges.findIndex(m => m.message === commit.subject) !== -1) {
-		// Filter out commits with the same message as an existing merge
-		return false
-	}
-	return true
+function filterCommits(merges) {
+	return (commit) => {
+		if (commit.fixes || commit.merge) {
+			// Filter out commits that already appear in fix or merge lists
+			return false;
+		}
+		if (commit.breaking) {
+			return true;
+		}
+		if (semver.valid(commit.subject)) {
+			// Filter out version commits
+			return false;
+		}
+		if (MERGE_COMMIT_PATTERN.test(commit.subject)) {
+			// Filter out merge commits
+			return false;
+		}
+		if (merges.findIndex((m) => m.message === commit.subject) !== -1) {
+			// Filter out commits with the same message as an existing merge
+			return false;
+		}
+		return true;
+	};
 }
 
-const getRelevance = ({ insertions = 0, deletions = 0 }) => insertions + deletions
-
-const sortCommits = ({ sortCommits }) => (a, b) => {
-	if (!a.breaking && b.breaking) return 1
-	if (a.breaking && !b.breaking) return -1
-	if (sortCommits === 'date') return new Date(a.date) - new Date(b.date)
-	if (sortCommits === 'date-desc') return new Date(b.date) - new Date(a.date)
-	if (sortCommits === 'subject') return a.subject.localeCompare(b.subject)
-	if (sortCommits === 'subject-desc') return b.subject.localeCompare(a.subject)
-	return getRelevance(b) - getRelevance(a)
+function getRelevance({ insertions = 0, deletions = 0 }) {
+	return insertions + deletions;
 }
 
-const getCommitLimit = ({ commitLimit, backfillLimit }, emptyRelease, breakingCount) => {
-	const limit = emptyRelease ? backfillLimit : commitLimit
+function sortCommits({ sortCommits }) {
+	return (a, b) => {
+		if (!a.breaking && b.breaking) { return 1; }
+		if (a.breaking && !b.breaking) { return -1; }
+		if (sortCommits === 'date') { return new Date(a.date) - new Date(b.date); }
+		if (sortCommits === 'date-desc') { return new Date(b.date) - new Date(a.date); }
+		if (sortCommits === 'subject') { return a.subject.localeCompare(b.subject); }
+		if (sortCommits === 'subject-desc') { return b.subject.localeCompare(a.subject); }
+		return getRelevance(b) - getRelevance(a);
+	};
+}
+
+function getCommitLimit({ commitLimit, backfillLimit }, emptyRelease, breakingCount) {
+	const limit = emptyRelease ? backfillLimit : commitLimit;
 	if (commitLimit === false || limit === false) {
-		return undefined // Return all commits
+		return undefined; // Return all commits
 	}
-	return Math.max(breakingCount, limit)
+	return Math.max(breakingCount, limit);
 }
 
-const getSummary = (message, { releaseSummary }) => {
+function getSummary(message, { releaseSummary }) {
 	if (!message || !releaseSummary) {
-		return null
+		return null;
 	}
 	if (COMMIT_MESSAGE_PATTERN.test(message)) {
-		return message.match(COMMIT_MESSAGE_PATTERN)[1]
+		return message.match(COMMIT_MESSAGE_PATTERN)[1];
 	}
-	return null
+	return null;
 }
 
-const filterReleases = options => ({
-	merges,
-	fixes,
-	commits
-}) => {
-	if (options.hideEmptyReleases && (merges.length + fixes.length + commits.length) === 0) {
-		return false
-	}
-	return true
+function filterReleases(options) {
+	return ({
+		merges,
+		fixes,
+		commits,
+	}) => {
+		if (options.hideEmptyReleases && (merges.length + fixes.length + commits.length) === 0) {
+			return false;
+		}
+		return true;
+	};
 }
 
 module.exports = {
-	parseReleases
-}
+	parseReleases,
+};

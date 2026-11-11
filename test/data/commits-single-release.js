@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = [
   {
     "hash": "77bb243170408cd18e70ca05bf8b3ca7646ea437",

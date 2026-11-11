@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = [
   {
     "tag": "v1.0.0",

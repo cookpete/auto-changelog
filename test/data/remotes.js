@@ -1,3 +1,5 @@
+'use strict'
+
 const { getRemote } = require('../../src/remote')
 
 module.exports = {

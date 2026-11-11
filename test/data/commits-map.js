@@ -1,3 +1,5 @@
+'use strict'
+
 const { generateCommits } = require('../utils/commits')
 
 const tags = [
