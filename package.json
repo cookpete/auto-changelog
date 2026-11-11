@@ -76,11 +76,11 @@
   },
   "devDependencies": {
     "markdownlint-cli": "^0.48.0",
-    "npmignore": "^0.3.5",
+    "npmignore": "^0.3.6",
     "nyc": "^15.1.0",
     "snazzy": "^9.0.0",
     "standard": "^16.0.4",
-    "tape": "^5.10.2"
+    "tape": "^5.10.3"
   },
   "standard": {
     "globals": [
