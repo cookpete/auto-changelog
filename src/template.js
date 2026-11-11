@@ -4,6 +4,9 @@ const { readFile, fileExists, isURL } = require('./utils')
 
 async function fetchText (url) {
   const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Template '${url}' could not be fetched: ${response.status} ${response.statusText}`)
+  }
   return response.text()
 }
 

@@ -39,6 +39,24 @@ test('compileTemplate: compiles using url path', async t => {
   }
 })
 
+test('compileTemplate: throws an error when the url template responds with an error status', async t => {
+  const server = createServer((request, response) => {
+    response.statusCode = 404
+    response.end('Not Found')
+  })
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  try {
+    const { port } = server.address()
+    const url = `http://127.0.0.1:${port}/missing.hbs`
+    await compileTemplate(releases, { template: url }).then(
+      () => t.fail('Should throw an error'),
+      error => t.equal(error.message, `Template '${url}' could not be fetched: 404 Not Found`)
+    )
+  } finally {
+    server.close()
+  }
+})
+
 test('compileTemplate: throws an error when no template found', t => {
   return compileTemplate(releases, { template: 'not-found' })
     .then(() => t.fail('Should throw an error'))
