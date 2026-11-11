@@ -152,7 +152,7 @@ test('fetchTags: sorts tags using semver', async (t) => {
 		'0.2.2---2000-03-03',
 		'1.0.0---2001-01-01',
 	].join('\n')));
-	t.deepEqual(tags.map((t) => t.title), [
+	t.deepEqual(tags.map((tag) => tag.title), [
 		'1.0.0',
 		'0.3.0',
 		'0.2.2',
@@ -171,7 +171,7 @@ test('fetchTags: does not sort when sorting via --append-git-tag', async (t) => 
 		'0.2.2---2000-03-03',
 		'1.0.0---2001-01-01',
 	].join('\n')));
-	t.deepEqual(tags.map((t) => t.title), [
+	t.deepEqual(tags.map((tag) => tag.title), [
 		'0.1.0',
 		'0.2.0',
 		'0.3.0',
@@ -190,7 +190,7 @@ test('fetchTags: supports partial semver tags', async (t) => {
 		'v0.3---2000-04-01',
 		'v1---2001-01-01',
 	].join('\n')));
-	t.deepEqual(tags.map((t) => t.version), [
+	t.deepEqual(tags.map((tag) => tag.version), [
 		'v1.0.0',
 		'v0.3.0',
 		'v0.2.2',
@@ -209,7 +209,7 @@ test('fetchTags: supports --latest-version without v prefix', async (t) => {
 		'0.3.0---2000-04-01',
 		'1.0.0---2001-01-01',
 	].join('\n')));
-	t.deepEqual(tags.map((t) => t.title), [
+	t.deepEqual(tags.map((tag) => tag.title), [
 		'2.0.0',
 		'1.0.0',
 		'0.3.0',
@@ -226,7 +226,7 @@ test('fetchTags: ignores invalid semver tags', async (t) => {
 		'invalid-semver-tag---2000-03-01',
 		'v0.2.0---2000-03-02',
 	].join('\n')));
-	t.deepEqual(tags.map((t) => t.version), [
+	t.deepEqual(tags.map((tag) => tag.version), [
 		'v0.2.0',
 		'v0.1.0',
 	]);
@@ -237,9 +237,9 @@ test('fetchTags: strips the tag prefix from titles when stripTagPrefix is set', 
 		'my-package@0.1.0---2000-02-01',
 		'my-package@1.0.0---2001-01-01',
 	].join('\n')));
-	t.deepEqual(tags.map((t) => t.title), ['1.0.0', '0.1.0'], 'titles drop the prefix');
-	t.deepEqual(tags.map((t) => t.version), ['1.0.0', '0.1.0']);
-	t.deepEqual(tags.map((t) => t.tag), ['my-package@1.0.0', 'my-package@0.1.0'], 'tags keep the prefix');
+	t.deepEqual(tags.map((tag) => tag.title), ['1.0.0', '0.1.0'], 'titles drop the prefix');
+	t.deepEqual(tags.map((tag) => tag.version), ['1.0.0', '0.1.0']);
+	t.deepEqual(tags.map((tag) => tag.tag), ['my-package@1.0.0', 'my-package@0.1.0'], 'tags keep the prefix');
 	t.equal(tags[0].href, 'https://github.com/user/repo/compare/my-package@0.1.0...my-package@1.0.0', 'compare link uses full tags');
 });
 

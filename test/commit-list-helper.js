@@ -18,61 +18,84 @@ const merges = [
 ];
 
 test('commit-list helper: returns nothing with no commits', (t) => {
-	const compile = Handlebars.compile('{{#commit-list commits heading="# Heading"}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}');
+	const compile = Handlebars.compile([
+		'{{#commit-list commits heading="# Heading"}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
 	const expected = '';
 	t.equal(compile({ commits: [] }), expected);
 	t.end();
 });
 
 test('commit-list helper: returns all commits with no options', (t) => {
-	const compile = Handlebars.compile('{{#commit-list commits heading="# Heading"}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}');
-	const expected =
-		'# Heading\n\n' +
-		'- Commit 1\n' +
-		'- Commit 2\n' +
-		'- feat: Commit 3\n' +
-		'- fix: Commit 4\n';
+	const compile = Handlebars.compile([
+		'{{#commit-list commits heading="# Heading"}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
+	const expected = [
+		'# Heading',
+		'',
+		'- Commit 1',
+		'- Commit 2',
+		'- feat: Commit 3',
+		'- fix: Commit 4',
+		'',
+	].join('\n');
 
 	t.equal(compile({ commits }), expected);
 	t.end();
 });
 
 test('commit-list helper: supports subject pattern matching', (t) => {
-	const compile = Handlebars.compile('{{#commit-list commits heading="# Heading" subject="^feat: "}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}');
-	const expected =
-		'# Heading\n\n' +
-		'- feat: Commit 3\n';
+	const compile = Handlebars.compile([
+		'{{#commit-list commits heading="# Heading" subject="^feat: "}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
+	const expected = [
+		'# Heading',
+		'',
+		'- feat: Commit 3',
+		'',
+	].join('\n');
 	t.equal(compile({ commits }), expected);
 	t.end();
 });
 
 test('commit-list helper: supports merge subject pattern matching', (t) => {
-	const compile = Handlebars.compile('{{#commit-list merges heading="# Heading" subject="^feat: "}}\n' +
-			'- {{commit.subject}}\n' +
-		'{{/commit-list}}');
-	const expected =
-		'# Heading\n\n' +
-		'- feat: Commit 3\n';
+	const compile = Handlebars.compile([
+		'{{#commit-list merges heading="# Heading" subject="^feat: "}}',
+		'- {{commit.subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
+	const expected = [
+		'# Heading',
+		'',
+		'- feat: Commit 3',
+		'',
+	].join('\n');
 	t.equal(compile({ merges }), expected);
 	t.end();
 });
 
 test('commit-list helper: supports commit lists with no heading', (t) => {
-	const compile = Handlebars.compile('{{#commit-list merges heading="# Heading" subject="^fix: "}}\n' +
-			'- {{commit.subject}}\n' +
-		'{{/commit-list}}\n' +
-		'{{#commit-list commits subject="^fix: "}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}\n');
-	const expectedMerges =
-		'# Heading\n\n' +
-		'- fix: Commit 4\n';
+	const compile = Handlebars.compile([
+		'{{#commit-list merges heading="# Heading" subject="^fix: "}}',
+		'- {{commit.subject}}',
+		'{{/commit-list}}',
+		'{{#commit-list commits subject="^fix: "}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+		'',
+	].join('\n'));
+	const expectedMerges = [
+		'# Heading',
+		'',
+		'- fix: Commit 4',
+		'',
+	].join('\n');
 	const expectedCommits = '- fix: Commit 4\n';
 	t.equal(compile({ merges }), expectedMerges);
 	t.equal(compile({ commits }), expectedCommits);
@@ -80,33 +103,45 @@ test('commit-list helper: supports commit lists with no heading', (t) => {
 });
 
 test('commit-list helper: supports message pattern matching', (t) => {
-	const compile = Handlebars.compile('{{#commit-list commits heading="# Breaking Changes" message="^BREAKING CHANGE: "}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}');
-	const expected =
-		'# Breaking Changes\n\n' +
-		'- Commit 2\n';
+	const compile = Handlebars.compile([
+		'{{#commit-list commits heading="# Breaking Changes" message="^BREAKING CHANGE: "}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
+	const expected = [
+		'# Breaking Changes',
+		'',
+		'- Commit 2',
+		'',
+	].join('\n');
 	t.equal(compile({ commits }), expected);
 	t.end();
 });
 
 test('commit-list helper: supports excludes option', (t) => {
-	const compile = Handlebars.compile('{{#commit-list commits heading="# Heading" exclude="^BREAKING CHANGE: "}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}');
-	const expected =
-		'# Heading\n\n' +
-		'- Commit 1\n' +
-		'- feat: Commit 3\n' +
-		'- fix: Commit 4\n';
+	const compile = Handlebars.compile([
+		'{{#commit-list commits heading="# Heading" exclude="^BREAKING CHANGE: "}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
+	const expected = [
+		'# Heading',
+		'',
+		'- Commit 1',
+		'- feat: Commit 3',
+		'- fix: Commit 4',
+		'',
+	].join('\n');
 	t.equal(compile({ commits }), expected);
 	t.end();
 });
 
 test('commit-list helper: returns nothing if nothing matches', (t) => {
-	const compile = Handlebars.compile('{{#commit-list commits heading="# Heading" message="A string that never appears"}}\n' +
-			'- {{subject}}\n' +
-		'{{/commit-list}}');
+	const compile = Handlebars.compile([
+		'{{#commit-list commits heading="# Heading" message="A string that never appears"}}',
+		'- {{subject}}',
+		'{{/commit-list}}',
+	].join('\n'));
 	const expected = '';
 	t.equal(compile({ commits }), expected);
 	t.end();

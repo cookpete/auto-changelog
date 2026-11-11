@@ -5,10 +5,18 @@ const cmd = require('./cmd');
 
 const DEPENDENCIES = { cmd };
 
-async function fetchRemote(options, overrides) {
-	const { cmd } = { ...DEPENDENCIES, ...overrides };
-	const remoteURL = await cmd(`git config --get remote.${options.remote}.url`);
-	return getRemote(remoteURL.trim(), options);
+function getOverrides({
+	commitUrl,
+	issueUrl,
+	mergeUrl,
+	compareUrl,
+}) {
+	const overrides = {};
+	if (commitUrl) { overrides.getCommitLink = (id) => commitUrl.replace('{id}', id); }
+	if (issueUrl) { overrides.getIssueLink = (id) => issueUrl.replace('{id}', id); }
+	if (mergeUrl) { overrides.getMergeLink = (id) => mergeUrl.replace('{id}', id); }
+	if (compareUrl) { overrides.getCompareLink = (from, to) => compareUrl.replace('{from}', from).replace('{to}', to); }
+	return overrides;
 }
 
 function getRemote(remoteURL, options = {}) {
@@ -83,18 +91,10 @@ function getRemote(remoteURL, options = {}) {
 	};
 }
 
-function getOverrides({
-	commitUrl,
-	issueUrl,
-	mergeUrl,
-	compareUrl,
-}) {
-	const overrides = {};
-	if (commitUrl) { overrides.getCommitLink = (id) => commitUrl.replace('{id}', id); }
-	if (issueUrl) { overrides.getIssueLink = (id) => issueUrl.replace('{id}', id); }
-	if (mergeUrl) { overrides.getMergeLink = (id) => mergeUrl.replace('{id}', id); }
-	if (compareUrl) { overrides.getCompareLink = (from, to) => compareUrl.replace('{from}', from).replace('{to}', to); }
-	return overrides;
+async function fetchRemote(options, overrides) {
+	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
+	const remoteURL = await command(`git config --get remote.${options.remote}.url`);
+	return getRemote(remoteURL.trim(), options);
 }
 
 module.exports = {

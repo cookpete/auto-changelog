@@ -88,14 +88,14 @@ function assertRepoConfigSafe(config) {
 // A package is part of a monorepo if it declares a `repository.directory`
 // (i.e. it lives in a subdirectory of a larger repo), or if an ancestor
 // package.json declares npm `workspaces`.
-async function isMonorepoPackage(pkg, readJson) {
+async function isMonorepoPackage(pkg, readJSON) {
 	if (pkg && pkg.repository && pkg.repository.directory) {
 		return true;
 	}
 	let dir = process.cwd();
 	let parent = dirname(dir);
 	while (parent !== dir) {
-		const ancestor = await readJson(join(parent, PACKAGE_FILE));
+		const ancestor = await readJSON(join(parent, PACKAGE_FILE));
 		if (ancestor && ancestor.workspaces) {
 			return true;
 		}
@@ -117,12 +117,34 @@ function camelCase(string) {
 	return string.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 }
 
+function parsePlugins(plugins, importCWD) {
+	if (!Array.isArray(plugins)) {
+		throw new Error('--plugins requires at least one plugin name');
+	}
+	return plugins.map((p) => importCWD(`auto-changelog-${p}`));
+}
+
+async function getLatestVersion(options, exists, readJSON) {
+	if (options.latestVersion) {
+		return options.latestVersion;
+	}
+	if (options.package) {
+		const file = options.package === true ? PACKAGE_FILE : options.package;
+		if (await exists(file) === false) {
+			throw new Error(`File ${file} does not exist`);
+		}
+		const { version } = await readJSON(file);
+		return version;
+	}
+	return null;
+}
+
 async function getOptions(argv, overrides) {
 	const {
-		fetchRemote,
-		readJson,
-		fileExists,
-		importCwd,
+		fetchRemote: fR,
+		readJson: readJSON,
+		fileExists: fE,
+		importCwd: importCWD,
 	} = { ...DEPENDENCIES, ...overrides };
 	const { values, help } = await pargs(__filename, {
 		options: {
@@ -346,9 +368,9 @@ async function getOptions(argv, overrides) {
 	}
 	const commandOptions = Object.fromEntries(Object.entries(values).map(([key, value]) => [camelCase(key), value]));
 
-	const pkg = await readJson(PACKAGE_FILE);
+	const pkg = await readJSON(PACKAGE_FILE);
 	const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null;
-	const dotOptions = await readJson(commandOptions.config || DEFAULT_OPTIONS.config);
+	const dotOptions = await readJSON(commandOptions.config || DEFAULT_OPTIONS.config);
 	const repoOptions = { ...dotOptions, ...packageOptions };
 	if (!commandOptions.unsafeConfig) {
 		assertRepoConfigSafe(repoOptions);
@@ -358,7 +380,7 @@ async function getOptions(argv, overrides) {
 		...repoOptions,
 		...commandOptions,
 	};
-	if (!options.autodetectMonorepoDisabled && await isMonorepoPackage(pkg, readJson)) {
+	if (!options.autodetectMonorepoDisabled && await isMonorepoPackage(pkg, readJSON)) {
 		if (!options.tagPrefix && pkg && pkg.name) {
 			// Monorepo version tags are conventionally prefixed with the package name
 			// (e.g. `my-package@1.2.3`), so derive the prefix from package.json rather
@@ -369,36 +391,14 @@ async function getOptions(argv, overrides) {
 		// using the full tags for compare links.
 		options.stripTagPrefix = true;
 	}
-	const remote = await fetchRemote(options);
-	const latestVersion = await getLatestVersion(options, fileExists, readJson);
+	const remote = await fR(options);
+	const latestVersion = await getLatestVersion(options, fE, readJSON);
 	return {
 		...options,
 		...remote,
 		latestVersion,
-		plugins: parsePlugins(options.plugins, importCwd),
+		plugins: parsePlugins(options.plugins, importCWD),
 	};
-}
-
-function parsePlugins(plugins, importCwd) {
-	if (!Array.isArray(plugins)) {
-		throw new Error('--plugins requires at least one plugin name');
-	}
-	return plugins.map((p) => importCwd(`auto-changelog-${p}`));
-}
-
-async function getLatestVersion(options, fileExists, readJson) {
-	if (options.latestVersion) {
-		return options.latestVersion;
-	}
-	if (options.package) {
-		const file = options.package === true ? PACKAGE_FILE : options.package;
-		if (await fileExists(file) === false) {
-			throw new Error(`File ${file} does not exist`);
-		}
-		const { version } = await readJson(file);
-		return version;
-	}
-	return null;
 }
 
 module.exports = getOptions;

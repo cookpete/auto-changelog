@@ -6,52 +6,60 @@ const releases = require('./data/releases');
 
 function compileCommits(matches) {
 	return Handlebars.compile(
-		'{{#each releases}}\n' +
-			'{{#each commits}}\n' +
-				matches +
-			'{{/each}}\n' +
-		'{{/each}}',
+		[
+			'{{#each releases}}',
+			'{{#each commits}}',
+			matches,
+			'{{/each}}',
+			'{{/each}}',
+		].join('\n'),
 		{ noEscape: true },
 	);
 }
 
 test('matches helper: matches on field value', (t) => {
-	const matches =
-		'{{#matches href "12c0624"}}\n' +
-			'- {{message}}\n' +
-		'{{/matches}}\n';
-	const expected =
-		'- Commit that fixes nothing with `backticks` and &lt;html&gt;\n';
+	const matches = [
+		'{{#matches href "12c0624"}}',
+		'- {{message}}',
+		'{{/matches}}',
+	].join('\n');
+	const expected = '- Commit that fixes nothing with `backticks` and &lt;html&gt;\n';
 	t.equal(compileCommits(matches)({ releases }), expected);
 	t.end();
 });
 
 test('matches helper: matches with case insensitive flag', (t) => {
-	const matches =
-		'{{#matches author "example" flags="i"}}\n' +
-			'- {{shorthash}}\n' +
-		'{{/matches}}\n';
-	const expected =
-		'- b0b3040\n' +
-		'- 12c0624\n' +
-		'- e9a43b2\n' +
-		'- 158fdde\n';
+	const matches = [
+		'{{#matches author "example" flags="i"}}',
+		'- {{shorthash}}',
+		'{{/matches}}',
+	].join('\n');
+	const expected = [
+		'- b0b3040',
+		'- 12c0624',
+		'- e9a43b2',
+		'- 158fdde',
+		'',
+	].join('\n');
 	t.equal(compileCommits(matches)({ releases }), expected);
 	t.end();
 });
 
 test('matches helper: provides non-matching conditional', (t) => {
-	const matches =
-		'{{#matches shorthash "e9a43b2"}}\n' +
-			'- HIT {{date}}\n' +
-		'{{else}}\n' +
-			'- MISS {{date}}\n' +
-		'{{/matches}}\n';
-	const expected =
-		'- MISS 2015-12-29T21:57:19.000Z\n' +
-		'- MISS 2015-12-29T21:18:19.000Z\n' +
-		'- HIT 2015-12-29T21:19:19.000Z\n' +
-		'- MISS 2015-12-14T17:06:12.000Z\n';
+	const matches = [
+		'{{#matches shorthash "e9a43b2"}}',
+		'- HIT {{date}}',
+		'{{else}}',
+		'- MISS {{date}}',
+		'{{/matches}}',
+	].join('\n');
+	const expected = [
+		'- MISS 2015-12-29T21:57:19.000Z',
+		'- MISS 2015-12-29T21:18:19.000Z',
+		'- HIT 2015-12-29T21:19:19.000Z',
+		'- MISS 2015-12-14T17:06:12.000Z',
+		'',
+	].join('\n');
 	t.equal(compileCommits(matches)({ releases }), expected);
 	t.end();
 });
@@ -69,12 +77,12 @@ test('matches helper: matches on multiline content', (t) => {
 			},
 		],
 	}];
-	const matches =
-		'{{#matches message "BREAKING CHANGE"}}\n' +
-			'- {{shorthash}}\n' +
-		'{{/matches}}\n';
-	const expected =
-		'- c0f25d7\n';
+	const matches = [
+		'{{#matches message "BREAKING CHANGE"}}',
+		'- {{shorthash}}',
+		'{{/matches}}',
+	].join('\n');
+	const expected = '- c0f25d7\n';
 	t.equal(compileCommits(matches)({ releases: multiReleases }), expected);
 	t.end();
 });

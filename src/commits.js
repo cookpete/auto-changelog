@@ -11,10 +11,10 @@ const {
 
 const DEPENDENCIES = { cmd };
 
-async function fetchCommits(diff, options = {}, overrides) {
-	const { cmd } = { ...DEPENDENCIES, ...overrides };
+async function fetchCommits(diff, options = {}, overrides = {}) {
+	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
 	const format = await getLogFormat(overrides);
-	const log = await cmd(`git log ${diff} --shortstat --pretty=format:${format} ${options.appendGitLog}`);
+	const log = await command(`git log ${diff} --shortstat --pretty=format:${format} ${options.appendGitLog}`);
 	return parseCommits(log, options);
 }
 

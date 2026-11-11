@@ -4,9 +4,9 @@ const { spawn } = require('child_process');
 
 // Simple util for calling a child process
 function cmd(string, onProgress) {
-	const [cmd, ...args] = string.trim().split(' ');
+	const [command, ...args] = string.trim().split(' ');
 	return new Promise((resolve, reject) => {
-		const child = spawn(cmd, args);
+		const child = spawn(command, args);
 		let data = '';
 
 		child.stdout.on('data', (buffer) => {

@@ -32,7 +32,7 @@ test('compileTemplate: compiles using url path', async (t) => {
 	const template = await readFile(join(__dirname, '..', 'templates', 'compact.hbs'));
 	const expected = await readFile(join(__dirname, 'data', 'template-compact.md'));
 	const server = createServer((request, response) => response.end(template));
-	await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+	await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
 	try {
 		const { port } = server.address();
 		t.equal(await compileTemplate(releases, { template: `http://127.0.0.1:${port}/compact.hbs` }), expected);
@@ -46,7 +46,7 @@ test('compileTemplate: throws an error when the url template responds with an er
 		response.statusCode = 404;
 		response.end('Not Found');
 	});
-	await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+	await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
 	try {
 		const { port } = server.address();
 		const url = `http://127.0.0.1:${port}/missing.hbs`;

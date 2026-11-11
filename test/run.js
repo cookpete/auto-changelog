@@ -9,6 +9,8 @@ const { tags } = require('./data/commits-map');
 const { run } = require('../src/run');
 const getOptions = require('../src/options');
 
+const { version } = require('../package.json');
+
 const deps = {
 	fileExists: () => false,
 	readJson: () => null,
@@ -22,6 +24,30 @@ test('getOptions: parses commit limit correctly', async (t) => {
 	const options = await getOptions(['', '', '--commit-limit', '10']);
 	t.equal(options.commitLimit, 10);
 });
+
+// `help()` reports `--help`/`--version` through `console.log`, which is also how tape emits TAP,
+// so the capture has to be restored before any assertion or its result line is swallowed.
+function captureLog(t) {
+	const capture = t.capture(console, 'log');
+	return () => {
+		capture.restore?.();
+		return capture().map((call) => call.args.join(' '));
+	};
+}
+
+async function rejectedWith(t, args) {
+	const { exitCode } = process;
+	const errors = t.capture(console, 'error');
+	const logs = captureLog(t);
+	const options = await getOptions(['', '', ...args], deps);
+	logs();
+	errors.restore?.();
+	const failedWith = process.exitCode;
+	process.exitCode = exitCode;
+	t.equal(options, null, 'returns null so the caller stops');
+	t.equal(failedWith, 1, 'sets a failing exit code');
+	return errors().map((call) => call.args.join(' ')).join('\n');
+}
 
 test('getOptions: --commit-limit and --backfill-limit take only an integer', async (t) => {
 	t.match(await rejectedWith(t, ['--commit-limit', 'false']), /Invalid integer value for option "commit-limit"/);
@@ -147,13 +173,15 @@ test('run: generates a changelog', async (t) => {
 	});
 });
 
+const noRemote = require('./data/commits-no-remote');
+
 test.skip('run: generates a changelog with no remote', async (t) => {
 	const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'));
 
 	await run(['', ''], {
 		...deps,
 		fetchRemote: () => remotes.null,
-		fetchCommits: () => require('./data/commits-no-remote'),
+		fetchCommits: () => noRemote,
 		writeFile(output, log) {
 			t.equal(output, 'CHANGELOG.md');
 			t.equal(log, expected);
@@ -375,8 +403,9 @@ test.skip('run: supports unreleased option', async (t) => {
 	});
 });
 
+const { commitsMap } = require('./data/commits-map');
+
 test.skip('run: supports breakingPattern option', async (t) => {
-	const { commitsMap } = require('./data/commits-map');
 	function addBreakingFlag(commit) {
 		if ((/Some breaking change/).test(commit.message)) {
 			return { ...commit, breaking: true };
@@ -425,16 +454,6 @@ test('run: throws an error when no template found', (t) => run(['', '', '--templ
 	.then(() => t.fail('Should throw an error'))
 	.catch(() => t.pass('threw')));
 
-// `help()` reports `--help`/`--version` through `console.log`, which is also how tape emits TAP,
-// so the capture has to be restored before any assertion or its result line is swallowed.
-function captureLog(t) {
-	const capture = t.capture(console, 'log');
-	return () => {
-		capture.restore?.();
-		return capture().map((call) => call.args.join(' '));
-	};
-}
-
 test('getOptions: --help prints usage and parses no options', async (t) => {
 	const { exitCode } = process;
 	const logs = captureLog(t);
@@ -452,7 +471,7 @@ test('getOptions: --version prints the v-prefixed version', async (t) => {
 	const printed = logs();
 	process.exitCode = exitCode;
 	t.equal(options, null, 'returns null so the caller stops');
-	t.deepEqual(printed, [`v${require('../package.json').version}`], 'prints the version with a `v` prefix');
+	t.deepEqual(printed, [`v${version}`], 'prints the version with a `v` prefix');
 });
 
 test('getOptions: rejects an unsupported --sort-commits', async (t) => {
@@ -474,20 +493,6 @@ test('getOptions: accepts every supported --sort-commits', async (t) => {
 	const options = await Promise.all(choices.map((sortCommits) => getOptions(['', '', '--sort-commits', sortCommits], deps)));
 	t.deepEqual(options.map((o) => o.sortCommits), choices);
 });
-
-async function rejectedWith(t, args) {
-	const { exitCode } = process;
-	const errors = t.capture(console, 'error');
-	const logs = captureLog(t);
-	const options = await getOptions(['', '', ...args], deps);
-	logs();
-	errors.restore?.();
-	const failedWith = process.exitCode;
-	process.exitCode = exitCode;
-	t.equal(options, null, 'returns null so the caller stops');
-	t.equal(failedWith, 1, 'sets a failing exit code');
-	return errors().map((call) => call.args.join(' ')).join('\n');
-}
 
 test('getOptions: --append-git-log and --append-git-tag take a dash-leading value attached with =', async (t) => {
 	const options = await getOptions(['', '', '--append-git-log=--first-parent --no-merges', '--append-git-tag=--merged'], deps);

@@ -8,10 +8,82 @@ const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/;
 
 const DEPENDENCIES = { fetchCommits };
 
+function filterCommits(merges) {
+	return (commit) => {
+		if (commit.fixes || commit.merge) {
+			// Filter out commits that already appear in fix or merge lists
+			return false;
+		}
+		if (commit.breaking) {
+			return true;
+		}
+		if (semver.valid(commit.subject)) {
+			// Filter out version commits
+			return false;
+		}
+		if (MERGE_COMMIT_PATTERN.test(commit.subject)) {
+			// Filter out merge commits
+			return false;
+		}
+		if (merges.findIndex((m) => m.message === commit.subject) !== -1) {
+			// Filter out commits with the same message as an existing merge
+			return false;
+		}
+		return true;
+	};
+}
+
+function getRelevance({ insertions = 0, deletions = 0 }) {
+	return insertions + deletions;
+}
+
+function sortCommits({ sortCommits: sC }) {
+	return (a, b) => {
+		if (!a.breaking && b.breaking) { return 1; }
+		if (a.breaking && !b.breaking) { return -1; }
+		if (sC === 'date') { return new Date(a.date) - new Date(b.date); }
+		if (sC === 'date-desc') { return new Date(b.date) - new Date(a.date); }
+		if (sC === 'subject') { return a.subject.localeCompare(b.subject); }
+		if (sC === 'subject-desc') { return b.subject.localeCompare(a.subject); }
+		return getRelevance(b) - getRelevance(a);
+	};
+}
+
+function filterReleases(options) {
+	return ({
+		merges,
+		fixes,
+		commits,
+	}) => {
+		if (options.hideEmptyReleases && (merges.length + fixes.length + commits.length) === 0) {
+			return false;
+		}
+		return true;
+	};
+}
+
+function getCommitLimit({ commitLimit, backfillLimit }, emptyRelease, breakingCount) {
+	const limit = emptyRelease ? backfillLimit : commitLimit;
+	if (commitLimit === false || limit === false) {
+		return undefined; // Return all commits
+	}
+	return Math.max(breakingCount, limit);
+}
+
+function getSummary(message, { releaseSummary }) {
+	if (!message || !releaseSummary) {
+		return null;
+	}
+	if (COMMIT_MESSAGE_PATTERN.test(message)) {
+		return message.match(COMMIT_MESSAGE_PATTERN)[1];
+	}
+	return null;
+}
+
 async function parseReleases(tags, options, onParsed, overrides) {
-	const { fetchCommits } = { ...DEPENDENCIES, ...overrides };
+	const { fetchCommits: fetchC } = { ...DEPENDENCIES, ...overrides };
 	const releases = await Promise.all(tags.map(async (tag) => {
-		const commits = await fetchCommits(tag.diff, options);
+		const commits = await fetchC(tag.diff, options);
 		const merges = commits.filter((commit) => commit.merge).map((commit) => commit.merge);
 		const fixes = commits.filter((commit) => commit.fixes).map((commit) => ({ fixes: commit.fixes, commit }));
 
@@ -45,78 +117,6 @@ async function parseReleases(tags, options, onParsed, overrides) {
 	}
 
 	return releases.filter(filterReleases(options));
-}
-
-function filterCommits(merges) {
-	return (commit) => {
-		if (commit.fixes || commit.merge) {
-			// Filter out commits that already appear in fix or merge lists
-			return false;
-		}
-		if (commit.breaking) {
-			return true;
-		}
-		if (semver.valid(commit.subject)) {
-			// Filter out version commits
-			return false;
-		}
-		if (MERGE_COMMIT_PATTERN.test(commit.subject)) {
-			// Filter out merge commits
-			return false;
-		}
-		if (merges.findIndex((m) => m.message === commit.subject) !== -1) {
-			// Filter out commits with the same message as an existing merge
-			return false;
-		}
-		return true;
-	};
-}
-
-function getRelevance({ insertions = 0, deletions = 0 }) {
-	return insertions + deletions;
-}
-
-function sortCommits({ sortCommits }) {
-	return (a, b) => {
-		if (!a.breaking && b.breaking) { return 1; }
-		if (a.breaking && !b.breaking) { return -1; }
-		if (sortCommits === 'date') { return new Date(a.date) - new Date(b.date); }
-		if (sortCommits === 'date-desc') { return new Date(b.date) - new Date(a.date); }
-		if (sortCommits === 'subject') { return a.subject.localeCompare(b.subject); }
-		if (sortCommits === 'subject-desc') { return b.subject.localeCompare(a.subject); }
-		return getRelevance(b) - getRelevance(a);
-	};
-}
-
-function getCommitLimit({ commitLimit, backfillLimit }, emptyRelease, breakingCount) {
-	const limit = emptyRelease ? backfillLimit : commitLimit;
-	if (commitLimit === false || limit === false) {
-		return undefined; // Return all commits
-	}
-	return Math.max(breakingCount, limit);
-}
-
-function getSummary(message, { releaseSummary }) {
-	if (!message || !releaseSummary) {
-		return null;
-	}
-	if (COMMIT_MESSAGE_PATTERN.test(message)) {
-		return message.match(COMMIT_MESSAGE_PATTERN)[1];
-	}
-	return null;
-}
-
-function filterReleases(options) {
-	return ({
-		merges,
-		fixes,
-		commits,
-	}) => {
-		if (options.hideEmptyReleases && (merges.length + fixes.length + commits.length) === 0) {
-			return false;
-		}
-		return true;
-	};
 }
 
 module.exports = {

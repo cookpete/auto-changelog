@@ -11,40 +11,8 @@ export default [
 	{
 		files: ['**/*.js'],
 		rules: {
-			'consistent-return': 'off',
-			'default-param-last': 'off',
 			'func-style': ['error', 'declaration'],
-			'global-require': 'off',
-			'id-length': 'off',
-			'max-len': 'off',
-			'max-lines': 'off',
-			'max-lines-per-function': 'off',
-			'max-params': 'off',
-			'max-statements-per-line': ['error', { max: 2 }],
 			'multiline-comment-style': 'off',
-			'no-await-in-loop': 'off',
-			'no-empty-function': 'off',
-			'no-param-reassign': 'off',
-			'no-promise-executor-return': 'off',
-			'no-return-await': 'off',
-			'no-shadow': 'off',
-			'no-unused-vars': [
-				'error',
-				{
-					args: 'none',
-					caughtErrors: 'none',
-					ignoreRestSiblings: true,
-					vars: 'all',
-				},
-			],
-			'no-use-before-define': [
-				'error',
-				{
-					classes: false,
-					functions: false,
-					variables: false,
-				},
-			],
 			'operator-linebreak': [
 				'error',
 				'after',
@@ -56,9 +24,121 @@ export default [
 					},
 				},
 			],
-			'prefer-named-capture-group': 'off',
-			'prefer-template': 'off',
 			'sort-keys': 'off',
+		},
+	},
+
+	{
+		files: ['src/template.js'],
+		rules: {
+			'global-require': 'warn',
+		},
+	},
+
+	{
+		files: [
+			'src/releases.js',
+			'src/tags.js',
+		],
+		rules: {
+			'id-length': 'warn',
+		},
+	},
+
+	{
+		files: ['src/tags.js'],
+		rules: {
+			'max-len': 'warn',
+		},
+	},
+
+	{
+		files: ['src/options.js'],
+		rules: {
+			'max-lines': 'warn',
+		},
+	},
+
+	{
+		files: [
+			'src/options.js',
+			'src/remote.js',
+		],
+		rules: {
+			'max-lines-per-function': 'warn',
+		},
+	},
+
+	{
+		files: [
+			'src/releases.js',
+			'src/run.js',
+		],
+		rules: {
+			'max-params': 'warn',
+		},
+	},
+
+	{
+		files: [
+			'src/parse-commits.js',
+			'src/releases.js',
+			'src/remote.js',
+		],
+		rules: {
+			'max-statements-per-line': ['error', { max: 2 }],
+		},
+	},
+
+	{
+		files: [
+			'src/options.js',
+			'src/releases.js',
+		],
+		rules: {
+			'no-await-in-loop': 'warn',
+		},
+	},
+
+	{
+		files: ['test/run.js'],
+		rules: {
+			'no-empty-function': 'warn',
+		},
+	},
+
+	{
+		files: ['test/template.js'],
+		rules: {
+			'no-param-reassign': 'warn',
+		},
+	},
+
+	{
+		files: ['src/template.js'],
+		rules: {
+			'no-return-await': 'warn',
+		},
+	},
+
+	{
+		files: [
+			'src/tags.js',
+			'test/run.js',
+		],
+		rules: {
+			'no-unused-vars': 'warn',
+		},
+	},
+
+	{
+		files: [
+			'src/options.js',
+			'src/parse-commits.js',
+			'src/releases.js',
+		],
+		rules: {
+			'prefer-named-capture-group': 'warn',
 		},
 	},
 ];

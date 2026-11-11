@@ -10,8 +10,8 @@ const FALLBACK_BODY_FORMAT = '%s%n%n%b';
 const DEPENDENCIES = { getGitVersion };
 
 async function getLogFormat(overrides) {
-	const { getGitVersion } = { ...DEPENDENCIES, ...overrides };
-	const gitVersion = await getGitVersion();
+	const { getGitVersion: gGV } = { ...DEPENDENCIES, ...overrides };
+	const gitVersion = await gGV();
 	const bodyFormat = gitVersion && semver.gte(gitVersion, '1.7.2')
 		? BODY_FORMAT
 		: FALLBACK_BODY_FORMAT;

@@ -27,8 +27,8 @@ test('parseCommits: parses commits without remote', async (t) => {
 
 test('parseCommits: parses bitbucket commits', async (t) => {
 	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
-	const commits = parseCommits(gitLog, remotes.bitbucket);
-	t.equal(commits[0].href, 'https://bitbucket.org/user/repo/commits/2401ee4706e94629f48830bab9ed5812c032734a');
+	const parsedCommits = parseCommits(gitLog, remotes.bitbucket);
+	t.equal(parsedCommits[0].href, 'https://bitbucket.org/user/repo/commits/2401ee4706e94629f48830bab9ed5812c032734a');
 });
 
 test('parseCommits: supports breakingPattern option', async (t) => {

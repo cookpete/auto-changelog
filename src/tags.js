@@ -9,82 +9,16 @@ const MATCH_V = /^v\d/;
 
 const DEPENDENCIES = { cmd };
 
-async function fetchTags(options, overrides) {
-	const { cmd } = { ...DEPENDENCIES, ...overrides };
-	const format = `%(refname:short)${DIVIDER}%(creatordate:short)`;
-	const tags = (await cmd(`git tag -l --format=${format} ${options.appendGitTag}`))
-		.trim()
-		.split('\n')
-		.map(parseTag(options))
-		.filter(isValidTag(options))
-		.sort(sortTags(options));
-
-	const {
-		latestVersion,
-		unreleased,
-		unreleasedOnly,
-		getCompareLink,
-		tagPrefix,
-		stripTagPrefix,
-	} = options;
-	if (latestVersion || unreleased || unreleasedOnly) {
-		const previous = tags[0];
-		const v = !MATCH_V.test(latestVersion) && previous && MATCH_V.test(previous.version) ? 'v' : '';
-		// The title shows the bare version, but the compare link must target the real
-		// tag. In a monorepo that is prefixed with the package name, and the `v`
-		// convention (if any) still applies after that prefix (e.g. `my-package@v2.0.0`).
-		const prefix = stripTagPrefix && tagPrefix ? `${tagPrefix}${v}` : v;
-		const compareTo = latestVersion ? `${prefix}${latestVersion}` : 'HEAD';
-		tags.unshift({
-			tag: null,
-			title: latestVersion ? `${v}${latestVersion}` : 'Unreleased',
-			date: new Date().toISOString(),
-			diff: previous ? `${previous.tag}..` : 'HEAD',
-			href: previous ? getCompareLink(previous.tag, compareTo) : null,
-		});
+function inferSemver(tag) {
+	if ((/^v?\d+$/).test(tag)) {
+		// v1 becomes v1.0.0
+		return `${tag}.0.0`;
 	}
-
-	const enriched = tags.map(enrichTag(options));
-	return enriched.slice(getStartIndex(enriched, options), getEndIndex(enriched, options));
-}
-
-function getStartIndex(tags, { endingVersion }) {
-	if (endingVersion) {
-		const index = tags.findIndex(({ tag }) => tag === endingVersion);
-		if (index !== -1) {
-			return index;
-		}
+	if ((/^v?\d+\.\d+$/).test(tag)) {
+		// v1.0 becomes v1.0.0
+		return `${tag}.0`;
 	}
-	return 0;
-}
-
-function getEndIndex(tags, {
-	unreleasedOnly,
-	startingVersion,
-	startingDate,
-	tagPrefix,
-}) {
-	if (unreleasedOnly) {
-		return 1;
-	}
-	if (startingVersion) {
-		const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''));
-		const index = tags.findIndex(({ tag }) => tag === startingVersion || tag === semverStartingVersion);
-		if (index !== -1) {
-			return index + 1;
-		}
-		if (!semver.valid(semverStartingVersion)) {
-			throw new Error(`Starting version '${startingVersion}' is not a valid version, and does not match any tag`);
-		}
-		// Fall back to nearest version lower than startingVersion
-		const fallbackIndex = tags.findIndex(({ version }) => semver.valid(version) && semver.lt(version, semverStartingVersion));
-		// -1 as a slice end would drop the oldest release rather than include every tag
-		return fallbackIndex === -1 ? tags.length : fallbackIndex;
-	}
-	if (startingDate) {
-		return tags.filter((t) => t.isoDate >= startingDate).length;
-	}
-	return tags.length;
+	return tag;
 }
 
 function parseTag({ tagPrefix, stripTagPrefix }) {
@@ -141,16 +75,82 @@ function sortTags({ appendGitTag }) {
 	};
 }
 
-function inferSemver(tag) {
-	if ((/^v?\d+$/).test(tag)) {
-		// v1 becomes v1.0.0
-		return `${tag}.0.0`;
+function getStartIndex(tags, { endingVersion }) {
+	if (endingVersion) {
+		const index = tags.findIndex(({ tag }) => tag === endingVersion);
+		if (index !== -1) {
+			return index;
+		}
 	}
-	if ((/^v?\d+\.\d+$/).test(tag)) {
-		// v1.0 becomes v1.0.0
-		return `${tag}.0`;
+	return 0;
+}
+
+function getEndIndex(tags, {
+	unreleasedOnly,
+	startingVersion,
+	startingDate,
+	tagPrefix,
+}) {
+	if (unreleasedOnly) {
+		return 1;
 	}
-	return tag;
+	if (startingVersion) {
+		const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''));
+		const index = tags.findIndex(({ tag }) => tag === startingVersion || tag === semverStartingVersion);
+		if (index !== -1) {
+			return index + 1;
+		}
+		if (!semver.valid(semverStartingVersion)) {
+			throw new Error(`Starting version '${startingVersion}' is not a valid version, and does not match any tag`);
+		}
+		// Fall back to nearest version lower than startingVersion
+		const fallbackIndex = tags.findIndex(({ version }) => semver.valid(version) && semver.lt(version, semverStartingVersion));
+		// -1 as a slice end would drop the oldest release rather than include every tag
+		return fallbackIndex === -1 ? tags.length : fallbackIndex;
+	}
+	if (startingDate) {
+		return tags.filter((t) => t.isoDate >= startingDate).length;
+	}
+	return tags.length;
+}
+
+async function fetchTags(options, overrides) {
+	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
+	const format = `%(refname:short)${DIVIDER}%(creatordate:short)`;
+	const tags = (await command(`git tag -l --format=${format} ${options.appendGitTag}`))
+		.trim()
+		.split('\n')
+		.map(parseTag(options))
+		.filter(isValidTag(options))
+		.sort(sortTags(options));
+
+	const {
+		latestVersion,
+		unreleased,
+		unreleasedOnly,
+		getCompareLink,
+		tagPrefix,
+		stripTagPrefix,
+	} = options;
+	if (latestVersion || unreleased || unreleasedOnly) {
+		const previous = tags[0];
+		const v = !MATCH_V.test(latestVersion) && previous && MATCH_V.test(previous.version) ? 'v' : '';
+		// The title shows the bare version, but the compare link must target the real
+		// tag. In a monorepo that is prefixed with the package name, and the `v`
+		// convention (if any) still applies after that prefix (e.g. `my-package@v2.0.0`).
+		const prefix = stripTagPrefix && tagPrefix ? `${tagPrefix}${v}` : v;
+		const compareTo = latestVersion ? `${prefix}${latestVersion}` : 'HEAD';
+		tags.unshift({
+			tag: null,
+			title: latestVersion ? `${v}${latestVersion}` : 'Unreleased',
+			date: new Date().toISOString(),
+			diff: previous ? `${previous.tag}..` : 'HEAD',
+			href: previous ? getCompareLink(previous.tag, compareTo) : null,
+		});
+	}
+
+	const enriched = tags.map(enrichTag(options));
+	return enriched.slice(getStartIndex(enriched, options), getEndIndex(enriched, options));
 }
 
 module.exports = {

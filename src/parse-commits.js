@@ -22,12 +22,97 @@ const MERGE_PATTERNS = [
 	/^Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/, // GitLab merge
 ];
 
-function parseCommits(string, options = {}) {
-	return string
-		.split(COMMIT_SEPARATOR)
-		.slice(1)
-		.map((commit) => parseCommit(commit, options))
-		.filter((commit) => filterCommit(commit, options));
+function filterCommit(commit, { ignoreCommitPattern, commitPattern }) {
+	if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
+		return false;
+	}
+	if (commitPattern) {
+		return new RegExp(commitPattern).test(commit.subject);
+	}
+	return true;
+}
+
+function getSubject(message) {
+	if (!message.trim()) {
+		return '_No commit message_';
+	}
+	return message.match(/[^\n]+/)[0].trim();
+}
+
+function getFixPattern(options) {
+	if (options.issuePattern) {
+		return new RegExp(options.issuePattern, 'g');
+	}
+	return DEFAULT_FIX_PATTERN;
+}
+
+function getFixID(match) {
+	// Get the last non-falsey value in the match array
+	for (let i = match.length; i >= 0; i--) {
+		if (match[i]) {
+			return match[i];
+		}
+	}
+	return void undefined;
+}
+
+function getFixes(message, author, options = {}) {
+	const pattern = getFixPattern(options);
+	const fixes = [];
+	let match = pattern.exec(message);
+	if (!match) { return null; }
+	while (match) {
+		const id = getFixID(match);
+		const href = isLink(match[2]) ? match[2] : options.getIssueLink(id);
+		fixes.push({
+			id,
+			href,
+			author,
+		});
+		match = pattern.exec(message);
+	}
+	return fixes;
+}
+
+function getMergePatterns(options) {
+	if (options.mergePattern) {
+		return MERGE_PATTERNS.concat(new RegExp(options.mergePattern, 'g'));
+	}
+	return MERGE_PATTERNS;
+}
+
+function getMerge(commit, message, options = {}) {
+	const patterns = getMergePatterns(options);
+	for (const pattern of patterns) {
+		const match = pattern.exec(message);
+		if (match) {
+			const id = (/^\d+$/).test(match[1]) ? match[1] : match[2];
+			const msg = (/^\d+$/).test(match[1]) ? match[2] : match[1];
+			return {
+				id,
+				message: replaceText(msg, options),
+				href: options.getMergeLink(id),
+				author: commit.author,
+				commit,
+			};
+		}
+	}
+	return null;
+}
+
+function getStats(stats) {
+	if (!stats.trim()) { return {}; }
+	const [
+		,
+		files,
+		insertions,
+		deletions,
+	] = stats.match(MATCH_STATS);
+	return {
+		files: parseInt(files || 0, 10),
+		insertions: parseInt(insertions || 0, 10),
+		deletions: parseInt(deletions || 0, 10),
+	};
 }
 
 function parseCommit(commit, options = {}) {
@@ -61,96 +146,12 @@ function parseCommit(commit, options = {}) {
 	};
 }
 
-function getSubject(message) {
-	if (!message.trim()) {
-		return '_No commit message_';
-	}
-	return message.match(/[^\n]+/)[0].trim();
-}
-
-function getStats(stats) {
-	if (!stats.trim()) { return {}; }
-	const [
-		,
-		files,
-		insertions,
-		deletions,
-	] = stats.match(MATCH_STATS);
-	return {
-		files: parseInt(files || 0, 10),
-		insertions: parseInt(insertions || 0, 10),
-		deletions: parseInt(deletions || 0, 10),
-	};
-}
-
-function getFixes(message, author, options = {}) {
-	const pattern = getFixPattern(options);
-	const fixes = [];
-	let match = pattern.exec(message);
-	if (!match) { return null; }
-	while (match) {
-		const id = getFixID(match);
-		const href = isLink(match[2]) ? match[2] : options.getIssueLink(id);
-		fixes.push({
-			id,
-			href,
-			author,
-		});
-		match = pattern.exec(message);
-	}
-	return fixes;
-}
-
-function getFixID(match) {
-	// Get the last non-falsey value in the match array
-	for (let i = match.length; i >= 0; i--) {
-		if (match[i]) {
-			return match[i];
-		}
-	}
-}
-
-function getFixPattern(options) {
-	if (options.issuePattern) {
-		return new RegExp(options.issuePattern, 'g');
-	}
-	return DEFAULT_FIX_PATTERN;
-}
-
-function getMergePatterns(options) {
-	if (options.mergePattern) {
-		return MERGE_PATTERNS.concat(new RegExp(options.mergePattern, 'g'));
-	}
-	return MERGE_PATTERNS;
-}
-
-function getMerge(commit, message, options = {}) {
-	const patterns = getMergePatterns(options);
-	for (const pattern of patterns) {
-		const match = pattern.exec(message);
-		if (match) {
-			const id = (/^\d+$/).test(match[1]) ? match[1] : match[2];
-			const message = (/^\d+$/).test(match[1]) ? match[2] : match[1];
-			return {
-				id,
-				message: replaceText(message, options),
-				href: options.getMergeLink(id),
-				author: commit.author,
-				commit,
-			};
-		}
-	}
-	return null;
-}
-
-function filterCommit(commit, { ignoreCommitPattern, commitPattern }) {
-	if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
-		return false;
-	}
-	if (commitPattern) {
-		return new RegExp(commitPattern).test(commit.subject);
-	}
-	return true;
+function parseCommits(string, options = {}) {
+	return string
+		.split(COMMIT_SEPARATOR)
+		.slice(1)
+		.map((commit) => parseCommit(commit, options))
+		.filter((commit) => filterCommit(commit, options));
 }
 
 module.exports = {

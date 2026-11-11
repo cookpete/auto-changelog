@@ -80,7 +80,7 @@ async function getTemplate(template) {
 	if (await fileExists(template)) {
 		return readFile(template);
 	}
-	const path = join(TEMPLATES_DIR, template + '.hbs');
+	const path = join(TEMPLATES_DIR, `${template}.hbs`);
 	if (await fileExists(path) === false) {
 		throw new Error(`Template '${template}' was not found`);
 	}

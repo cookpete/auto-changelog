@@ -36,8 +36,8 @@ function formatBytes(bytes) {
 }
 
 async function getGitVersion(overrides) {
-	const { cmd } = { ...DEPENDENCIES, ...overrides };
-	const output = await cmd('git --version');
+	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
+	const output = await command('git --version');
 	const match = output.match(/\d+\.\d+\.\d+/);
 	return match ? match[0] : null;
 }
@@ -67,7 +67,7 @@ function replaceText(string, options) {
 		return string;
 	}
 	return Object.keys(options.replaceText).reduce(
-		(string, pattern) => string.replace(new RegExp(pattern, 'g'), options.replaceText[pattern]),
+		(str, pattern) => str.replace(new RegExp(pattern, 'g'), options.replaceText[pattern]),
 		string,
 	);
 }
@@ -83,23 +83,23 @@ function createCallback(resolve, reject) {
 }
 
 function readFile(path, overrides) {
-	const { fs } = { ...DEPENDENCIES, ...overrides };
+	const { fs: fsInj } = { ...DEPENDENCIES, ...overrides };
 	return new Promise((resolve, reject) => {
-		fs.readFile(path, 'utf-8', createCallback(resolve, reject));
+		fsInj.readFile(path, 'utf-8', createCallback(resolve, reject));
 	});
 }
 
 function writeFile(path, data, overrides) {
-	const { fs } = { ...DEPENDENCIES, ...overrides };
+	const { fs: fsInj } = { ...DEPENDENCIES, ...overrides };
 	return new Promise((resolve, reject) => {
-		fs.writeFile(path, data, createCallback(resolve, reject));
+		fsInj.writeFile(path, data, createCallback(resolve, reject));
 	});
 }
 
 function fileExists(path, overrides) {
-	const { fs } = { ...DEPENDENCIES, ...overrides };
+	const { fs: fsInj } = { ...DEPENDENCIES, ...overrides };
 	return new Promise((resolve) => {
-		fs.access(path, (err) => resolve(!err));
+		fsInj.access(path, (err) => resolve(!err));
 	});
 }
 
