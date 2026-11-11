@@ -25,10 +25,10 @@ const DEPENDENCIES = { cmd, fs };
 
 function updateLog(string, clearLine = true) {
 	if (clearLine) {
-		readline.clearLine(process.stdout);
-		readline.cursorTo(process.stdout, 0);
+		readline.clearLine(process.stderr);
+		readline.cursorTo(process.stderr, 0);
 	}
-	process.stdout.write(`auto-changelog: ${string}`);
+	process.stderr.write(`auto-changelog: ${string}`);
 }
 
 function formatBytes(bytes) {

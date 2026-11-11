@@ -20,6 +20,17 @@ test('updateLog: doesn\'t error', (t) => {
 	t.end();
 });
 
+test('updateLog: writes to stderr, not stdout', (t) => {
+	const stdout = t.capture(process.stdout, 'write');
+	const stderr = t.capture(process.stderr, 'write');
+	updateLog('Test');
+	stdout.restore?.();
+	stderr.restore?.();
+	t.deepEqual(stdout(), [], 'nothing on stdout');
+	t.ok(stderr().some((call) => call.args[0] === 'auto-changelog: Test'), 'the message is on stderr');
+	t.end();
+});
+
 test('cmd: runs a command', async (t) => {
 	const result = await cmd('node --version');
 	t.equal(typeof result, 'string');
