@@ -42,8 +42,8 @@ Releases:
   -u, --unreleased                    # include section for unreleased changes
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags, default: v
-      --autodetect-monorepo-disabled  # disable monorepo autodetection, default: true (will default to false in the next major)
-      --no-autodetect-monorepo-disabled # enable monorepo autodetection
+      --autodetect-monorepo-disabled  # disable monorepo autodetection
+      --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
       --starting-version [tag]        # specify earliest version to include in changelog
       --starting-date [yyyy-mm-dd]    # specify earliest date to include in changelog
       --ending-version [tag]          # specify latest version to include in changelog
@@ -210,22 +210,20 @@ auto-changelog --tag-prefix my-package/
 
 #### Monorepos
 
-In a monorepo, each package's version tags are typically prefixed with the package name, like `my-package@1.2.3`. When monorepo autodetection is enabled, `auto-changelog` detects a monorepo package - by a `repository.directory` field in `package.json`, or an ancestor `package.json` declaring npm `workspaces` - and, for a detected package:
+In a monorepo, each package's version tags are typically prefixed with the package name, like `my-package@1.2.3`. By default, `auto-changelog` detects a monorepo package - by a `repository.directory` field in `package.json`, or an ancestor `package.json` declaring npm `workspaces` - and, for a detected package:
 
 - derives the [tag prefix](#tag-prefixes) from the `name` in `package.json` (so you don't have to set `--tag-prefix` for every package), unless one is already configured, and
 - strips that prefix from the release titles in the changelog (so headings read `## [1.2.3]` rather than `## [my-package@1.2.3]`), while still using the full tags for the compare links.
 
-Autodetection is controlled by `--autodetect-monorepo-disabled`, which defaults to `true`. To opt in for a single run, pass `--no-autodetect-monorepo-disabled`. To opt in for the project, set it to `false`:
+Autodetection is controlled by `--autodetect-monorepo-disabled`, which defaults to `false`. To opt out for a single run, pass `--autodetect-monorepo-disabled`. To opt out for the project, set it to `true`:
 
 ```json
 {
   "auto-changelog": {
-    "autodetectMonorepoDisabled": false
+    "autodetectMonorepoDisabled": true
   }
 }
 ```
-
-This option **will default to `false` in the next major version**, enabling monorepo autodetection out of the box.
 
 #### Tag patterns
 

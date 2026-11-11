@@ -21,8 +21,7 @@ const DEFAULT_OPTIONS = {
 	commitLimit: 3,
 	backfillLimit: 3,
 	tagPrefix: '',
-	// TODO[major]: default to false so monorepo autodetection is on by default
-	autodetectMonorepoDisabled: true,
+	autodetectMonorepoDisabled: false,
 	sortCommits: 'relevance',
 	appendGitLog: '',
 	appendGitTag: '',

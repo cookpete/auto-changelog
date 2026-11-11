@@ -152,10 +152,22 @@ test('getOptions: does not autodetect when the package is not in a monorepo', as
 	t.notOk(options.stripTagPrefix);
 });
 
-test('getOptions: does not autodetect a monorepo by default', async (t) => {
+test('getOptions: autodetects a monorepo by default', async (t) => {
 	function readJson(file) {
 		return file === 'package.json'
 			? { name: 'my-package', repository: { directory: 'packages/my-package' } }
+			: null;
+	}
+	const options = await getOptions(['', ''], { readJson });
+	t.equal(options.autodetectMonorepoDisabled, false);
+	t.equal(options.tagPrefix, 'my-package@');
+	t.equal(options.stripTagPrefix, true);
+});
+
+test('getOptions: in-repo config can disable monorepo autodetection', async (t) => {
+	function readJson(file) {
+		return file === 'package.json'
+			? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: true } }
 			: null;
 	}
 	const options = await getOptions(['', ''], { readJson });
