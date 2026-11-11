@@ -33,8 +33,8 @@ Options:
       --stdout                        # output changelog to stdout
       --plugins [name]                # use plugins to augment commit/merge/release information; repeat for each plugin
       --unsafe-config                 # trust unsafe options from in-repo config (see Security)
-  -V, --version                       # output the version number
-  -h, --help                          # output usage information
+      --version                       # output the version number
+      --help                          # output usage information
 
 Releases:
 

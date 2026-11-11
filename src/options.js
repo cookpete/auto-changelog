@@ -145,8 +145,6 @@ async function getOptions (argv, overrides) {
     },
     // the binary and the entrypoint, as `process.argv` carries them
     args: argv.slice(2),
-    // `-h`/`-V` are what this CLI already shipped
-    shorts: true,
     // commander printed the bare version, with no `v` prefix
     version
   })

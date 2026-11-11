@@ -482,6 +482,14 @@ test('getOptions: --plugins takes one name per flag', async t => {
   t.match(await rejectedWith(t, ['--plugins', 'foo', 'bar']), /Unexpected argument 'bar'/)
 })
 
+test('getOptions: -h is not a short flag for --help', async t => {
+  t.match(await rejectedWith(t, ['-h']), /Unknown option '-h'/)
+})
+
+test('getOptions: -V is not a short flag for --version', async t => {
+  t.match(await rejectedWith(t, ['-V']), /Unknown option '-V'/)
+})
+
 test('run: does nothing when --help was handled', async t => {
   const { exitCode } = process
   const logs = captureLog(t)
