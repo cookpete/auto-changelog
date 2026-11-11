@@ -43,10 +43,6 @@ function isURL (string) {
   return /^https?:\/\/.+/.test(string)
 }
 
-const parseLimit = (limit) => {
-  return limit === false || limit === 'false' ? false : parseInt(limit, 10)
-}
-
 const encodeHTML = (string) => {
   return string.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
@@ -101,7 +97,6 @@ module.exports = {
   niceDate,
   isLink,
   isURL,
-  parseLimit,
   encodeHTML,
   replaceText,
   readFile,

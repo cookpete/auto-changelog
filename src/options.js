@@ -2,7 +2,7 @@ const { dirname, isAbsolute, join } = require('path')
 const { default: pargs } = require('pargs')
 const importCwd = require('import-cwd')
 const { fetchRemote } = require('./remote')
-const { parseLimit, readJson, fileExists, isURL } = require('./utils')
+const { readJson, fileExists, isURL } = require('./utils')
 
 const DEFAULT_OPTIONS = {
   output: 'CHANGELOG.md',
@@ -93,8 +93,6 @@ async function isMonorepoPackage (pkg, readJson) {
 
 const SORT_COMMITS_CHOICES = ['relevance', 'date', 'date-desc', 'subject', 'subject-desc']
 
-const LIMIT_OPTIONS = new Set(['commitLimit', 'backfillLimit'])
-
 const camelCase = string => string.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase())
 
 async function getOptions (argv, overrides) {
@@ -108,8 +106,8 @@ async function getOptions (argv, overrides) {
       package: { type: 'string', placeholder: 'file', short: 'p', optionalValue: true, description: 'use version from file as latest release', defaultDescription: PACKAGE_FILE },
       'latest-version': { type: 'string', placeholder: 'version', short: 'v', description: 'use specified version as latest release' },
       unreleased: { group: 'Releases', type: 'boolean', short: 'u', description: 'include section for unreleased changes' },
-      'commit-limit': { group: 'Commits', type: 'string', negatable: true, placeholder: 'count', short: 'l', description: 'number of commits to display per release', defaultDescription: String(DEFAULT_OPTIONS.commitLimit) },
-      'backfill-limit': { group: 'Commits', type: 'string', negatable: true, placeholder: 'count', short: 'b', description: 'number of commits to backfill empty releases with', defaultDescription: String(DEFAULT_OPTIONS.backfillLimit) },
+      'commit-limit': { group: 'Commits', type: 'integer', negatable: true, placeholder: 'count', short: 'l', description: 'number of commits to display per release', defaultDescription: String(DEFAULT_OPTIONS.commitLimit) },
+      'backfill-limit': { group: 'Commits', type: 'integer', negatable: true, placeholder: 'count', short: 'b', description: 'number of commits to backfill empty releases with', defaultDescription: String(DEFAULT_OPTIONS.backfillLimit) },
       'commit-url': { group: 'Links', type: 'string', placeholder: 'url', description: 'override url for commits, use {id} for commit id' },
       // -i kept for back compatibility
       'issue-url': { group: 'Links', type: 'string', placeholder: 'url', short: 'i', description: 'override url for issues, use {id} for issue id' },
@@ -149,10 +147,7 @@ async function getOptions (argv, overrides) {
     return null
   }
   const commandOptions = Object.fromEntries(
-    Object.entries(values).map(([key, value]) => {
-      const name = camelCase(key)
-      return [name, LIMIT_OPTIONS.has(name) ? parseLimit(value) : value]
-    })
+    Object.entries(values).map(([key, value]) => [camelCase(key), value])
   )
 
   const pkg = await readJson(PACKAGE_FILE)

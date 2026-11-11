@@ -21,9 +21,10 @@ test('getOptions: parses commit limit correctly', async t => {
   t.equal(options.commitLimit, 10)
 })
 
-test('getOptions: parses false commit limit correctly', async t => {
-  const options = await getOptions(['', '', '--commit-limit', 'false'])
-  t.equal(options.commitLimit, false)
+test('getOptions: --commit-limit and --backfill-limit take only an integer', async t => {
+  t.match(await rejectedWith(t, ['--commit-limit', 'false']), /Invalid integer value for option "commit-limit"/)
+  t.match(await rejectedWith(t, ['--backfill-limit', 'false']), /Invalid integer value for option "backfill-limit"/)
+  t.match(await rejectedWith(t, ['--commit-limit', '1.5']), /Invalid integer value for option "commit-limit"/)
 })
 
 test('getOptions: parses --issue-url correctly when given --issue-url', async t => {
