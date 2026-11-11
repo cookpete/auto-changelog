@@ -445,6 +445,34 @@ test('getOptions: accepts every supported --sort-commits', async t => {
   t.deepEqual(options.map(o => o.sortCommits), choices)
 })
 
+const rejectedWith = async (t, args) => {
+  const { exitCode } = process
+  const errors = t.capture(console, 'error')
+  const logs = captureLog(t)
+  const options = await getOptions(['', '', ...args], deps)
+  logs()
+  errors.restore?.()
+  const failedWith = process.exitCode
+  process.exitCode = exitCode
+  t.equal(options, null, 'returns null so the caller stops')
+  t.equal(failedWith, 1, 'sets a failing exit code')
+  return errors().map(call => call.args.join(' ')).join('\n')
+}
+
+test('getOptions: --append-git-log and --append-git-tag take a dash-leading value attached with =', async t => {
+  const options = await getOptions(['', '', '--append-git-log=--first-parent --no-merges', '--append-git-tag=--merged'], deps)
+  t.equal(options.appendGitLog, '--first-parent --no-merges')
+  t.equal(options.appendGitTag, '--merged')
+})
+
+test('getOptions: --append-git-log rejects a dash-leading value given separately', async t => {
+  t.match(await rejectedWith(t, ['--append-git-log', '--first-parent']), /Option '--append-git-log' argument is ambiguous/)
+})
+
+test('getOptions: --append-git-tag rejects a dash-leading value given separately', async t => {
+  t.match(await rejectedWith(t, ['--append-git-tag', '--merged']), /Option '--append-git-tag' argument is ambiguous/)
+})
+
 test('run: does nothing when --help was handled', async t => {
   const { exitCode } = process
   const logs = captureLog(t)

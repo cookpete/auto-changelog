@@ -79,6 +79,9 @@ auto-changelog --output HISTORY.md --template keepachangelog
 
 # Disable the commit limit, rendering all commits for every release
 auto-changelog --commit-limit false
+
+# Append arguments to git log; a value starting with a dash must be attached with `=`
+auto-changelog --append-git-log=--first-parent
 ```
 
 ### Requirements
