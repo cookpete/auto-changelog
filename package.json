@@ -4,7 +4,7 @@
   "description": "Command line tool for generating a changelog from git tags and commit history",
   "main": "./src/index.js",
   "bin": {
-    "auto-changelog": "./src/index.js"
+    "auto-changelog": "./bin/auto-changelog.js"
   },
   "exports": {
     ".": "./src/index.js",
@@ -43,7 +43,7 @@
     "posttest": "npx npm@\">= 10.2\" audit --production",
     "tests-only": "nyc tape 'test/*.js'",
     "preversion": "npm run lint && npm run test",
-    "version": "node src/index.js --package && git add CHANGELOG.md"
+    "version": "node bin/auto-changelog.js --package && git add CHANGELOG.md"
   },
   "author": "Pete Cook (https://github.com/cookpete)",
   "homepage": "https://github.com/CookPete/auto-changelog",

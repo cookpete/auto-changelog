@@ -1,7 +1,6 @@
 {
     "all": true,
     "include": "src",
-    "exclude": "src/index.js",
     "sourceMap": false,
     "instrument": true,
     "report-dir": "./coverage",
