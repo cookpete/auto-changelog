@@ -102,15 +102,15 @@ async function getOptions (argv, overrides) {
   const { fetchRemote, readJson, fileExists, importCwd } = { ...DEPENDENCIES, ...overrides }
   const { values, help } = await pargs(__filename, {
     options: {
-      output: { type: 'string', placeholder: 'file', short: 'o', description: `output file, default: ${DEFAULT_OPTIONS.output}` },
-      config: { type: 'string', placeholder: 'file', short: 'c', description: `config file location, default: ${DEFAULT_OPTIONS.config}` },
-      template: { type: 'string', placeholder: 'template', short: 't', description: `specify template to use [compact, keepachangelog, json], default: ${DEFAULT_OPTIONS.template}` },
-      remote: { type: 'string', placeholder: 'remote', short: 'r', description: `specify git remote to use for links, default: ${DEFAULT_OPTIONS.remote}` },
-      package: { type: 'string', placeholder: 'file', short: 'p', optionalValue: true, description: 'use version from file as latest release, default: package.json' },
+      output: { type: 'string', placeholder: 'file', short: 'o', description: 'output file', defaultDescription: DEFAULT_OPTIONS.output },
+      config: { type: 'string', placeholder: 'file', short: 'c', description: 'config file location', defaultDescription: DEFAULT_OPTIONS.config },
+      template: { type: 'string', placeholder: 'template', short: 't', description: 'specify template to use [compact, keepachangelog, json]', defaultDescription: DEFAULT_OPTIONS.template },
+      remote: { type: 'string', placeholder: 'remote', short: 'r', description: 'specify git remote to use for links', defaultDescription: DEFAULT_OPTIONS.remote },
+      package: { type: 'string', placeholder: 'file', short: 'p', optionalValue: true, description: 'use version from file as latest release', defaultDescription: PACKAGE_FILE },
       'latest-version': { type: 'string', placeholder: 'version', short: 'v', description: 'use specified version as latest release' },
       unreleased: { type: 'boolean', short: 'u', description: 'include section for unreleased changes' },
-      'commit-limit': { type: 'string', placeholder: 'count', short: 'l', description: `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}` },
-      'backfill-limit': { type: 'string', placeholder: 'count', short: 'b', description: `number of commits to backfill empty releases with, default: ${DEFAULT_OPTIONS.backfillLimit}` },
+      'commit-limit': { type: 'string', placeholder: 'count', short: 'l', description: 'number of commits to display per release', defaultDescription: String(DEFAULT_OPTIONS.commitLimit) },
+      'backfill-limit': { type: 'string', placeholder: 'count', short: 'b', description: 'number of commits to backfill empty releases with', defaultDescription: String(DEFAULT_OPTIONS.backfillLimit) },
       'commit-url': { type: 'string', placeholder: 'url', description: 'override url for commits, use {id} for commit id' },
       // -i kept for back compatibility
       'issue-url': { type: 'string', placeholder: 'url', short: 'i', description: 'override url for issues, use {id} for issue id' },
@@ -130,7 +130,7 @@ async function getOptions (argv, overrides) {
       'starting-version': { type: 'string', placeholder: 'tag', description: 'specify earliest version to include in changelog' },
       'starting-date': { type: 'string', placeholder: 'yyyy-mm-dd', description: 'specify earliest date to include in changelog' },
       'ending-version': { type: 'string', placeholder: 'tag', description: 'specify latest version to include in changelog' },
-      'sort-commits': { type: 'enum', choices: SORT_COMMITS_CHOICES, placeholder: 'property', description: `sort commits by property [${SORT_COMMITS_CHOICES.join(', ')}], default: ${DEFAULT_OPTIONS.sortCommits}` },
+      'sort-commits': { type: 'enum', choices: SORT_COMMITS_CHOICES, placeholder: 'property', description: `sort commits by property [${SORT_COMMITS_CHOICES.join(', ')}]`, defaultDescription: DEFAULT_OPTIONS.sortCommits },
       'release-summary': { type: 'boolean', description: 'use tagged commit message body as release summary' },
       'unreleased-only': { type: 'boolean', description: 'only output unreleased changes' },
       'hide-empty-releases': { type: 'boolean', description: 'hide empty releases' },
