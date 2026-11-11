@@ -425,6 +425,26 @@ test('getOptions: --version prints the bare version', async t => {
   t.deepEqual(printed, [require('../package.json').version], 'prints the version with no `v` prefix')
 })
 
+test('getOptions: rejects an unsupported --sort-commits', async t => {
+  const { exitCode } = process
+  const errors = t.capture(console, 'error')
+  const logs = captureLog(t)
+  const options = await getOptions(['', '', '--sort-commits', 'nope'], deps)
+  logs()
+  errors.restore?.()
+  const failedWith = process.exitCode
+  process.exitCode = exitCode
+  t.equal(options, null, 'returns null so the caller stops')
+  t.equal(failedWith, 1, 'sets a failing exit code')
+  t.deepEqual(errors().map(call => call.args.join(' ')), ['Error: Invalid value for option "sort-commits"'], 'reports the invalid value')
+})
+
+test('getOptions: accepts every supported --sort-commits', async t => {
+  const choices = ['relevance', 'date', 'date-desc', 'subject', 'subject-desc']
+  const options = await Promise.all(choices.map(sortCommits => getOptions(['', '', '--sort-commits', sortCommits], deps)))
+  t.deepEqual(options.map(o => o.sortCommits), choices)
+})
+
 test('run: does nothing when --help was handled', async t => {
   const { exitCode } = process
   const logs = captureLog(t)

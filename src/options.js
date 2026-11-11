@@ -92,6 +92,8 @@ async function isMonorepoPackage (pkg, readJson) {
   return false
 }
 
+const SORT_COMMITS_CHOICES = ['relevance', 'date', 'date-desc', 'subject', 'subject-desc']
+
 const LIMIT_OPTIONS = new Set(['commitLimit', 'backfillLimit'])
 
 const camelCase = string => string.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase())
@@ -128,7 +130,7 @@ async function getOptions (argv, overrides) {
       'starting-version': { type: 'string', placeholder: 'tag', description: 'specify earliest version to include in changelog' },
       'starting-date': { type: 'string', placeholder: 'yyyy-mm-dd', description: 'specify earliest date to include in changelog' },
       'ending-version': { type: 'string', placeholder: 'tag', description: 'specify latest version to include in changelog' },
-      'sort-commits': { type: 'string', placeholder: 'property', description: `sort commits by property [relevance, date, date-desc], default: ${DEFAULT_OPTIONS.sortCommits}` },
+      'sort-commits': { type: 'enum', choices: SORT_COMMITS_CHOICES, placeholder: 'property', description: `sort commits by property [${SORT_COMMITS_CHOICES.join(', ')}], default: ${DEFAULT_OPTIONS.sortCommits}` },
       'release-summary': { type: 'boolean', description: 'use tagged commit message body as release summary' },
       'unreleased-only': { type: 'boolean', description: 'only output unreleased changes' },
       'hide-empty-releases': { type: 'boolean', description: 'hide empty releases' },
