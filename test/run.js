@@ -415,14 +415,14 @@ test('getOptions: --help prints usage and parses no options', async t => {
   t.ok(printed.join('\n').includes('Usage: auto-changelog'), 'prints the usage text')
 })
 
-test('getOptions: --version prints the bare version', async t => {
+test('getOptions: --version prints the v-prefixed version', async t => {
   const { exitCode } = process
   const logs = captureLog(t)
   const options = await getOptions(['', '', '--version'], deps)
   const printed = logs()
   process.exitCode = exitCode
   t.equal(options, null, 'returns null so the caller stops')
-  t.deepEqual(printed, [require('../package.json').version], 'prints the version with no `v` prefix')
+  t.deepEqual(printed, [`v${require('../package.json').version}`], 'prints the version with a `v` prefix')
 })
 
 test('getOptions: rejects an unsupported --sort-commits', async t => {

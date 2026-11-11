@@ -1,7 +1,6 @@
 const { dirname, isAbsolute, join } = require('path')
 const { default: pargs } = require('pargs')
 const importCwd = require('import-cwd')
-const { version } = require('../package.json')
 const { fetchRemote } = require('./remote')
 const { parseLimit, readJson, fileExists, isURL } = require('./utils')
 
@@ -144,9 +143,7 @@ async function getOptions (argv, overrides) {
       'unsafe-config': { type: 'boolean', description: 'trust in-repo config completely, honoring options that can load code, run git commands, or make network requests; do not use with untrusted repositories' }
     },
     // the binary and the entrypoint, as `process.argv` carries them
-    args: argv.slice(2),
-    // commander printed the bare version, with no `v` prefix
-    version
+    args: argv.slice(2)
   })
   if (await help({ exit: false })) {
     return null
