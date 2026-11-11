@@ -482,6 +482,27 @@ test('getOptions: --plugins takes one name per flag', async t => {
   t.match(await rejectedWith(t, ['--plugins', 'foo', 'bar']), /Unexpected argument 'bar'/)
 })
 
+test('getOptions: --no-commit-limit disables the commit limit', async t => {
+  const options = await getOptions(['', '', '--no-commit-limit'], deps)
+  t.equal(options.commitLimit, false)
+  t.equal(options.backfillLimit, 3, 'leaves the backfill limit alone')
+})
+
+test('getOptions: --no-backfill-limit disables the backfill limit', async t => {
+  const options = await getOptions(['', '', '--no-backfill-limit'], deps)
+  t.equal(options.backfillLimit, false)
+  t.equal(options.commitLimit, 3, 'leaves the commit limit alone')
+})
+
+test('getOptions: --commit-limit and --no-commit-limit are mutually exclusive', async t => {
+  t.match(await rejectedWith(t, ['--commit-limit', '10', '--no-commit-limit']), /`--commit-limit` and `--no-commit-limit` are mutually exclusive/)
+  t.match(await rejectedWith(t, ['--no-commit-limit', '-l', '10']), /`--commit-limit` and `--no-commit-limit` are mutually exclusive/)
+})
+
+test('getOptions: --backfill-limit and --no-backfill-limit are mutually exclusive', async t => {
+  t.match(await rejectedWith(t, ['--no-backfill-limit', '--backfill-limit=1']), /`--backfill-limit` and `--no-backfill-limit` are mutually exclusive/)
+})
+
 test('getOptions: -h is not a short flag for --help', async t => {
   t.match(await rejectedWith(t, ['-h']), /Unknown option '-h'/)
 })

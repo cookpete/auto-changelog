@@ -54,7 +54,9 @@ Releases:
 Commits:
 
   -l, --commit-limit [count]          # number of commits to display per release (default: 3)
+      --no-commit-limit               # display all commits for every release
   -b, --backfill-limit [count]        # number of commits to backfill empty releases with (default: 3)
+      --no-backfill-limit             # backfill empty releases with all commits
       --issue-pattern [regex]         # override regex pattern for issues in commit messages
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
@@ -78,7 +80,7 @@ auto-changelog
 auto-changelog --output HISTORY.md --template keepachangelog
 
 # Disable the commit limit, rendering all commits for every release
-auto-changelog --commit-limit false
+auto-changelog --no-commit-limit
 
 # Append arguments to git log; a value starting with a dash must be attached with `=`
 auto-changelog --append-git-log=--first-parent

@@ -44,7 +44,7 @@ function isURL (string) {
 }
 
 const parseLimit = (limit) => {
-  return limit === 'false' ? false : parseInt(limit, 10)
+  return limit === false || limit === 'false' ? false : parseInt(limit, 10)
 }
 
 const encodeHTML = (string) => {
