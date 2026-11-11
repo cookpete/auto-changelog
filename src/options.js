@@ -128,8 +128,11 @@ async function getLatestVersion(options, exists, readJSON) {
 	if (options.latestVersion) {
 		return options.latestVersion;
 	}
-	if (options.package) {
-		const file = options.package === true ? PACKAGE_FILE : options.package;
+	if (typeof options.package === 'string') {
+		throw new TypeError('`package` no longer takes a file path; use `packageFile` (`--package-file <file>`) instead');
+	}
+	const file = options.packageFile || (options.package ? PACKAGE_FILE : null);
+	if (file) {
 		if (await exists(file) === false) {
 			throw new Error(`File ${file} does not exist`);
 		}
@@ -177,12 +180,14 @@ async function getOptions(argv, overrides) {
 				defaultDescription: DEFAULT_OPTIONS.remote,
 			},
 			package: {
+				type: 'boolean',
+				short: 'p',
+				description: `use version from ${PACKAGE_FILE} as latest release`,
+			},
+			'package-file': {
 				type: 'string',
 				placeholder: 'file',
-				short: 'p',
-				optionalValue: true,
-				description: 'use version from file as latest release',
-				defaultDescription: PACKAGE_FILE,
+				description: 'use version from the specified file as latest release',
 			},
 			'latest-version': {
 				type: 'string',

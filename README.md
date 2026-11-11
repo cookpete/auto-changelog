@@ -26,6 +26,7 @@ Options:
   -t, --template [template]           # specify template to use [compact, keepachangelog, json] (default: compact)
   -r, --remote [remote]               # specify git remote to use for links (default: origin)
   -p, --package                       # use version from package.json as latest release
+      --package-file [file]           # use version from the specified file as latest release
       --latest-version [version]      # use specified version as latest release
       --hide-credit                   # hide auto-changelog credit
       --handlebars-setup [file]       # handlebars setup file
@@ -122,6 +123,8 @@ Add `auto-changelog -p && git add CHANGELOG.md` to the `version` scripts in your
 ```
 
 Using `-p` or `--package` uses the `version` from `package.json` as the latest release, so that all commits between the previous release and now become part of that release. Essentially anything that would normally be parsed as `Unreleased` will now come under the `version` from `package.json`
+
+To read the `version` from a different file, use `--package-file <file>` instead.
 
 Now every time you run [`npm version`](https://docs.npmjs.com/cli/version), the changelog will automatically update and be part of the version commit.
 

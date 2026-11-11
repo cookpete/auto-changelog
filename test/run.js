@@ -73,6 +73,41 @@ test('getOptions: -v is not a short flag for --latest-version', async (t) => {
 	t.match(await rejectedWith(t, ['-v', '1.2.3']), /Unknown option '-v'/);
 });
 
+test('getOptions: --package takes no value', async (t) => {
+	t.match(await rejectedWith(t, ['-p', '9.9.9']), /Unexpected argument '9.9.9'/);
+	t.match(await rejectedWith(t, ['--package=package.json']), /Option '-p, --package' does not take an argument/);
+
+	const options = await getOptions(['', '', '-pu'], {
+		...deps,
+		fileExists: () => true,
+		readJson: (file) => (file === 'package.json' ? { version: '2.0.0' } : null),
+	});
+	t.equal(options.latestVersion, '2.0.0', '-p in a short cluster reads package.json');
+	t.equal(options.unreleased, true, 'the rest of the cluster is its own flags');
+});
+
+test('getOptions: --package-file uses the version from that file', async (t) => {
+	const options = await getOptions(['', '', '--package-file', 'test.json'], {
+		...deps,
+		fileExists: (file) => file === 'test.json',
+		readJson: (file) => (file === 'test.json' ? { version: '3.1.4' } : null),
+	});
+	t.equal(options.latestVersion, '3.1.4');
+});
+
+test('getOptions: rejects a file path in the `package` config option', async (t) => {
+	try {
+		await getOptions(['', ''], {
+			...deps,
+			readJson: (file) => (file === 'package.json' ? { 'auto-changelog': { package: 'test.json' } } : null),
+		});
+		t.fail('should throw');
+	} catch (error) {
+		t.equal(error.name, 'TypeError');
+		t.match(error.message, /use `packageFile`/);
+	}
+});
+
 test('getOptions: autodetects a monorepo via repository.directory and derives the tag prefix', async (t) => {
 	function readJson(file) {
 		return file === 'package.json'
@@ -224,7 +259,7 @@ test.skip('run: uses version from package.json', async (t) => {
 });
 
 test.skip('run: uses version from custom package file', async (t) => {
-	await run(['', '', '--package', 'test.json'], {
+	await run(['', '', '--package-file', 'test.json'], {
 		...deps,
 		fileExists: () => true,
 		readJson(file) {
@@ -449,7 +484,7 @@ test('run: throws an error when no package found', (t) => run(['', '', '--packag
 	.then(() => t.fail('Should throw an error'))
 	.catch(() => t.pass('threw')));
 
-test('run: throws an error when no custom package found', (t) => run(['', '', '--package', 'does-not-exist.json'], deps)
+test('run: throws an error when no custom package found', (t) => run(['', '', '--package-file', 'does-not-exist.json'], deps)
 	.then(() => t.fail('Should throw an error'))
 	.catch(() => t.pass('threw')));
 
