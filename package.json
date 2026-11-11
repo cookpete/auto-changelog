@@ -68,11 +68,11 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "handlebars": "^4.7.9",
+    "handlebars": "^4.7.10",
     "import-cwd": "^3.0.0",
-    "pargs": "^1.6.0",
+    "pargs": "^1.7.0",
     "parse-github-url": "^1.0.4",
-    "semver": "^7.8.5"
+    "semver": "^7.8.6"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.48.0",
