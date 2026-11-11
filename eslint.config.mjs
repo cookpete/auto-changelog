@@ -122,10 +122,7 @@ export default [
 	},
 
 	{
-		files: [
-			'src/tags.js',
-			'test/run.js',
-		],
+		files: ['test/run.js'],
 		rules: {
 			'no-unused-vars': 'warn',
 		},

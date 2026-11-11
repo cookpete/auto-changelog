@@ -33,7 +33,7 @@ function parseTag({ tagPrefix, stripTagPrefix }) {
 	};
 }
 
-function enrichTag({ getCompareLink, tagPattern }) {
+function enrichTag({ getCompareLink }) {
 	return (t, index, tags) => {
 		const previous = tags[index + 1];
 		return {
