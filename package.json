@@ -77,9 +77,9 @@
   "devDependencies": {
     "@ljharb/eslint-config": "^22.2.5",
     "eslint": "^10.14.0",
-    "markdownlint-cli": "^0.48.0",
+    "markdownlint-cli": "^0.50.0",
     "npmignore": "^0.3.6",
-    "nyc": "^15.1.0",
+    "nyc": "^18.0.0",
     "tape": "^5.10.3"
   },
   "auto-changelog": {
