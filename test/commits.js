@@ -53,6 +53,21 @@ test('parseCommits: supports replaceText option', async (t) => {
 	t.equal(result.filter((c) => c.subject === 'Some **BREAKING** change').length, 1);
 });
 
+test('parseCommits: applies replaceText to the whole message', async (t) => {
+	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
+	const options = {
+		replaceText: {
+			'extra notes': '**extra notes**',
+		},
+		...remotes.github,
+	};
+	const result = parseCommits(gitLog, options);
+	t.deepEqual(
+		result.filter((c) => c.message.includes('**extra notes**')).map((c) => c.message),
+		['Commit 4 fixes #4 in the subject\n\nWith some **extra notes** here'],
+	);
+});
+
 test('parseCommits: supports commitPattern option', async (t) => {
 	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
 	const options = {
