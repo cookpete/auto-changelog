@@ -42,6 +42,7 @@ function getRemote(remoteURL, options = {}) {
 	const IS_GITLAB = (/gitlab/).test(hostname);
 	const IS_AZURE = (/dev\.azure/).test(hostname);
 	const IS_VISUAL_STUDIO = (/visualstudio/).test(hostname);
+	const path = remote.pathname.replace(/git@.*:/, '').replace(/\/+$/, '').replace(/\.git$/, '');
 
 	if (IS_BITBUCKET) {
 		const url = `${protocol}//${hostname}/${remote.repo}`;
@@ -55,7 +56,7 @@ function getRemote(remoteURL, options = {}) {
 	}
 
 	if (IS_GITLAB) {
-		const url = `${protocol}//${hostname}/${remote.pathname.replace(/git@.*:/, '').replace(/\.git$/, '')}`;
+		const url = `${protocol}//${hostname}/${path}`;
 		return {
 			getCommitLink: (id) => `${url}/commit/${id}`,
 			getIssueLink: (id) => `${url}/issues/${id}`,

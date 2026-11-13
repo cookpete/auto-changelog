@@ -20,6 +20,8 @@ const TEST_DATA = [
 			'https://github.com/user/repo',
 			'https://github.com:8080/user/repo',
 			'git@github.com:user/repo.git',
+			'https://github.com/user/repo/',
+			'https://github.com/user/repo.git/',
 		],
 		expected: {
 			commit: 'https://github.com/user/repo/commit/123',
@@ -44,6 +46,7 @@ const TEST_DATA = [
 		remotes: [
 			'https://gitlab.com/user/repo/subgroup.git',
 			'git@gitlab.com:user/repo/subgroup.git',
+			'https://gitlab.com/user/repo/subgroup.git/',
 		],
 		expected: {
 			commit: 'https://gitlab.com/user/repo/subgroup/commit/123',
