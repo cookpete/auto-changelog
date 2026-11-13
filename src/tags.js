@@ -69,7 +69,7 @@ function sortTags({ appendGitTag }) {
 			return 0;
 		}
 		if (semver.valid(a) && semver.valid(b)) {
-			return semver.rcompare(a, b);
+			return semver.compareBuild(b, a);
 		}
 		return a < b ? 1 : -1;
 	};
@@ -86,7 +86,7 @@ function getStartIndex(tags, { endingVersion, tagPrefix }) {
 			throw new Error(`Ending version '${endingVersion}' is not a valid version, and does not match any tag`);
 		}
 		const fallbackIndex = tags.findIndex(({ version }) => semver.valid(version) &&
-			semver.lte(version, semverEndingVersion));
+			semver.compareBuild(version, semverEndingVersion) <= 0);
 		return fallbackIndex === -1 ? tags.length : fallbackIndex;
 	}
 	return 0;
@@ -111,7 +111,8 @@ function getEndIndex(tags, {
 			throw new Error(`Starting version '${startingVersion}' is not a valid version, and does not match any tag`);
 		}
 		// Fall back to nearest version lower than startingVersion
-		const fallbackIndex = tags.findIndex(({ version }) => semver.valid(version) && semver.lt(version, semverStartingVersion));
+		const fallbackIndex = tags.findIndex(({ version }) => semver.valid(version) &&
+			semver.compareBuild(version, semverStartingVersion) < 0);
 		// -1 as a slice end would drop the oldest release rather than include every tag
 		return fallbackIndex === -1 ? tags.length : fallbackIndex;
 	}

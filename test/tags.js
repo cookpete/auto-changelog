@@ -321,3 +321,40 @@ test('fetchTags: adds an unreleased entry when the latest version is already tag
 	t.equal(tags[0].title, 'Unreleased');
 	t.equal(tags[0].href, 'https://github.com/user/repo/compare/v1.0.0...HEAD');
 });
+
+const BUILD_TAGS = gitTags([
+	'5.0.0+2---2000-03-01',
+	'4.9.0---2000-01-01',
+	'5.0.0+10---2000-04-01',
+	'5.0.0---2000-02-01',
+	'5.0.0+1---2000-02-15',
+].join('\n'));
+
+test('fetchTags: sorts by build metadata', async (t) => {
+	const tags = await fetchTags(options, BUILD_TAGS);
+	t.deepEqual(tags.map((tag) => tag.title), [
+		'5.0.0+10',
+		'5.0.0+2',
+		'5.0.0+1',
+		'5.0.0',
+		'4.9.0',
+	]);
+});
+
+test('fetchTags: --starting-version respects build metadata', async (t) => {
+	const exact = await fetchTags({ ...options, startingVersion: '5.0.0+2' }, BUILD_TAGS);
+	t.deepEqual(exact.map((tag) => tag.title), ['5.0.0+10', '5.0.0+2'], 'exact tag');
+
+	const between = await fetchTags({ ...options, startingVersion: '5.0.0+3' }, BUILD_TAGS);
+	t.deepEqual(between.map((tag) => tag.title), ['5.0.0+10'], 'not a tag');
+});
+
+test('fetchTags: --ending-version respects build metadata', async (t) => {
+	const tags = await fetchTags({ ...options, endingVersion: '5.0.0+3' }, BUILD_TAGS);
+	t.deepEqual(tags.map((tag) => tag.title), [
+		'5.0.0+2',
+		'5.0.0+1',
+		'5.0.0',
+		'4.9.0',
+	]);
+});
