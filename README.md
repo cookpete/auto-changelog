@@ -30,6 +30,7 @@ Options:
       --latest-version [version]      # use specified version as latest release
       --hide-credit                   # hide auto-changelog credit
       --handlebars-setup [file]       # handlebars setup file
+      --keep-indentation              # keep indentation from the template in the output
       --prepend                       # prepend changelog to output file
       --stdout                        # output changelog to stdout
       --plugins [name]                # use plugins to augment commit/merge/release information; repeat for each plugin
@@ -293,7 +294,7 @@ Save `changelog-template.hbs` somewhere in your repo:
 
 ```hbs
 ### Changelog
-My custom changelog template. Don’t worry about indentation here; it is automatically removed from the output.
+My custom changelog template. Don’t worry about indentation here; it is automatically removed from the output, unless you pass `--keep-indentation`.
 
 {{#each releases}}
   Every release has a {{title}} and a {{href}} you can use to link to the commit diff.

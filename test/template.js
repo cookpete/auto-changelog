@@ -74,3 +74,19 @@ test('compileTemplate: supports handlebarsSetup option', async (t) => {
 		expected,
 	);
 });
+
+test('compileTemplate: supports keepIndentation option', async (t) => {
+	const template = join(__dirname, 'data', 'template-indented.hbs');
+	const titles = releases.map(({ title }) => title);
+
+	t.equal(
+		await compileTemplate(releases, { template }),
+		`${titles.map((title) => `- ${title}\nindented line\n`).join('')}`,
+		'removes indentation by default',
+	);
+	t.equal(
+		await compileTemplate(releases, { template, keepIndentation: true }),
+		`${titles.map((title) => `- ${title}\n  indented line\n`).join('')}`,
+		'keeps indentation with keepIndentation',
+	);
+});

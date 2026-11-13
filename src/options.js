@@ -342,6 +342,7 @@ async function getOptions(argv, overrides) {
 				placeholder: 'file',
 				description: 'handlebars setup file',
 			},
+			'keep-indentation': { type: 'boolean', description: 'keep indentation from the template in the output' },
 			'append-git-log': {
 				group: 'Commits',
 				type: 'string',

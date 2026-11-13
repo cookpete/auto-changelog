@@ -87,11 +87,14 @@ async function getTemplate(template) {
 	return readFile(path);
 }
 
-function cleanTemplate(template) {
-	return template
-		// Remove indentation
-		.replace(/\n +/g, '\n')
-		.replace(/^ +/, '')
+function cleanTemplate(template, { keepIndentation }) {
+	const unindented = keepIndentation
+		? template
+		: template
+			// Remove indentation
+			.replace(/\n +/g, '\n')
+			.replace(/^ +/, '');
+	return unindented
 		// Fix multiple blank lines
 		.replace(/\n\n\n+/g, '\n\n')
 		.replace(/\n\n$/, '\n');
@@ -110,7 +113,7 @@ async function compileTemplate(releases, options) {
 	if (template === 'json') {
 		return compile({ releases, options });
 	}
-	return cleanTemplate(compile({ releases, options }));
+	return cleanTemplate(compile({ releases, options }), options);
 }
 
 module.exports = {
