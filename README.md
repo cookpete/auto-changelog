@@ -222,7 +222,7 @@ Tags with a leading `v`, like `v1.2.3`, are already valid version tags, so they 
 
 #### Monorepos
 
-In a monorepo, each package's version tags are typically prefixed with the package name, like `my-package@1.2.3`. By default, `auto-changelog` detects a monorepo package - by a `repository.directory` field in `package.json`, or an ancestor `package.json` declaring npm `workspaces` - and, for a detected package:
+In a monorepo, each package's version tags are typically prefixed with the package name, like `my-package@1.2.3`. By default, `auto-changelog` detects a monorepo package - by a `repository.directory` field in `package.json`, or an ancestor `package.json` within the same git repository declaring npm `workspaces` - and, for a detected package:
 
 - derives the [tag prefix](#tag-prefixes) from the `name` in `package.json` (so you don't have to set `--tag-prefix` for every package), unless one is already configured, and
 - strips that prefix from the release titles in the changelog (so headings read `## [1.2.3]` rather than `## [my-package@1.2.3]`), while still using the full tags for the compare links.

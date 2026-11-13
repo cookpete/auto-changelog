@@ -4,9 +4,11 @@ const {
 	dirname,
 	isAbsolute,
 	join,
+	resolve,
 } = require('path');
 const { default: pargs } = require('pargs');
 const importCwd = require('import-cwd');
+const cmd = require('./cmd');
 const { fetchRemote } = require('./remote');
 const {
 	readJson,
@@ -86,14 +88,16 @@ function assertRepoConfigSafe(config) {
 
 // A package is part of a monorepo if it declares a `repository.directory`
 // (i.e. it lives in a subdirectory of a larger repo), or if an ancestor
-// package.json declares npm `workspaces`.
+// package.json within the same git repository declares npm `workspaces`.
 async function isMonorepoPackage(pkg, readJSON) {
 	if (pkg && pkg.repository && pkg.repository.directory) {
 		return true;
 	}
+	const toplevel = (await cmd('git rev-parse --show-toplevel')).trim();
+	const root = toplevel ? resolve(toplevel) : null;
 	let dir = process.cwd();
 	let parent = dirname(dir);
-	while (parent !== dir) {
+	while (dir !== root && parent !== dir) {
 		const ancestor = await readJSON(join(parent, PACKAGE_FILE));
 		if (ancestor && ancestor.workspaces) {
 			return true;

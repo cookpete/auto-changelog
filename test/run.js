@@ -2,6 +2,14 @@
 
 const test = require('tape');
 const { join } = require('path');
+const {
+	mkdirSync,
+	mkdtempSync,
+	realpathSync,
+	rmSync,
+} = require('fs');
+const { tmpdir } = require('os');
+const { execFileSync } = require('child_process');
 const { readFile } = require('../src/utils');
 const remotes = require('./data/remotes');
 const releases = require('./data/releases');
@@ -119,13 +127,46 @@ test('getOptions: autodetects a monorepo via repository.directory and derives th
 	t.equal(options.stripTagPrefix, true);
 });
 
-test('getOptions: autodetects a monorepo via an ancestor workspaces field', async (t) => {
+async function optionsInTempDir({
+	gitRoot,
+	workspacesRoot,
+	cwd,
+}) {
+	const original = process.cwd();
+	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
 	function readJson(file) {
 		if (file === 'package.json') { return { name: 'my-package', 'auto-changelog': { autodetectMonorepoDisabled: false } }; }
-		if (file.endsWith('package.json')) { return { workspaces: ['packages/*'] }; }
+		if (file === join(tmp, workspacesRoot, 'package.json')) { return { workspaces: ['packages/*'] }; }
 		return null;
 	}
-	const options = await getOptions(['', ''], { readJson });
+	try {
+		if (gitRoot) {
+			mkdirSync(join(tmp, gitRoot), { recursive: true });
+			execFileSync('git', ['init', '-q'], { cwd: join(tmp, gitRoot) });
+		}
+		mkdirSync(join(tmp, cwd), { recursive: true });
+		process.chdir(join(tmp, cwd));
+		return await getOptions(['', ''], { readJson, fetchRemote: deps.fetchRemote });
+	} finally {
+		process.chdir(original);
+		rmSync(tmp, { recursive: true, force: true });
+	}
+}
+
+test('getOptions: autodetects a monorepo via an ancestor workspaces field', async (t) => {
+	const options = await optionsInTempDir({ gitRoot: 'repo', workspacesRoot: 'repo', cwd: 'repo/packages/my-package' });
+	t.equal(options.tagPrefix, 'my-package@');
+	t.equal(options.stripTagPrefix, true);
+});
+
+test('getOptions: does not autodetect a monorepo via a workspaces field outside the git repository', async (t) => {
+	const options = await optionsInTempDir({ gitRoot: 'outer/solo', workspacesRoot: 'outer', cwd: 'outer/solo' });
+	t.equal(options.tagPrefix, '');
+	t.notOk(options.stripTagPrefix);
+});
+
+test('getOptions: outside a git repository, autodetects a monorepo via any ancestor workspaces field', async (t) => {
+	const options = await optionsInTempDir({ gitRoot: null, workspacesRoot: '', cwd: 'packages/my-package' });
 	t.equal(options.tagPrefix, 'my-package@');
 	t.equal(options.stripTagPrefix, true);
 });
