@@ -90,3 +90,18 @@ test('readJson: reads file', async (t) => {
 	};
 	t.deepEqual(await readJson(null, { fs }), { abc: 123 });
 });
+
+test('readJson: names the file when its JSON is invalid', async (t) => {
+	const fs = {
+		readFile: (path, type, cb) => cb(null, '{\n  version: "1.0.0"\n}'),
+		access: (path, cb) => cb(null),
+	};
+	await readJson('package.json', { fs }).then(
+		() => t.fail('should have thrown'),
+		(e) => {
+			t.ok(e instanceof SyntaxError, 'throws a SyntaxError');
+			t.match(e.message, /^Invalid JSON in package\.json: /, 'names the file');
+			t.ok(e.cause instanceof SyntaxError, 'keeps the original error as `cause`');
+		},
+	);
+});

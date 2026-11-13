@@ -107,7 +107,12 @@ async function readJson(path, overrides) {
 	if (await fileExists(path, overrides) === false) {
 		return null;
 	}
-	return JSON.parse(await readFile(path, overrides));
+	const contents = await readFile(path, overrides);
+	try {
+		return JSON.parse(contents);
+	} catch (e) {
+		throw new SyntaxError(`Invalid JSON in ${path}: ${e.message}`, { cause: e });
+	}
 }
 
 module.exports = {
