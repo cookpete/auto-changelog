@@ -45,7 +45,7 @@ Releases:
       --autodetect-monorepo-disabled  # disable monorepo autodetection
       --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
       --starting-version [tag]        # specify earliest version to include in changelog
-      --starting-date [yyyy-mm-dd]    # specify earliest date to include in changelog
+      --starting-date [yyyy-mm-dd]    # specify earliest release date to include in changelog (filters releases by tag date, not commits)
       --ending-version [tag]          # specify latest version to include in changelog
       --release-summary               # display tagged commit message body as release summary
       --unreleased-only               # only output unreleased changes

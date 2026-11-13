@@ -305,7 +305,7 @@ async function getOptions(argv, overrides) {
 				group: 'Releases',
 				type: 'string',
 				placeholder: 'yyyy-mm-dd',
-				description: 'specify earliest date to include in changelog',
+				description: 'specify earliest release date to include in changelog (filters releases by tag date, not commits)',
 			},
 			'ending-version': {
 				group: 'Releases',
