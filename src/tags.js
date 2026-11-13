@@ -132,21 +132,22 @@ async function fetchTags(options, overrides) {
 		.sort(sortTags(options));
 
 	const {
-		latestVersion,
 		unreleased,
 		unreleasedOnly,
 		getCompareLink,
 		tagPrefix,
 		stripTagPrefix,
 	} = options;
+	const previous = tags[0];
+	const v = !MATCH_V.test(options.latestVersion) && previous && MATCH_V.test(previous.version) ? 'v' : '';
+	// The title shows the bare version, but the compare link must target the real
+	// tag. In a monorepo that is prefixed with the package name, and the `v`
+	// convention (if any) still applies after that prefix (e.g. `my-package@v2.0.0`).
+	const prefix = stripTagPrefix && tagPrefix ? `${tagPrefix}${v}` : v;
+	const latestTag = options.latestVersion ? `${prefix}${options.latestVersion}` : null;
+	const latestVersion = tags.some(({ tag }) => tag === latestTag) ? null : options.latestVersion;
 	if (latestVersion || unreleased || unreleasedOnly) {
-		const previous = tags[0];
-		const v = !MATCH_V.test(latestVersion) && previous && MATCH_V.test(previous.version) ? 'v' : '';
-		// The title shows the bare version, but the compare link must target the real
-		// tag. In a monorepo that is prefixed with the package name, and the `v`
-		// convention (if any) still applies after that prefix (e.g. `my-package@v2.0.0`).
-		const prefix = stripTagPrefix && tagPrefix ? `${tagPrefix}${v}` : v;
-		const compareTo = latestVersion ? `${prefix}${latestVersion}` : 'HEAD';
+		const compareTo = latestVersion ? latestTag : 'HEAD';
 		tags.unshift({
 			tag: null,
 			title: latestVersion ? `${v}${latestVersion}` : 'Unreleased',

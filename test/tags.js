@@ -303,3 +303,21 @@ test('fetchTags: keeps the v convention after the package prefix in the latest-v
 	t.equal(tags[0].title, 'v2.0.0', 'latest title keeps the v convention');
 	t.equal(tags[0].href, 'https://github.com/user/repo/compare/my-package@v1.0.0...my-package@v2.0.0', 'links to the real prefixed v-tag');
 });
+
+test('fetchTags: does not add a latest-version entry when that version is already tagged', async (t) => {
+	const tags = await fetchTags({ ...options, latestVersion: '1.0.0' }, defaultTags);
+	t.deepEqual(tags, await fetchTags(options, defaultTags), 'same as without a latest version');
+
+	const prefixed = await fetchTags(
+		{ ...options, tagPrefix: 'my-package@', stripTagPrefix: true, latestVersion: '1.0.0' },
+		gitTags('my-package@1.0.0---2001-01-01'),
+	);
+	t.deepEqual(prefixed.map(({ tag }) => tag), ['my-package@1.0.0'], 'matches the prefixed tag');
+});
+
+test('fetchTags: adds an unreleased entry when the latest version is already tagged', async (t) => {
+	const tags = await fetchTags({ ...options, latestVersion: '1.0.0', unreleased: true }, defaultTags);
+	t.equal(tags.length, 7);
+	t.equal(tags[0].title, 'Unreleased');
+	t.equal(tags[0].href, 'https://github.com/user/repo/compare/v1.0.0...HEAD');
+});
