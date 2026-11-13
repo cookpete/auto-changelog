@@ -41,7 +41,7 @@ Releases:
 
   -u, --unreleased                    # include section for unreleased changes
       --tag-pattern [regex]           # override regex pattern for version tags
-      --tag-prefix [prefix]           # prefix used in version tags, default: v
+      --tag-prefix [prefix]           # prefix used in version tags
       --autodetect-monorepo-disabled  # disable monorepo autodetection
       --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
       --starting-version [tag]        # specify earliest version to include in changelog
@@ -217,6 +217,8 @@ Use `--tag-prefix [prefix]` if you prefix your version tags with a certain strin
 # When all versions are tagged like my-package/1.2.3
 auto-changelog --tag-prefix my-package/
 ```
+
+Tags with a leading `v`, like `v1.2.3`, are already valid version tags, so they do not need `--tag-prefix v`.
 
 #### Monorepos
 
