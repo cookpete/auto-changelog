@@ -75,12 +75,19 @@ function sortTags({ appendGitTag }) {
 	};
 }
 
-function getStartIndex(tags, { endingVersion }) {
+function getStartIndex(tags, { endingVersion, tagPrefix }) {
 	if (endingVersion) {
 		const index = tags.findIndex(({ tag }) => tag === endingVersion);
 		if (index !== -1) {
 			return index;
 		}
+		const semverEndingVersion = inferSemver(endingVersion.replace(tagPrefix, ''));
+		if (!semver.valid(semverEndingVersion)) {
+			throw new Error(`Ending version '${endingVersion}' is not a valid version, and does not match any tag`);
+		}
+		const fallbackIndex = tags.findIndex(({ version }) => semver.valid(version) &&
+			semver.lte(version, semverEndingVersion));
+		return fallbackIndex === -1 ? tags.length : fallbackIndex;
 	}
 	return 0;
 }

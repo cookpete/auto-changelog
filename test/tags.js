@@ -133,6 +133,43 @@ test('fetchTags: supports --ending-version', async (t) => {
 	t.equal((await fetchTags({ ...options, endingVersion: 'v0.2.2' }, defaultTags)).length, 4);
 });
 
+test('fetchTags: supports --ending-version that is not an exact tag', async (t) => {
+	t.equal((await fetchTags({ ...options, endingVersion: 'v0.3' }, defaultTags)).length, 5, 'inferred semver');
+	t.equal((await fetchTags({ ...options, endingVersion: '0.2.2' }, defaultTags)).length, 4, 'without the `v`');
+	t.equal((await fetchTags({ ...options, endingVersion: 'v0.2.8' }, defaultTags)).length, 4, 'non-existent version between tags');
+	t.equal((await fetchTags({ ...options, endingVersion: 'v2.0.0' }, defaultTags)).length, 6, 'non-existent version newer than every tag');
+	t.equal((await fetchTags({ ...options, endingVersion: 'v0.0.1' }, defaultTags)).length, 0, 'non-existent version older than every tag');
+});
+
+test('fetchTags: supports --ending-version without the tag prefix', async (t) => {
+	const tags = await fetchTags(
+		{ ...options, tagPrefix: 'my-package@', endingVersion: '1.1.0' },
+		gitTags([
+			'my-package@1.0.0---2001-01-01',
+			'my-package@1.1.0---2001-02-01',
+			'my-package@1.2.0---2001-03-01',
+		].join('\n')),
+	);
+	t.deepEqual(tags.map(({ tag }) => tag), ['my-package@1.1.0', 'my-package@1.0.0']);
+});
+
+test('fetchTags: throws a useful error for an invalid --ending-version', async (t) => {
+	try {
+		await fetchTags({ ...options, endingVersion: 'not-a-version' }, defaultTags);
+		t.fail('should throw');
+	} catch (error) {
+		t.match(error.message, /Ending version 'not-a-version' is not a valid version/);
+	}
+});
+
+test('fetchTags: supports --ending-version with non-semver tags', async (t) => {
+	const tags = await fetchTags(
+		{ ...options, tagPattern: '^build-', endingVersion: 'v9.0.0' },
+		gitTags(['build-9---2001-01-01', 'build-10---2002-01-01'].join('\n')),
+	);
+	t.equal(tags.length, 0);
+});
+
 test('fetchTags: supports --starting-version and --ending-version', async (t) => {
 	t.equal((await fetchTags({ ...options, startingVersion: 'v0.2.1', endingVersion: 'v0.2.2' }, defaultTags)).length, 2);
 });
