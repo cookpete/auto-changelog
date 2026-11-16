@@ -9,6 +9,10 @@ const MATCH_V = /^v\d/;
 
 const DEPENDENCIES = { cmd };
 
+function removePrefix(tag, tagPrefix) {
+	return tagPrefix && tag.startsWith(tagPrefix) ? tag.slice(tagPrefix.length) : tag;
+}
+
 function inferSemver(rawTag, {
 	tagPrefix,
 	tagParserPattern,
@@ -18,9 +22,7 @@ function inferSemver(rawTag, {
 		return rawTag.replace(new RegExp(tagParserPattern), tagParserReplacement);
 	}
 
-	const tag = !!tagPrefix && rawTag.startsWith(tagPrefix)
-		? rawTag.replace(new RegExp(`^${tagPrefix}`), '')
-		: rawTag;
+	const tag = removePrefix(rawTag, tagPrefix);
 
 	if ((/^v?\d+$/).test(tag)) {
 		// v1 becomes v1.0.0
@@ -42,7 +44,7 @@ function parseTag(options) {
 		return {
 			tag,
 			date,
-			title: stripTagPrefix ? tag.replace(tagPrefix, '') : tag,
+			title: stripTagPrefix ? removePrefix(tag, tagPrefix) : tag,
 			version: inferSemver(tag, options),
 		};
 	};
@@ -96,7 +98,7 @@ function getStartIndex(tags, { endingVersion, tagPrefix }) {
 		if (index !== -1) {
 			return index;
 		}
-		const semverEndingVersion = inferSemver(endingVersion.replace(tagPrefix, ''));
+		const semverEndingVersion = inferSemver(removePrefix(endingVersion, tagPrefix));
 		if (!semver.valid(semverEndingVersion)) {
 			throw new Error(`Ending version '${endingVersion}' is not a valid version, and does not match any tag`);
 		}
@@ -117,7 +119,7 @@ function getEndIndex(tags, {
 		return 1;
 	}
 	if (startingVersion) {
-		const semverStartingVersion = inferSemver(startingVersion.replace(tagPrefix, ''));
+		const semverStartingVersion = inferSemver(removePrefix(startingVersion, tagPrefix));
 		const index = tags.findIndex(({ tag }) => tag === startingVersion || tag === semverStartingVersion);
 		if (index !== -1) {
 			return index + 1;

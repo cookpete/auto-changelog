@@ -395,3 +395,24 @@ test('fetchTags: supports tag parsing through --tag-parser-pattern and --tag-par
 		'0.1.0-build.2345',
 	]);
 });
+
+test('fetchTags: a tag prefix is matched literally', async (t) => {
+	const plus = await fetchTags({ ...options, tagPrefix: 'a+' }, gitTags('a+1.0.0---2000-01-01\na+2.0.0---2000-02-01'));
+	t.deepEqual(plus.map((tag) => tag.version), ['2.0.0', '1.0.0'], 'regex quantifier');
+
+	const paren = await fetchTags({ ...options, tagPrefix: 'pkg(' }, gitTags('pkg(1.0.0---2000-01-01'));
+	t.deepEqual(paren.map((tag) => tag.version), ['1.0.0'], 'regex group');
+});
+
+test('fetchTags: a tag prefix is only removed from the start of a version option', async (t) => {
+	const RC_TAGS = gitTags([
+		'v1.0.0-rc.1---2000-01-01',
+		'v1.0.0-rc.2---2000-01-02',
+		'v1.0.0-rc.3---2000-01-03',
+		'v1.0.0---2000-01-04',
+	].join('\n'));
+	const starting = await fetchTags({ ...options, tagPrefix: 'v', startingVersion: '1.0.0-rc.v2' }, RC_TAGS);
+	t.deepEqual(starting.map(({ tag }) => tag), ['v1.0.0'], '--starting-version');
+	const ending = await fetchTags({ ...options, tagPrefix: 'v', endingVersion: '1.0.0-rc.v2' }, RC_TAGS);
+	t.deepEqual(ending.map(({ tag }) => tag), ['v1.0.0-rc.3', 'v1.0.0-rc.2', 'v1.0.0-rc.1'], '--ending-version');
+});
