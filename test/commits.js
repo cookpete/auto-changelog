@@ -2,6 +2,13 @@
 
 const test = require('tape');
 const { join } = require('path');
+const {
+	mkdtempSync,
+	realpathSync,
+	rmSync,
+} = require('fs');
+const { tmpdir } = require('os');
+const { execFileSync } = require('child_process');
 const { readFile } = require('../src/utils');
 const remotes = require('./data/remotes');
 const commits = require('./data/commits');
@@ -20,6 +27,44 @@ const {
 test('fetchCommits: fetches commits', async (t) => {
 	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
 	t.deepEqual(await fetchCommits('', remotes.github, { cmd: () => gitLog }), commits);
+});
+
+test('fetchCommits: reads parent hashes from a real git log', async (t) => {
+	const original = process.cwd();
+	const repo = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	function git(...args) {
+		return execFileSync('git', [
+			'-c',
+			'user.name=Example Author',
+			'-c',
+			'user.email=email@example.com',
+			'-c',
+			'commit.gpgsign=false',
+			...args,
+		], { cwd: repo }).toString().trim();
+	}
+	try {
+		git('init', '-q');
+		git('commit', '-q', '--allow-empty', '-m', 'Root commit');
+		git('checkout', '-q', '-b', 'branch');
+		git('commit', '-q', '--allow-empty', '-m', 'Branch commit');
+		git('checkout', '-q', '-');
+		git('commit', '-q', '--allow-empty', '-m', 'Mainline commit');
+		git('merge', '-q', '--no-ff', 'branch', '-m', 'Merge pull request #1 from user/branch', '-m', 'Pull request title');
+		const [merge, first, second] = git('rev-list', '--parents', '-n', '1', 'HEAD').split(' ');
+		const [root] = git('rev-list', '--max-parents=0', 'HEAD').split('\n');
+		process.chdir(repo);
+		const fetched = await fetchCommits('HEAD', { ...remotes.github, appendGitLog: '' });
+		const byHash = new Map(fetched.map((commit) => [commit.hash, commit]));
+		t.equal(fetched.length, 4, 'every commit is parsed');
+		t.deepEqual(byHash.get(merge).parents, [first, second], 'a merge commit has both parents');
+		t.equal(byHash.get(merge).merge.message, 'Pull request title', 'the rest of the format is still parsed');
+		t.deepEqual(byHash.get(first).parents, [root], 'a commit has its parent');
+		t.deepEqual(byHash.get(root).parents, [], 'a root commit has no parents');
+	} finally {
+		process.chdir(original);
+		rmSync(repo, { recursive: true, force: true });
+	}
 });
 
 test('parseCommits: parses commits', async (t) => {
@@ -304,6 +349,42 @@ ${MESSAGE_SEPARATOR}
 	t.end();
 });
 
+test('parseCommits: parses parent hashes', (t) => {
+	const gitLog = `${COMMIT_SEPARATOR}0e24bf427a51eac52133cc731b4b5d74a7e04672 92839699a6aaea148dcd72ea897321e66cae0c18 17fbef87e82889f01d8257900f7edc55b05918a2
+2015-12-24 20:29:22 +0000
+Commit Author
+commit@author.com
+Merge pull request #5 from repo/branch
+
+Pull request title
+${MESSAGE_SEPARATOR}
+${COMMIT_SEPARATOR}92839699a6aaea148dcd72ea897321e66cae0c18 158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69
+2015-12-24 20:28:22 +0000
+Commit Author
+commit@author.com
+Second commit
+${MESSAGE_SEPARATOR}
+ 1 file changed, 1 insertion(+)
+
+${COMMIT_SEPARATOR}158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69${' '}
+2015-12-24 20:27:22 +0000
+Commit Author
+commit@author.com
+Root commit
+${MESSAGE_SEPARATOR}
+ 1 file changed, 1 insertion(+)
+`;
+	const [merge, commit, root] = parseCommits(gitLog, remotes.github);
+	t.equal(merge.hash, '0e24bf427a51eac52133cc731b4b5d74a7e04672', 'merge commit hash');
+	t.deepEqual(merge.parents, ['92839699a6aaea148dcd72ea897321e66cae0c18', '17fbef87e82889f01d8257900f7edc55b05918a2'], 'merge commit parents');
+	t.deepEqual(merge.merge.commit.parents, merge.parents, 'the merge carries its commit\'s parents');
+	t.equal(commit.hash, '92839699a6aaea148dcd72ea897321e66cae0c18', 'commit hash');
+	t.deepEqual(commit.parents, ['158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69'], 'commit parent');
+	t.equal(root.hash, '158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69', 'root commit hash');
+	t.deepEqual(root.parents, [], 'root commit has no parents');
+	t.end();
+});
+
 test('getMerge gitlab: parses a merge', (t) => {
 	const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007';
 	t.deepEqual(getMerge(EXAMPLE_COMMIT, message, remotes.gitlab), {
@@ -416,19 +497,19 @@ test('getLogFormat: returns modern format', async (t) => {
 	function getGitVersion() {
 		return Promise.resolve('1.7.2');
 	}
-	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
+	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
 });
 
 test('getLogFormat: returns fallback format', async (t) => {
 	function getGitVersion() {
 		return Promise.resolve('1.7.1');
 	}
-	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
+	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
 });
 
 test('getLogFormat: returns fallback format when null', async (t) => {
 	function getGitVersion() {
 		return Promise.resolve(null);
 	}
-	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
+	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
 });

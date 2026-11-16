@@ -3,6 +3,7 @@
 module.exports = [
   {
     "hash": "2401ee4706e94629f48830bab9ed5812c032734a",
+    "parents": [],
     "shorthash": "2401ee4",
     "author": "Example Author",
     "email": "email@example.com",
@@ -26,6 +27,7 @@ module.exports = [
   },
   {
     "hash": "77bb243170408cd18e70ca05bf8b3ca7646ea437",
+    "parents": [],
     "shorthash": "77bb243",
     "author": "Example Author",
     "email": "email@example.com",
@@ -43,6 +45,7 @@ module.exports = [
   },
   {
     "hash": "b0b304049847d9568585bc11399fa6cfa4cab5dc",
+    "parents": [],
     "shorthash": "b0b3040",
     "author": "Example Author",
     "email": "email@example.com",
@@ -60,6 +63,7 @@ module.exports = [
   },
   {
     "hash": "db92947e6129cc20cd7777b7ed90b2bd547918c0",
+    "parents": [],
     "shorthash": "db92947",
     "author": "Example Author",
     "email": "email@example.com",
@@ -77,6 +81,7 @@ module.exports = [
   },
   {
     "hash": "e9a43b2bf50449fc0d84465308e6008cc1597bb3",
+    "parents": [],
     "shorthash": "e9a43b2",
     "author": "Example Author",
     "email": "email@example.com",
@@ -94,6 +99,7 @@ module.exports = [
   },
   {
     "hash": "12c0624e7e419a70bd5f3b403d7e0bd8f23ec617",
+    "parents": [],
     "shorthash": "12c0624",
     "author": "Example Author",
     "email": "email@example.com",
@@ -111,6 +117,7 @@ module.exports = [
   },
   {
     "hash": "ef17dcc732d282f027aa3bddf8f91cbb05998cc8",
+    "parents": [],
     "shorthash": "ef17dcc",
     "author": "Example Author",
     "email": "email@example.com",
@@ -128,6 +135,7 @@ module.exports = [
   },
   {
     "hash": "0e24bf427a51eac52133cc731b4b5d74a7e04672",
+    "parents": [],
     "shorthash": "0e24bf4",
     "author": "Example Author",
     "email": "email@example.com",
@@ -145,6 +153,7 @@ module.exports = [
       "author": "Example Author",
       "commit": {
         "hash": "0e24bf427a51eac52133cc731b4b5d74a7e04672",
+        "parents": [],
         "shorthash": "0e24bf4",
         "author": "Example Author",
         "email": "email@example.com",
@@ -160,6 +169,7 @@ module.exports = [
   },
   {
     "hash": "92839699a6aaea148dcd72ea897321e66cae0c18",
+    "parents": [],
     "shorthash": "9283969",
     "author": "Example Author",
     "email": "email@example.com",
@@ -177,6 +187,7 @@ module.exports = [
   },
   {
     "hash": "17fbef87e82889f01d8257900f7edc55b05918a2",
+    "parents": [],
     "shorthash": "17fbef8",
     "author": "Example Author",
     "email": "email@example.com",
@@ -200,6 +211,7 @@ module.exports = [
   },
   {
     "hash": "796edd129a6aaea148dcd72ea897321e66cae0c1",
+    "parents": [],
     "shorthash": "796edd1",
     "author": "Example Author",
     "email": "email@example.com",
@@ -217,6 +229,7 @@ module.exports = [
   },
   {
     "hash": "31b7d3da24d64e32a0a7e558f254d01c348613f3",
+    "parents": [],
     "shorthash": "31b7d3d",
     "author": "Example Author",
     "email": "email@example.com",
@@ -234,6 +247,7 @@ module.exports = [
       "author": "Example Author",
       "commit": {
         "hash": "31b7d3da24d64e32a0a7e558f254d01c348613f3",
+        "parents": [],
         "shorthash": "31b7d3d",
         "author": "Example Author",
         "email": "email@example.com",
@@ -249,6 +263,7 @@ module.exports = [
   },
   {
     "hash": "1c2694e44a032d2ab6d6eaa381beaf23ba3d9573",
+    "parents": [],
     "shorthash": "1c2694e",
     "author": "Example Author",
     "email": "email@example.com",
@@ -266,6 +281,7 @@ module.exports = [
   },
   {
     "hash": "90ef33485369fc7892d11b2e4da04ffb64df1e99",
+    "parents": [],
     "shorthash": "90ef334",
     "author": "Example Author",
     "email": "email@example.com",
@@ -294,6 +310,7 @@ module.exports = [
   },
   {
     "hash": "158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69",
+    "parents": [],
     "shorthash": "158fdde",
     "author": "Example Author",
     "email": "email@example.com",

@@ -15,7 +15,8 @@ async function getLogFormat(overrides) {
 	const bodyFormat = gitVersion && semver.gte(gitVersion, '1.7.2')
 		? BODY_FORMAT
 		: FALLBACK_BODY_FORMAT;
-	return `${COMMIT_SEPARATOR}%H%n%ai%n%an%n%ae%n${bodyFormat}${MESSAGE_SEPARATOR}`;
+	// `cmd` splits its command on spaces, so the space between the hash and its parents is escaped.
+	return `${COMMIT_SEPARATOR}%H%x20%P%n%ai%n%an%n%ae%n${bodyFormat}${MESSAGE_SEPARATOR}`;
 }
 
 module.exports = getLogFormat;

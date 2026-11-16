@@ -123,16 +123,18 @@ function getStats(stats) {
 function parseCommit(commit, options = {}) {
 	const [
 		,
-		hash,
+		hashes,
 		date,
 		author,
 		email,
 		tail,
 	] = commit.match(MATCH_COMMIT);
+	const [hash, ...parents] = hashes.split(' ').filter(Boolean);
 	const [body, stats] = tail.split(MESSAGE_SEPARATOR);
 	const message = encodeHTML(body);
 	const parsed = {
 		hash,
+		parents,
 		shorthash: hash.slice(0, 7),
 		author,
 		email,
