@@ -4,6 +4,11 @@ const { availableParallelism } = require('os');
 const semver = require('semver');
 const { mapLimit } = require('async');
 const { fetchCommits } = require('./commits');
+const {
+	logVerbose,
+	logLeftOutReleases,
+	logLeftOutCommit,
+} = require('./utils');
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/;
 const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/;
@@ -63,7 +68,11 @@ function getMergeMembership(commits, options) {
 	};
 }
 
-function filterCommits(merges, isPartOfMerge) {
+function filterCommits(merges, isPartOfMerge, options) {
+	function leaveOut(commit, reason) {
+		logLeftOutCommit(options, commit, reason);
+		return false;
+	}
 	return (commit) => {
 		if (commit.fixes || commit.merge) {
 			// Filter out commits that already appear in fix or merge lists
@@ -73,16 +82,14 @@ function filterCommits(merges, isPartOfMerge) {
 			return true;
 		}
 		if (semver.valid(commit.subject)) {
-			// Filter out version commits
-			return false;
+			return leaveOut(commit, 'it is a version commit');
 		}
 		if (MERGE_COMMIT_PATTERN.test(commit.subject)) {
-			// Filter out merge commits
-			return false;
+			return leaveOut(commit, 'it is a merge commit');
 		}
-		if (merges.some((m) => m.message === commit.subject && isPartOfMerge(commit, m))) {
-			// Filter out a merge's own commits that repeat its message
-			return false;
+		const merge = merges.find((m) => m.message === commit.subject && isPartOfMerge(commit, m));
+		if (merge) {
+			return leaveOut(commit, `it is part of merge #${merge.id}, and repeats its title`);
 		}
 		return true;
 	};
@@ -152,10 +159,14 @@ async function parseReleases(tags, options, onParsed, overrides) {
 		const emptyRelease = merges.length === 0 && fixes.length === 0;
 		const { message } = commits[0] || { message: null };
 		const breakingCount = commits.filter((c) => c.breaking).length;
-		const filteredCommits = commits
-			.filter(filterCommits(merges, getMergeMembership(commits, options)))
-			.sort(sortCommits(options))
-			.slice(0, getCommitLimit(options, emptyRelease, breakingCount));
+		const sortedCommits = commits
+			.filter(filterCommits(merges, getMergeMembership(commits, options), options))
+			.sort(sortCommits(options));
+		const filteredCommits = sortedCommits.slice(0, getCommitLimit(options, emptyRelease, breakingCount));
+		const overLimit = sortedCommits.length - filteredCommits.length;
+		if (overLimit > 0) {
+			logVerbose(options, `left out ${overLimit} of the ${sortedCommits.length} commits in ${tag.title}: over \`${emptyRelease ? '--backfill-limit' : '--commit-limit'}\``);
+		}
 
 		if (onParsed) { onParsed(tag); }
 
@@ -172,7 +183,12 @@ async function parseReleases(tags, options, onParsed, overrides) {
 		if (plugin.processReleases) { await plugin.processReleases(releases); }
 	}
 
-	return releases.filter(filterReleases(options)).slice(0, options.releaseLimit);
+	const isShown = filterReleases(options);
+	logLeftOutReleases(options, releases.filter((release) => !isShown(release)), 'with no changes (`--hide-empty-releases`)');
+	const shown = releases.filter(isShown);
+	const limited = shown.slice(0, options.releaseLimit);
+	logLeftOutReleases(options, shown.slice(limited.length), 'over `--release-limit`');
+	return limited;
 }
 
 module.exports = {

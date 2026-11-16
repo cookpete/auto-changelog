@@ -23,6 +23,7 @@ const {
 	getMerge,
 	getSubject,
 } = require('../src/parse-commits');
+const { captureStderr } = require('./utils/stderr');
 
 test('fetchCommits: fetches commits', async (t) => {
 	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
@@ -512,4 +513,37 @@ test('getLogFormat: returns fallback format when null', async (t) => {
 		return Promise.resolve(null);
 	}
 	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
+});
+
+function gitLogOf(commitsToLog) {
+	return commitsToLog
+		.map(({ hash, subject }) => `${COMMIT_SEPARATOR}${hash}\n2000-01-01 00:00:00 +0000\nAuthor\nemail@example.com\n${subject}\n${MESSAGE_SEPARATOR}\n`)
+		.join('');
+}
+
+test('fetchCommits: --verbose says which git command it runs', async (t) => {
+	const verbose = { ...remotes.github, verbose: true, appendGitLog: '' };
+	const { lines } = await captureStderr(t, () => fetchCommits('v1.0.0..v2.0.0', verbose, { cmd: () => Promise.resolve(''), getGitVersion: () => Promise.resolve(null) }));
+	t.equal(lines.length, 1);
+	t.match(lines[0], /^running git log v1\.0\.0\.\.v2\.0\.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__\S+$/);
+});
+
+test('parseCommits: --verbose says which commits the commit patterns left out', async (t) => {
+	const gitLog = gitLogOf([
+		{ hash: 'a'.repeat(40), subject: 'feat: kept' },
+		{ hash: 'b'.repeat(40), subject: 'chore: ignored' },
+		{ hash: 'c'.repeat(40), subject: 'unmatched' },
+	]);
+	const options = {
+		...remotes.github,
+		verbose: true,
+		commitPattern: ':',
+		ignoreCommitPattern: '^chore',
+	};
+	const { result, lines } = await captureStderr(t, () => parseCommits(gitLog, options));
+	t.deepEqual(result.map(({ subject }) => subject), ['feat: kept']);
+	t.deepEqual(lines, [
+		'left out commit bbbbbbb "chore: ignored": it matches `--ignore-commit-pattern`',
+		'left out commit ccccccc "unmatched": it does not match `--commit-pattern`',
+	]);
 });

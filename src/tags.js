@@ -2,7 +2,12 @@
 
 const semver = require('semver');
 const cmd = require('./cmd');
-const { niceDate, updateLog } = require('./utils');
+const {
+	niceDate,
+	updateLog,
+	logVerbose,
+	logLeftOutReleases,
+} = require('./utils');
 
 const DIVIDER = '---';
 const MATCH_V = /^v\d/;
@@ -107,6 +112,20 @@ function isValidTag({ tagPattern }) {
 	};
 }
 
+function filterValidTags(tags, options) {
+	const isValid = isValidTag(options);
+	return tags.filter((t) => {
+		const valid = isValid(t);
+		if (!valid && t.tag) {
+			const why = options.tagPattern
+				? 'it does not match `--tag-pattern`'
+				: `${t.version === t.tag ? 'it' : `its version "${t.version}"`} is not valid semver`;
+			logVerbose(options, `ignored tag ${t.tag}: ${why}`);
+		}
+		return valid;
+	});
+}
+
 function sortTags({ appendGitTag }) {
 	return ({ version: a }, { version: b }) => {
 		if ((/--sort/).test(appendGitTag)) {
@@ -134,6 +153,13 @@ function getStartIndex(tags, { endingVersion, tagPrefix }) {
 		return fallbackIndex === -1 ? tags.length : fallbackIndex;
 	}
 	return 0;
+}
+
+function getEndReason({ unreleasedOnly, startingVersion }) {
+	if (unreleasedOnly) {
+		return 'that are not unreleased (`--unreleased-only`)';
+	}
+	return startingVersion ? 'older than `--starting-version`' : 'older than `--starting-date`';
 }
 
 function getEndIndex(tags, {
@@ -168,9 +194,10 @@ function getEndIndex(tags, {
 
 const LISTED_TAGS = 3;
 
-function listTags(tags) {
-	const shown = tags.slice(0, LISTED_TAGS).map(({ tag }) => tag).join(', ');
-	return tags.length > LISTED_TAGS ? `${shown}, …` : shown;
+function listTags(tags, { verbose }) {
+	const listed = verbose ? tags.length : LISTED_TAGS;
+	const shown = tags.slice(0, listed).map(({ tag }) => tag).join(', ');
+	return tags.length > listed ? `${shown}, …` : shown;
 }
 
 // A tag prefix decides which tags are this changelog's releases. Version tags without it
@@ -189,9 +216,9 @@ function filterByPrefix(tags, options) {
 	if (skipped.length > 0) {
 		const count = skipped.length === 1 ? '1 version tag' : `${skipped.length} version tags`;
 		if (!prefixed.some(isValidTag(options))) {
-			throw new Error(`No version tags start with the tag prefix "${tagPrefix}", but ${count} without it ${skipped.length === 1 ? 'does' : 'do'} (${listTags(skipped)}); check \`--tag-prefix\`, or for a monorepo package, its \`name\` and \`--autodetect-monorepo-disabled\``);
+			throw new Error(`No version tags start with the tag prefix "${tagPrefix}", but ${count} without it ${skipped.length === 1 ? 'does' : 'do'} (${listTags(skipped, options)}); check \`--tag-prefix\`, or for a monorepo package, its \`name\` and \`--autodetect-monorepo-disabled\``);
 		}
-		updateLog(`skipped ${count} without the tag prefix "${tagPrefix}" (${listTags(skipped)})\n`);
+		updateLog(`skipped ${count} without the tag prefix "${tagPrefix}" (${listTags(skipped, options)})\n`);
 	}
 	return prefixed;
 }
@@ -220,12 +247,13 @@ async function getUnreleasedTarget({ remote }, command) {
 async function fetchTags(options, overrides) {
 	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
 	const format = `%(refname:short)${DIVIDER}%(creatordate:short)`;
-	const parsed = (await command(`git tag -l --format=${format} ${options.appendGitTag}`))
+	const tagCommand = `git tag -l --format=${format} ${options.appendGitTag}`;
+	logVerbose(options, `running ${tagCommand.trim()}`);
+	const parsed = (await command(tagCommand))
 		.trim()
 		.split('\n')
 		.map(parseTag(options));
-	const tags = filterByPrefix(parsed, options)
-		.filter(isValidTag(options))
+	const tags = filterValidTags(filterByPrefix(parsed, options), options)
 		.sort(sortTags(options));
 	const rollsUp = getRollsUp(options);
 
@@ -262,7 +290,11 @@ async function fetchTags(options, overrides) {
 	// Hidden empty releases aren't known until their commits are fetched, so the limit then
 	// waits for `parseReleases`; otherwise, limiting here skips fetching the rest.
 	const limitHere = options.releaseLimit && !options.hideEmptyReleases;
-	return enriched.slice(start, limitHere ? Math.min(end, start + options.releaseLimit) : end);
+	const kept = limitHere ? Math.min(end, start + options.releaseLimit) : end;
+	logLeftOutReleases(options, enriched.slice(0, start), 'newer than `--ending-version`');
+	logLeftOutReleases(options, enriched.slice(Math.max(start, end)), getEndReason(options));
+	logLeftOutReleases(options, enriched.slice(kept, end), 'over `--release-limit`');
+	return enriched.slice(start, kept);
 }
 
 module.exports = {

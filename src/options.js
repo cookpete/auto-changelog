@@ -14,6 +14,7 @@ const {
 	readJson,
 	fileExists,
 	isURL,
+	logVerbose,
 } = require('./utils');
 
 const DEFAULT_OPTIONS = {
@@ -130,6 +131,20 @@ function assertReleaseLimit({ releaseLimit }) {
 	if (releaseLimit !== undefined && !(Number.isInteger(releaseLimit) && releaseLimit > 0)) {
 		throw new RangeError(`\`releaseLimit\` must be a positive integer; got \`${releaseLimit}\``);
 	}
+}
+
+function describeConfig({
+	dotOptions,
+	configFile,
+	packageOptions,
+	extendsConfig,
+}) {
+	const sources = [].concat(
+		dotOptions ? configFile : [],
+		packageOptions ? `the ${PACKAGE_FILE} "${PACKAGE_OPTIONS_KEY}" key` : [],
+		extendsConfig ? `extended config ${extendsConfig}` : [],
+	);
+	return sources.length > 0 ? sources.join(', ') : 'none';
 }
 
 async function getLatestVersion(options, exists, readJSON) {
@@ -403,6 +418,7 @@ async function getOptions(argv, overrides) {
 				optionalValue: true,
 				description: 'use plugins to augment commit/merge/release information',
 			},
+			verbose: { type: 'boolean', description: 'explain on stderr what was left out of the changelog, and why' },
 			'unsafe-config': { type: 'boolean', description: 'trust in-repo config completely, honoring options that can load code, run git commands, or make network requests; do not use with untrusted repositories' },
 		},
 		// the binary and the entrypoint, as `process.argv` carries them
@@ -417,6 +433,7 @@ async function getOptions(argv, overrides) {
 	const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null;
 	const configFile = commandOptions.config || DEFAULT_OPTIONS.config;
 	const dotOptions = await readJSON(configFile);
+	const extendsConfig = commandOptions.extends ?? packageOptions?.extends ?? dotOptions?.extends;
 	// `extends` takes precedence like any other option, and a relative path resolves from wherever it was set.
 	const fromConfigFile = commandOptions.extends === undefined &&
 		!Object.hasOwn(packageOptions || {}, 'extends') &&
@@ -425,7 +442,7 @@ async function getOptions(argv, overrides) {
 		{
 			...dotOptions,
 			...packageOptions,
-			extends: commandOptions.extends ?? packageOptions?.extends ?? dotOptions?.extends,
+			extends: extendsConfig,
 		},
 		fromConfigFile ? dirname(resolve(configFile)) : process.cwd(),
 		[
@@ -441,6 +458,12 @@ async function getOptions(argv, overrides) {
 		...repoOptions,
 		...commandOptions,
 	};
+	logVerbose(options, `config read from: ${describeConfig({
+		dotOptions,
+		configFile,
+		packageOptions,
+		extendsConfig,
+	})}`);
 	if (!options.autodetectMonorepoDisabled && await isMonorepoPackage(pkg, readJSON)) {
 		if (!options.tagPrefix && pkg && pkg.name) {
 			// Monorepo version tags are conventionally prefixed with the package name
@@ -448,6 +471,7 @@ async function getOptions(argv, overrides) {
 			// than requiring it to be configured for every package.
 			options.tagPrefix = `${pkg.name}@`;
 		}
+		logVerbose(options, `detected a monorepo package (tag prefix: "${options.tagPrefix}")`);
 		// Strip the (derived or configured) prefix from release titles, while still
 		// using the full tags for compare links, unless `stripTagPrefix` was set explicitly.
 		options.stripTagPrefix ??= true;

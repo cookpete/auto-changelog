@@ -34,6 +34,7 @@ Options:
       --keep-indentation              # keep indentation from the template in the output
       --prepend                       # prepend changelog to output file
       --stdout                        # output changelog to stdout
+      --verbose                       # explain on stderr what was left out of the changelog, and why
       --plugins [name]                # use plugins to augment commit/merge/release information; repeat for each plugin
       --unsafe-config                 # trust unsafe options from in-repo config (see Security)
       --version                       # output the version number
@@ -390,6 +391,8 @@ All merges and fixes are listed, but **commits are limited** to the 3 most relev
 To only include the newest releases, use `--release-limit`. It counts an `Unreleased` or `--latest-version` section, and applies after `--starting-version`, `--starting-date`, `--ending-version`, and `--hide-empty-releases`; each release shown still lists its changes since the release before it.
 
 Commit message conventions aren't special: a `feat:` or `fix:` prefix is just part of the subject, so to group commits by type, use the [`commit-list` helper](#commit-list-helper) in a custom template. To leave commits out entirely, use `--ignore-commit-pattern`, or `--commit-pattern` to only include matching commits.
+
+To see why a tag, release, or commit is missing, use `--verbose`. It lists, on stderr, the config that was read, whether a monorepo package was detected, the `git` commands run, and each tag, release, and commit that was left out, with the reason. If the problem is in a template instead, generate the [JSON](#custom-templates) a template receives.
 
 #### Custom templates
 

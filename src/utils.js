@@ -31,6 +31,26 @@ function updateLog(string, clearLine = true) {
 	process.stderr.write(`auto-changelog: ${string}`);
 }
 
+function logVerbose({ verbose }, string) {
+	if (verbose) {
+		updateLog(`${string}\n`);
+	}
+}
+
+function plural(count, noun) {
+	return `${count} ${noun}${count === 1 ? '' : 's'}`;
+}
+
+function logLeftOutReleases(options, releases, reason) {
+	if (releases.length > 0) {
+		logVerbose(options, `left out ${plural(releases.length, 'release')} ${reason}: ${releases.map(({ title }) => title).join(', ')}`);
+	}
+}
+
+function logLeftOutCommit(options, { shorthash, subject }, reason) {
+	logVerbose(options, `left out commit ${shorthash} "${subject}": ${reason}`);
+}
+
 function formatBytes(bytes) {
 	return `${Math.max(1, Math.round(bytes / 1024))} kB`;
 }
@@ -117,6 +137,9 @@ async function readJson(path, overrides) {
 
 module.exports = {
 	updateLog,
+	logVerbose,
+	logLeftOutReleases,
+	logLeftOutCommit,
 	formatBytes,
 	cmd,
 	getGitVersion,

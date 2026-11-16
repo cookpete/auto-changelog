@@ -5,6 +5,7 @@ const {
 	encodeHTML,
 	niceDate,
 	replaceText,
+	logLeftOutCommit,
 } = require('./utils');
 
 const COMMIT_SEPARATOR = '__AUTO_CHANGELOG_COMMIT_SEPARATOR__';
@@ -22,15 +23,18 @@ const MERGE_PATTERNS = [
 	/^Merge branch .+ into .+\n\n(.+)[\S\s]+See merge request [^!]*!(\d+)/, // GitLab merge
 ];
 
-function filterCommit(commit, { ignoreCommitPattern, commitPattern }) {
+function filterCommit(commit, options) {
+	const { ignoreCommitPattern, commitPattern } = options;
 	if (ignoreCommitPattern) {
 		const ignore = new RegExp(ignoreCommitPattern);
 		if (ignore.test(commit.subject) || (commit.merge && ignore.test(commit.merge.message))) {
+			logLeftOutCommit(options, commit, 'it matches `--ignore-commit-pattern`');
 			return false;
 		}
 	}
-	if (commitPattern) {
-		return new RegExp(commitPattern).test(commit.subject);
+	if (commitPattern && !new RegExp(commitPattern).test(commit.subject)) {
+		logLeftOutCommit(options, commit, 'it does not match `--commit-pattern`');
+		return false;
 	}
 	return true;
 }

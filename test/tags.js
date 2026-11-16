@@ -3,6 +3,7 @@
 const test = require('tape');
 const remotes = require('./data/remotes');
 const { fetchTags } = require('../src/tags');
+const { captureStderr } = require('./utils/stderr');
 
 const options = {
 	tagPrefix: '',
@@ -633,4 +634,61 @@ test('fetchTags: --release-limit keeps the newest releases', async (t) => {
 
 	const hidingEmpty = await fetchTags({ ...options, releaseLimit: 2, hideEmptyReleases: true }, defaultTags);
 	t.equal(hidingEmpty.length, 6, 'not yet, when empty releases are hidden');
+});
+
+async function verboseTagLines(t, tagOptions, tags = defaultTags) {
+	const { lines } = await captureStderr(t, () => fetchTags({ ...options, verbose: true, ...tagOptions }, tags));
+	return lines.filter((line) => !line.startsWith('running '));
+}
+
+test('fetchTags: --verbose says which git command it runs', async (t) => {
+	const { lines } = await captureStderr(t, () => fetchTags({ ...options, verbose: true, appendGitTag: '' }, defaultTags));
+	t.deepEqual(lines, ['running git tag -l --format=%(refname:short)---%(creatordate:short)']);
+
+	const quiet = await captureStderr(t, () => fetchTags({ ...options, appendGitTag: '' }, defaultTags));
+	t.deepEqual(quiet.lines, [], 'nothing without --verbose');
+});
+
+test('fetchTags: --verbose says which tags are not versions, and why', async (t) => {
+	const tags = gitTags(['v1.0.0', 'latest', 'build-7'].map((tag) => `${tag}---2000-01-01`).join('\n'));
+	t.deepEqual(await verboseTagLines(t, {}, tags), [
+		'ignored tag latest: it is not valid semver',
+		'ignored tag build-7: it is not valid semver',
+	]);
+	t.deepEqual(await verboseTagLines(t, { tagPattern: '^v' }, tags), [
+		'ignored tag latest: it does not match `--tag-pattern`',
+		'ignored tag build-7: it does not match `--tag-pattern`',
+	], '--tag-pattern');
+	t.deepEqual(await verboseTagLines(t, { tagPrefix: 'build-' }, gitTags('build-7---2000-01-01\nbuild-x---2000-01-01')), [
+		'ignored tag build-x: its version "x" is not valid semver',
+	], 'names the version when it differs from the tag');
+	t.deepEqual(await verboseTagLines(t, {}, gitTags('')), [], 'no tags at all');
+});
+
+test('fetchTags: --verbose lists every tag skipped for lacking the tag prefix', async (t) => {
+	const tags = gitTags(['v1.0.0', '1.0.0', '1.1.0', '1.2.0', '1.3.0'].map((tag) => `${tag}---2000-01-01`).join('\n'));
+	t.deepEqual(await verboseTagLines(t, { tagPrefix: 'v' }, tags), [
+		'skipped 4 version tags without the tag prefix "v" (1.3.0, 1.2.0, 1.1.0, 1.0.0)',
+	]);
+});
+
+test('fetchTags: --verbose says which releases each option left out', async (t) => {
+	t.deepEqual(await verboseTagLines(t, { endingVersion: 'v0.3.0', startingVersion: 'v0.2.1' }), [
+		'left out 1 release newer than `--ending-version`: v1.0.0',
+		'left out 2 releases older than `--starting-version`: v0.2.0, v0.1.0',
+	]);
+	t.deepEqual(await verboseTagLines(t, { startingDate: '2000-04-01' }), [
+		'left out 4 releases older than `--starting-date`: v0.2.2, v0.2.1, v0.2.0, v0.1.0',
+	]);
+	t.deepEqual(await verboseTagLines(t, { releaseLimit: 4 }), [
+		'left out 2 releases over `--release-limit`: v0.2.0, v0.1.0',
+	]);
+	t.deepEqual(await verboseTagLines(t, { unreleasedOnly: true }, gitRepo()), [
+		'left out 6 releases that are not unreleased (`--unreleased-only`): v1.0.0, v0.3.0, v0.2.2, v0.2.1, v0.2.0, v0.1.0',
+	]);
+	t.deepEqual(await verboseTagLines(t, { endingVersion: 'v0.2.0', startingVersion: 'v0.3.0' }), [
+		'left out 4 releases newer than `--ending-version`: v1.0.0, v0.3.0, v0.2.2, v0.2.1',
+		'left out 2 releases older than `--starting-version`: v0.2.0, v0.1.0',
+	], 'each release once, when the options cross');
+	t.deepEqual(await verboseTagLines(t, {}), [], 'nothing left out');
 });

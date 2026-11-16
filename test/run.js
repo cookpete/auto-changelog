@@ -17,6 +17,7 @@ const releases = require('./data/releases');
 const { tags } = require('./data/commits-map');
 const { run } = require('../src/run');
 const getOptions = require('../src/options');
+const { captureStderr } = require('./utils/stderr');
 
 const { version } = require('../package.json');
 
@@ -289,6 +290,44 @@ test('getOptions: --release-limit takes a positive integer', async (t) => {
 		return file === 'package.json' ? { 'auto-changelog': { releaseLimit: '5' } } : null;
 	}
 	await rejects([], { readJson }, /got `5`/, 'a string from config');
+});
+
+test('getOptions: --verbose says which config was read', async (t) => {
+	const quiet = await captureStderr(t, () => getOptions(['', ''], deps));
+	t.deepEqual(quiet.lines, [], 'nothing without --verbose');
+
+	const none = await captureStderr(t, () => getOptions(['', '', '--verbose'], deps));
+	t.deepEqual(none.lines, ['config read from: none']);
+
+	const original = process.cwd();
+	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	function readJson(file) {
+		if (file === 'package.json') { return { 'auto-changelog': { verbose: true } }; }
+		return file === '.auto-changelog' ? { extends: './base.json' } : null;
+	}
+	try {
+		execFileSync('git', ['init', '-q'], { cwd: tmp });
+		writeFileSync(join(tmp, 'base.json'), '{}');
+		process.chdir(tmp);
+		const all = await captureStderr(t, () => getOptions(['', ''], { ...deps, readJson }));
+		t.deepEqual(all.lines, ['config read from: .auto-changelog, the package.json "auto-changelog" key, extended config ./base.json'], 'and in-repo config can turn it on');
+	} finally {
+		process.chdir(original);
+		rmSync(tmp, { recursive: true, force: true });
+	}
+});
+
+test('getOptions: --verbose says when it detected a monorepo package', async (t) => {
+	function readJson(file) {
+		return file === 'package.json'
+			? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { autodetectMonorepoDisabled: false } }
+			: null;
+	}
+	const { lines } = await captureStderr(t, () => getOptions(['', '', '--verbose'], { ...deps, readJson }));
+	t.deepEqual(lines, [
+		'config read from: the package.json "auto-changelog" key',
+		'detected a monorepo package (tag prefix: "my-package@")',
+	]);
 });
 
 test('getOptions: --rollup-prereleases-disabled takes no value, or a version', async (t) => {

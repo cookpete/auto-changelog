@@ -5,6 +5,7 @@ const { availableParallelism } = require('os');
 const remotes = require('./data/remotes');
 const { generateCommits } = require('./utils/commits');
 const { parseReleases } = require('../src/releases');
+const { captureStderr } = require('./utils/stderr');
 
 function commitsFrom(map) {
 	return { fetchCommits: (diff) => Promise.resolve(map[diff]) };
@@ -288,4 +289,66 @@ test('parseReleases: --release-limit counts releases after hiding empty ones', a
 
 	const shown = await parseReleases(tags, limits, null, commitsFrom(map));
 	t.deepEqual(shown.map(({ tag }) => tag), ['v3.0.0', 'v2.0.0'], 'empty releases count when shown');
+});
+
+async function verboseReleaseLines(t, map, options) {
+	const tags = Object.keys(map).map((tag) => ({
+		tag,
+		title: tag,
+		date: '2000-01-01',
+		diff: tag,
+	}));
+	const allOptions = {
+		...remotes.github,
+		...options,
+		verbose: true,
+	};
+	return (await captureStderr(t, () => parseReleases(tags, allOptions, null, commitsFrom(map)))).lines;
+}
+
+test('parseReleases: --verbose says which commits were left out, and why', async (t) => {
+	const commits = generateCommits([
+		{ hash: 'a'.repeat(40), message: 'Merge pull request #4 from user/branch\n\nAdd thing' },
+		{ hash: 'b'.repeat(40), parents: ['c'.repeat(40)], message: 'Add thing' },
+		{ hash: 'c'.repeat(40), message: '1.2.3' },
+		{ hash: 'd'.repeat(40), message: 'Merge branch \'main\' into feature' },
+		{ hash: 'e'.repeat(40), message: 'Fix thing\n\nFixes #1' },
+		{ hash: 'f'.repeat(40), message: 'Kept' },
+	]);
+	commits[0].merge.commit.parents = ['c'.repeat(40), 'b'.repeat(40)];
+	t.deepEqual(await verboseReleaseLines(t, { 'v1.0.0': commits }, { commitLimit: false }), [
+		'left out commit bbbbbbb "Add thing": it is part of merge #4, and repeats its title',
+		'left out commit ccccccc "1.2.3": it is a version commit',
+		'left out commit ddddddd "Merge branch \'main\' into feature": it is a merge commit',
+	], 'commits listed as merges or fixes are not left out');
+});
+
+test('parseReleases: --verbose says how many commits a limit left out', async (t) => {
+	const map = {
+		'v2.0.0': generateCommits(['Merge pull request #2 from user/branch\n\nTitle', 'One', 'Two', 'Three']),
+		'v1.0.0': generateCommits(['One', 'Two', 'Three']),
+	};
+	t.deepEqual(await verboseReleaseLines(t, map, { commitLimit: 1, backfillLimit: 2 }), [
+		'left out 2 of the 3 commits in v2.0.0: over `--commit-limit`',
+		'left out 1 of the 3 commits in v1.0.0: over `--backfill-limit`',
+	]);
+	t.deepEqual(await verboseReleaseLines(t, map, { commitLimit: false }), [], 'no limit');
+});
+
+test('parseReleases: --verbose says which releases were hidden or over the limit', async (t) => {
+	const map = {
+		'v3.0.0': [],
+		'v2.0.0': generateCommits(['Second commit']),
+		'v1.0.0': generateCommits(['First commit']),
+		'v0.1.0': generateCommits(['Initial commit']),
+	};
+	t.deepEqual(await verboseReleaseLines(t, map, {
+		commitLimit: 3,
+		backfillLimit: 3,
+		releaseLimit: 2,
+		hideEmptyReleases: true,
+	}), [
+		'left out 1 release with no changes (`--hide-empty-releases`): v3.0.0',
+		'left out 1 release over `--release-limit`: v0.1.0',
+	]);
 });
