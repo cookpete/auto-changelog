@@ -1,6 +1,7 @@
 'use strict';
 
 const test = require('tape');
+const { availableParallelism } = require('os');
 const remotes = require('./data/remotes');
 const { generateCommits } = require('./utils/commits');
 const { parseReleases } = require('../src/releases');
@@ -254,4 +255,21 @@ test('parseReleases: hides empty releases', async (t) => {
 	const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
 	const releases = await parseReleases(tags, options, null, commitsFrom(map));
 	t.equal(releases.length, 0);
+});
+
+test('parseReleases: limits how many releases fetch commits at once, and keeps their order', async (t) => {
+	const limit = availableParallelism();
+	const tags = Array.from({ length: limit * 3 }, (_, i) => ({ tag: `v1.0.${i}`, date: '2000-01-01', diff: `v1.0.${i}` }));
+	let running = 0;
+	let maxRunning = 0;
+	async function fetchCommits(diff) {
+		running += 1;
+		maxRunning = Math.max(maxRunning, running);
+		await new Promise((resolve) => { setTimeout(resolve, tags.length - Number(diff.split('.')[2])); });
+		running -= 1;
+		return generateCommits([`Commit for ${diff}`]);
+	}
+	const releases = await parseReleases(tags, { commitLimit: 3 }, null, { fetchCommits });
+	t.equal(maxRunning, limit, `at most ${limit} at once`);
+	t.deepEqual(releases.map(({ tag }) => tag), tags.map(({ tag }) => tag), 'in tag order, though later ones finish first');
 });

@@ -68,6 +68,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "async": "^3.2.6",
     "handlebars": "^4.7.10",
     "pargs": "^1.8.1",
     "parse-github-url": "^1.0.4",

@@ -1,6 +1,8 @@
 'use strict';
 
+const { availableParallelism } = require('os');
 const semver = require('semver');
+const { mapLimit } = require('async');
 const { fetchCommits } = require('./commits');
 
 const MERGE_COMMIT_PATTERN = /^Merge (remote-tracking )?branch '.+'/;
@@ -135,7 +137,8 @@ function getSummary(message, { releaseSummary }) {
 
 async function parseReleases(tags, options, onParsed, overrides) {
 	const { fetchCommits: fetchC } = { ...DEPENDENCIES, ...overrides };
-	const releases = await Promise.all(tags.map(async (tag) => {
+	// Each release runs its own `git log`; running them all at once overwhelms large repositories.
+	const releases = await mapLimit(tags, availableParallelism(), async (tag) => {
 		const commits = await fetchC(tag.diff, options);
 		const merges = commits.filter((commit) => commit.merge).map((commit) => commit.merge);
 		const fixes = commits.filter((commit) => commit.fixes).map((commit) => ({ fixes: commit.fixes, commit }));
@@ -163,7 +166,7 @@ async function parseReleases(tags, options, onParsed, overrides) {
 			merges,
 			fixes,
 		};
-	}));
+	});
 
 	for (const plugin of options.plugins || []) {
 		if (plugin.processReleases) { await plugin.processReleases(releases); }
