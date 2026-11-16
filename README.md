@@ -43,7 +43,7 @@ Releases:
 
   -u, --unreleased                    # include section for unreleased changes
       --tag-pattern [regex]           # override regex pattern for version tags
-      --tag-prefix [prefix]           # prefix used in version tags
+      --tag-prefix [prefix]           # prefix used in version tags; only tags starting with it are releases
       --tag-parser-pattern [regex]    # pattern used to capture values in tags for replacement
       --tag-parser-replacement [string] # replaces captures supplied in the --tag-parser-pattern option to create valid semver tags
       --strip-tag-prefix              # strip the tag prefix from release titles (default: on for a detected monorepo package)
@@ -131,6 +131,7 @@ What to change:
 What may look different:
 
 - **Monorepos**: [monorepo autodetection](#monorepos) is now on by default, so a detected package gets its tag prefix from its `name` (unless one is configured), and release titles without it. Set `autodetectMonorepoDisabled` to `true` to keep the v2 behavior.
+- **Tag prefixes**: with a [tag prefix](#tag-prefixes), whether set or derived for a monorepo package, only tags that start with it are releases. Version tags without it, which v2 included, are left out and listed on stderr; if no version tags have the prefix, that is now an error.
 - **Progress messages** go to stderr, so stdout carries only the changelog.
 - **`--version`** prints the version with a `v` prefix, like `v3.0.0`.
 - **`--ignore-commit-pattern`** also matches merged pull request titles, so it can hide merges as well as commits.
@@ -263,7 +264,14 @@ Use `--tag-prefix [prefix]` if you prefix your version tags with a certain strin
 auto-changelog --tag-prefix my-package/
 ```
 
-Tags with a leading `v`, like `v1.2.3`, are already valid version tags, so they do not need `--tag-prefix v`.
+Only tags that start with the prefix are releases; it is matched literally, and removed only from the start of a tag. Version tags without it are left out, and listed in a notice on stderr. If none of the version tags start with the prefix, that is an error, since the prefix is most likely wrong.
+
+Tags with a leading `v`, like `v1.2.3`, are already valid version tags, so they do not need `--tag-prefix v`; but use it to leave out other version tags, like `1.2.3-4567` tags from a CI system:
+
+```bash
+# Only tags like v1.2.3 are releases
+auto-changelog --tag-prefix v
+```
 
 By default, release titles show the full tag, like `my-package/1.2.3`. Pass `--strip-tag-prefix` to show only the version, like `1.2.3`; compare links still use the full tags.
 
@@ -273,6 +281,11 @@ In a monorepo, each package's version tags are typically prefixed with the packa
 
 - derives the [tag prefix](#tag-prefixes) from the `name` in `package.json` (so you don't have to set `--tag-prefix` for every package), unless one is already configured, and
 - strips that prefix from the release titles in the changelog (so headings read `## [1.2.3]` rather than `## [my-package@1.2.3]`), while still using the full tags for the compare links, unless [`--no-strip-tag-prefix`](#tag-prefixes) (or `"stripTagPrefix": false`) is set.
+
+Since [only tags with the prefix are releases](#tag-prefixes), a detected package's changelog leaves out the repository's other version tags. If none of the version tags have the package's prefix, that is an error:
+
+- for a package tagged like `v1.2.3`, pass `--tag-prefix v`;
+- for a package that has no release tags yet, in a repository with other version tags, pass `--autodetect-monorepo-disabled --tag-pattern '^my-package@'` until its first release is tagged.
 
 Autodetection is controlled by `--autodetect-monorepo-disabled`, which defaults to `false`. To opt out for a single run, pass `--autodetect-monorepo-disabled`. To opt out for the project, set it to `true`:
 

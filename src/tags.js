@@ -2,7 +2,7 @@
 
 const semver = require('semver');
 const cmd = require('./cmd');
-const { niceDate } = require('./utils');
+const { niceDate, updateLog } = require('./utils');
 
 const DIVIDER = '---';
 const MATCH_V = /^v\d/;
@@ -139,13 +139,44 @@ function getEndIndex(tags, {
 	return tags.length;
 }
 
+const LISTED_TAGS = 3;
+
+function listTags(tags) {
+	const shown = tags.slice(0, LISTED_TAGS).map(({ tag }) => tag).join(', ');
+	return tags.length > LISTED_TAGS ? `${shown}, …` : shown;
+}
+
+// A tag prefix decides which tags are this changelog's releases. Version tags without it
+// were releases before v3, so leaving them out is reported, and is an error when they are
+// the only version tags, since then the prefix is most likely wrong.
+function filterByPrefix(tags, options) {
+	const { tagPrefix } = options;
+	if (!tagPrefix) {
+		return tags;
+	}
+	const prefixed = tags.filter(({ tag }) => tag.startsWith(tagPrefix));
+	const skipped = tags
+		.filter(({ tag }) => !tag.startsWith(tagPrefix))
+		.filter(isValidTag(options))
+		.sort(sortTags(options));
+	if (skipped.length > 0) {
+		const count = skipped.length === 1 ? '1 version tag' : `${skipped.length} version tags`;
+		if (!prefixed.some(isValidTag(options))) {
+			throw new Error(`No version tags start with the tag prefix "${tagPrefix}", but ${count} without it ${skipped.length === 1 ? 'does' : 'do'} (${listTags(skipped)}); check \`--tag-prefix\`, or for a monorepo package, its \`name\` and \`--autodetect-monorepo-disabled\``);
+		}
+		updateLog(`skipped ${count} without the tag prefix "${tagPrefix}" (${listTags(skipped)})\n`);
+	}
+	return prefixed;
+}
+
 async function fetchTags(options, overrides) {
 	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
 	const format = `%(refname:short)${DIVIDER}%(creatordate:short)`;
-	const tags = (await command(`git tag -l --format=${format} ${options.appendGitTag}`))
+	const parsed = (await command(`git tag -l --format=${format} ${options.appendGitTag}`))
 		.trim()
 		.split('\n')
-		.map(parseTag(options))
+		.map(parseTag(options));
+	const tags = filterByPrefix(parsed, options)
 		.filter(isValidTag(options))
 		.sort(sortTags(options));
 

@@ -416,3 +416,66 @@ test('fetchTags: a tag prefix is only removed from the start of a version option
 	const ending = await fetchTags({ ...options, tagPrefix: 'v', endingVersion: '1.0.0-rc.v2' }, RC_TAGS);
 	t.deepEqual(ending.map(({ tag }) => tag), ['v1.0.0-rc.3', 'v1.0.0-rc.2', 'v1.0.0-rc.1'], '--ending-version');
 });
+
+async function fetchTagsWithStderr(t, tagOptions, tags) {
+	const stderr = t.capture(process.stderr, 'write');
+	try {
+		return {
+			tags: await fetchTags({ ...options, ...tagOptions }, gitTags(tags.map((tag) => `${tag}---2000-01-01`).join('\n'))),
+			stderr: stderr().map((call) => call.args[0]).join(''),
+		};
+	} finally {
+		stderr.restore?.();
+	}
+}
+
+test('fetchTags: only tags starting with the tag prefix are releases', async (t) => {
+	const { tags, stderr } = await fetchTagsWithStderr(t, { tagPrefix: 'v' }, [
+		'3.8.0-3316',
+		'3.8.0-3318',
+		'3.8.0-3319',
+		'3.8.0-3320',
+		'v3.6.0',
+		'v3.7.0',
+		'v3.8.0',
+	]);
+	t.deepEqual(tags.map(({ tag, diff }) => ({ tag, diff })), [
+		{ tag: 'v3.8.0', diff: 'v3.7.0..v3.8.0' },
+		{ tag: 'v3.7.0', diff: 'v3.6.0..v3.7.0' },
+		{ tag: 'v3.6.0', diff: 'v3.6.0' },
+	]);
+	t.match(stderr, /auto-changelog: skipped 4 version tags without the tag prefix "v" \(3\.8\.0-3320, 3\.8\.0-3319, 3\.8\.0-3318, …\)\n/, 'says which tags were skipped');
+});
+
+test('fetchTags: the tag prefix applies before --tag-pattern', async (t) => {
+	const { tags, stderr } = await fetchTagsWithStderr(t, { tagPrefix: 'ui-kit_', tagPattern: '_\\d+$' }, [
+		'ui-kit_1',
+		'ui-kit_2',
+		'other_3',
+	]);
+	t.deepEqual(tags.map(({ tag }) => tag), ['ui-kit_2', 'ui-kit_1']);
+	t.match(stderr, /skipped 1 version tag without the tag prefix "ui-kit_" \(other_3\)\n/, 'one skipped tag');
+});
+
+test('fetchTags: says nothing about tags without the prefix that are not versions', async (t) => {
+	const { tags, stderr } = await fetchTagsWithStderr(t, { tagPrefix: 'core@' }, [
+		'core@1.0.0',
+		'ui@1.0.0',
+		'not-a-version',
+	]);
+	t.deepEqual(tags.map(({ tag }) => tag), ['core@1.0.0']);
+	t.equal(stderr, '', 'no notice');
+});
+
+test('fetchTags: fails when only version tags without the tag prefix exist', async (t) => {
+	await fetchTagsWithStderr(t, { tagPrefix: 'pkg@' }, ['v1.0.0', 'v1.1.0', 'pkg@next']).then(
+		() => t.fail('should throw'),
+		(error) => t.match(error.message, /^No version tags start with the tag prefix "pkg@", but 2 version tags without it do \(v1\.1\.0, v1\.0\.0\); check `--tag-prefix`/, 'several tags'),
+	);
+	await fetchTagsWithStderr(t, { tagPrefix: 'pkg@' }, ['v1.0.0']).then(
+		() => t.fail('should throw'),
+		(error) => t.match(error.message, /but 1 version tag without it does \(v1\.0\.0\)/, 'one tag'),
+	);
+	const { tags } = await fetchTagsWithStderr(t, { tagPrefix: 'pkg@', unreleased: true }, ['other']);
+	t.deepEqual(tags.map(({ title }) => title), ['Unreleased'], 'no error without other version tags');
+});

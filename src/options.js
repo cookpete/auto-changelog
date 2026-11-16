@@ -291,7 +291,7 @@ async function getOptions(argv, overrides) {
 				group: 'Releases',
 				type: 'string',
 				placeholder: 'prefix',
-				description: 'prefix used in version tags',
+				description: 'prefix used in version tags; only tags starting with it are releases',
 			},
 			'tag-parser-pattern': {
 				group: 'Releases',
