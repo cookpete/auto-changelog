@@ -136,6 +136,32 @@ test('commit-list helper: supports excludes option', (t) => {
 	t.end();
 });
 
+test('commit-list helper: supports flags for message, subject, and exclude patterns', (t) => {
+	function render(hash) {
+		return Handlebars.compile(`{{#commit-list commits ${hash}}}- {{subject}}\n{{/commit-list}}`)({ commits });
+	}
+	t.equal(render('message="^breaking change"'), '', 'case-sensitive by default');
+	t.equal(render('message="^breaking change" flags="i"'), '- Commit 2\n', 'message, with `m` still applied');
+	t.equal(render('subject="^FEAT: " flags="i"'), '- feat: Commit 3\n', 'subject');
+	t.equal(
+		render('exclude="^(breaking change|this commit adds)" flags="i"'),
+		'- Commit 1\n',
+		'exclude, with `m` still applied',
+	);
+	t.equal(render('message="^this commit adds a fix" flags="mi"'), '- fix: Commit 4\n', 'an explicit `m` is fine');
+	t.end();
+});
+
+test('commit-list helper: rejects flags other than i, m, s, and u', (t) => {
+	for (const flags of ['g', 'y', 'd', 'v', 'x']) {
+		const compile = Handlebars.compile(`{{#commit-list commits subject="a" flags="${flags}"}}{{/commit-list}}`);
+		t.throws(() => compile({ commits }), new RegExp(`flags\` may only contain .*got \`${flags}\``), `rejects \`${flags}\``);
+	}
+	const nonString = Handlebars.compile('{{#commit-list commits subject="a" flags=1}}{{/commit-list}}');
+	t.throws(() => nonString({ commits }), TypeError, 'rejects a non-string');
+	t.end();
+});
+
 test('commit-list helper: returns nothing if nothing matches', (t) => {
 	const compile = Handlebars.compile([
 		'{{#commit-list commits heading="# Heading" message="A string that never appears"}}',

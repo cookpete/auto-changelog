@@ -23,6 +23,9 @@ const COMPILE_OPTIONS = {
 
 Handlebars.registerHelper('json', (object) => new Handlebars.SafeString(JSON.stringify(object, null, 2)));
 
+// `g` and `y` would make `test` stateful across commits, so only flags that change what matches are allowed.
+const COMMIT_LIST_FLAGS = /^[imsu]*$/;
+
 Handlebars.registerHelper('commit-list', (context, options) => {
 	if (!context || context.length === 0) {
 		return '';
@@ -33,23 +36,29 @@ Handlebars.registerHelper('commit-list', (context, options) => {
 		message,
 		subject,
 		heading,
+		flags = '',
 	} = options.hash;
+
+	if (typeof flags !== 'string' || !COMMIT_LIST_FLAGS.test(flags)) {
+		throw new TypeError(`commit-list: \`flags\` may only contain \`i\`, \`m\`, \`s\`, and \`u\`; got \`${flags}\``);
+	}
+	const messageFlags = [...new Set(`m${flags}`)].join('');
 
 	const list = context
 		.filter((item) => {
 			const commit = item.commit || item;
 			if (exclude) {
-				const pattern = new RegExp(exclude, 'm');
+				const pattern = new RegExp(exclude, messageFlags);
 				if (pattern.test(commit.message)) {
 					return false;
 				}
 			}
 			if (message) {
-				const pattern = new RegExp(message, 'm');
+				const pattern = new RegExp(message, messageFlags);
 				return pattern.test(commit.message);
 			}
 			if (subject) {
-				const pattern = new RegExp(subject);
+				const pattern = new RegExp(subject, flags);
 				return pattern.test(commit.subject);
 			}
 			return true;

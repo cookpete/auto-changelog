@@ -394,6 +394,7 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
 | `message` | A regex pattern to match against the entire commit message |
 | `subject` | A regex pattern to match against the commit subject only |
 | `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
+| `flags` | [Regex flags](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#advanced_searching_with_flags) for the patterns above: any of `i` (case-insensitive), `m`, `s`, and `u`. `message` and `exclude` always use `m` |
 
 #### Replacing text
 
