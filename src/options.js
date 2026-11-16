@@ -7,7 +7,6 @@ const {
 	resolve,
 } = require('path');
 const { default: pargs } = require('pargs');
-const importCwd = require('import-cwd');
 const cmd = require('./cmd');
 const resolveConfig = require('./extends');
 const { fetchRemote } = require('./remote');
@@ -39,7 +38,6 @@ const DEPENDENCIES = {
 	fetchRemote,
 	readJson,
 	fileExists,
-	importCwd,
 };
 
 // The in-repo config sources
@@ -121,11 +119,11 @@ function camelCase(string) {
 	return string.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 }
 
-function parsePlugins(plugins, importCWD) {
+function parsePlugins(plugins) {
 	if (!Array.isArray(plugins)) {
 		throw new Error('--plugins requires at least one plugin name');
 	}
-	return plugins.map((p) => importCWD(`auto-changelog-${p}`));
+	return plugins.map((p) => require(require.resolve(`auto-changelog-${p}`, { paths: [process.cwd()] }))); // eslint-disable-line global-require
 }
 
 async function getLatestVersion(options, exists, readJSON) {
@@ -151,7 +149,6 @@ async function getOptions(argv, overrides) {
 		fetchRemote: fR,
 		readJson: readJSON,
 		fileExists: fE,
-		importCwd: importCWD,
 	} = { ...DEPENDENCIES, ...overrides };
 	const { values, help } = await pargs(__filename, {
 		options: {
@@ -442,7 +439,7 @@ async function getOptions(argv, overrides) {
 		...options,
 		...remote,
 		latestVersion,
-		plugins: parsePlugins(options.plugins, importCWD),
+		plugins: parsePlugins(options.plugins),
 	};
 }
 
