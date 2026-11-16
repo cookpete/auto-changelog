@@ -304,6 +304,26 @@ test('fetchTags: keeps the v convention after the package prefix in the latest-v
 	t.equal(tags[0].href, 'https://github.com/user/repo/compare/my-package@v1.0.0...my-package@v2.0.0', 'links to the real prefixed v-tag');
 });
 
+test('fetchTags: uses the tag prefix for the latest version when not stripping it', async (t) => {
+	const tags = await fetchTags(
+		{ ...options, tagPrefix: 'my-package@', latestVersion: '0.0.2' },
+		gitTags('my-package@v0.0.1---2001-01-01'),
+	);
+	t.deepEqual(tags.map(({ title }) => title), ['my-package@v0.0.2', 'my-package@v0.0.1'], 'latest title matches the other titles');
+	t.equal(tags[0].href, 'https://github.com/user/repo/compare/my-package@v0.0.1...my-package@v0.0.2', 'links to the prefixed tag');
+});
+
+test('fetchTags: does not duplicate the latest version when its prefixed tag exists', async (t) => {
+	const tags = await fetchTags(
+		{ ...options, tagPrefix: 'my-package@', latestVersion: '0.0.2' },
+		gitTags([
+			'my-package@v0.0.1---2001-01-01',
+			'my-package@v0.0.2---2001-02-01',
+		].join('\n')),
+	);
+	t.deepEqual(tags.map(({ tag }) => tag), ['my-package@v0.0.2', 'my-package@v0.0.1']);
+});
+
 test('fetchTags: does not add a latest-version entry when that version is already tagged', async (t) => {
 	const tags = await fetchTags({ ...options, latestVersion: '1.0.0' }, defaultTags);
 	t.deepEqual(tags, await fetchTags(options, defaultTags), 'same as without a latest version');

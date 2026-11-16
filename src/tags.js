@@ -141,17 +141,17 @@ async function fetchTags(options, overrides) {
 	} = options;
 	const previous = tags[0];
 	const v = !MATCH_V.test(options.latestVersion) && previous && MATCH_V.test(previous.version) ? 'v' : '';
-	// The title shows the bare version, but the compare link must target the real
-	// tag. In a monorepo that is prefixed with the package name, and the `v`
-	// convention (if any) still applies after that prefix (e.g. `my-package@v2.0.0`).
-	const prefix = stripTagPrefix && tagPrefix ? `${tagPrefix}${v}` : v;
-	const latestTag = options.latestVersion ? `${prefix}${options.latestVersion}` : null;
+	// The compare link must target the real tag, which carries the tag prefix, and the
+	// `v` convention (if any) still applies after that prefix (e.g. `my-package@v2.0.0`).
+	// The title matches the other releases' titles: the full tag, unless the prefix is stripped.
+	const latestTag = options.latestVersion ? `${tagPrefix || ''}${v}${options.latestVersion}` : null;
 	const latestVersion = tags.some(({ tag }) => tag === latestTag) ? null : options.latestVersion;
 	if (latestVersion || unreleased || unreleasedOnly) {
 		const compareTo = latestVersion ? latestTag : 'HEAD';
+		const latestTitle = stripTagPrefix ? `${v}${latestVersion}` : latestTag;
 		tags.unshift({
 			tag: null,
-			title: latestVersion ? `${v}${latestVersion}` : 'Unreleased',
+			title: latestVersion ? latestTitle : 'Unreleased',
 			date: new Date().toISOString(),
 			diff: previous ? `${previous.tag}..` : 'HEAD',
 			href: previous ? getCompareLink(previous.tag, compareTo) : null,
