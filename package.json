@@ -83,7 +83,7 @@
     "tape": "^5.10.3"
   },
   "auto-changelog": {
-    "breakingPattern": "Breaking change"
+    "breakingPattern": "^\\[Breaking\\]|Breaking change"
   },
   "publishConfig": {
     "ignore": [
