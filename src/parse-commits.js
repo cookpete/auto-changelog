@@ -64,11 +64,13 @@ function getFixes(message, author, options = {}) {
 	while (match) {
 		const id = getFixID(match);
 		const href = isLink(match[2]) ? match[2] : options.getIssueLink(id);
-		fixes.push({
-			id,
-			href,
-			author,
-		});
+		if (!fixes.some((fix) => fix.id === id && fix.href === href)) {
+			fixes.push({
+				id,
+				href,
+				author,
+			});
+		}
 		match = pattern.exec(message);
 	}
 	return fixes;

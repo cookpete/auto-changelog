@@ -185,6 +185,28 @@ test('getFixes: supports issuePattern parameter with capture group', (t) => {
 	t.end();
 });
 
+test('getFixes: lists each fixed issue once', (t) => {
+	const options = {
+		issuePattern: '[A-Z]+-\\d+',
+		...remotes.github,
+	};
+	const message = 'ABC-1111 Added vital changes\n\nABC-1111 ABC-2222 ABC-1111';
+	t.deepEqual(getFixes(message, 'Commit Author', options), [
+		{ id: 'ABC-1111', href: 'https://github.com/user/repo/issues/ABC-1111', author: 'Commit Author' },
+		{ id: 'ABC-2222', href: 'https://github.com/user/repo/issues/ABC-2222', author: 'Commit Author' },
+	]);
+	t.end();
+});
+
+test('getFixes: keeps the same issue number in different repos', (t) => {
+	const message = 'Fixes #1 and fixes https://github.com/other/repo/issues/1 and fixes #1';
+	t.deepEqual(getFixes(message, 'Commit Author', remotes.github), [
+		{ id: '1', href: 'https://github.com/user/repo/issues/1', author: 'Commit Author' },
+		{ id: '1', href: 'https://github.com/other/repo/issues/1', author: 'Commit Author' },
+	]);
+	t.end();
+});
+
 const EXAMPLE_COMMIT = {
 	author: 'Commit Author',
 	id: 123,
