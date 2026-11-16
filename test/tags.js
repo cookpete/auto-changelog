@@ -479,3 +479,60 @@ test('fetchTags: fails when only version tags without the tag prefix exist', asy
 	const { tags } = await fetchTagsWithStderr(t, { tagPrefix: 'pkg@', unreleased: true }, ['other']);
 	t.deepEqual(tags.map(({ title }) => title), ['Unreleased'], 'no error without other version tags');
 });
+
+function gitRepo({
+	branch = 'refs/heads/feature/x',
+	upstream = 'origin---refs/heads/feature/x',
+	remoteHead = 'refs/remotes/origin/main',
+} = {}) {
+	return {
+		cmd(command) {
+			if (command.startsWith('git tag')) {
+				return Promise.resolve(DEFAULT_TAGS);
+			}
+			if (command === 'git symbolic-ref -q HEAD') {
+				return Promise.resolve(`${branch}\n`);
+			}
+			if (command.startsWith('git for-each-ref') && command.endsWith(` ${branch}`)) {
+				return Promise.resolve(`${upstream}\n`);
+			}
+			if (command === 'git symbolic-ref -q refs/remotes/origin/HEAD') {
+				return Promise.resolve(`${remoteHead}\n`);
+			}
+			return Promise.reject(new Error(`unexpected command: ${command}`));
+		},
+	};
+}
+
+async function getUnreleasedHref(repo, extra) {
+	const [unreleased] = await fetchTags({
+		...options,
+		remote: 'origin',
+		unreleased: true,
+		...extra,
+	}, gitRepo(repo));
+	return unreleased.href;
+}
+
+test('fetchTags: the unreleased compare link targets the remote branch being tracked', async (t) => {
+	t.equal(await getUnreleasedHref(), 'https://github.com/user/repo/compare/v1.0.0...feature/x', 'a branch that is not the default');
+	t.equal(
+		await getUnreleasedHref({ branch: 'refs/heads/local', upstream: 'origin---refs/heads/remote-name' }),
+		'https://github.com/user/repo/compare/v1.0.0...remote-name',
+		'the remote branch name, not the local one',
+	);
+	t.equal(
+		await getUnreleasedHref({}, { latestVersion: '1.1.0' }),
+		'https://github.com/user/repo/compare/v1.0.0...v1.1.0',
+		'a latest version still targets its tag',
+	);
+});
+
+test('fetchTags: the unreleased compare link targets HEAD when no other branch is known', async (t) => {
+	const head = 'https://github.com/user/repo/compare/v1.0.0...HEAD';
+	t.equal(await getUnreleasedHref({ upstream: 'origin---refs/heads/main', branch: 'refs/heads/main' }), head, 'the default branch');
+	t.equal(await getUnreleasedHref({ branch: '' }), head, 'a detached HEAD');
+	t.equal(await getUnreleasedHref({ upstream: '---' }), head, 'a branch with no upstream');
+	t.equal(await getUnreleasedHref({ upstream: 'fork---refs/heads/feature/x' }), head, 'an upstream on another remote');
+	t.equal(await getUnreleasedHref({ remoteHead: '' }), head, 'an unknown default branch');
+});

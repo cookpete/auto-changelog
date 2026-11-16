@@ -360,6 +360,8 @@ auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
 
 #### How releases are built
 
+With `--unreleased`, an `Unreleased` section covers the commits since the latest version tag. Its compare link targets `HEAD`, which hosts like GitHub show as the default branch; on another branch that tracks a branch on the remote, it targets that branch instead.
+
 Each release covers the commits since the previous version tag (`git log <previous tag>..<tag>`), and lists them in three groups:
 
 - **Merges**: merged pull requests, detected from GitHub merge and squash merge commits (a subject ending in `(#123)`), BitBucket and GitLab merge commits, and any `--merge-pattern`.

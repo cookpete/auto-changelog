@@ -169,6 +169,27 @@ function filterByPrefix(tags, options) {
 	return prefixed;
 }
 
+// A compare link to `HEAD` shows the remote's default branch, so on another branch,
+// link to the remote branch it tracks. Anything unknown keeps `HEAD`, which also keeps
+// existing links unchanged when the changelog is generated on the default branch.
+async function getUnreleasedTarget({ remote }, command) {
+	const branch = (await command('git symbolic-ref -q HEAD')).trim();
+	if (!branch) {
+		return 'HEAD';
+	}
+	const upstream = await command(`git for-each-ref --format=%(upstream:remotename)${DIVIDER}%(upstream:remoteref) ${branch}`);
+	const [remoteName, remoteRef = ''] = upstream.trim().split(DIVIDER);
+	if (remoteName !== remote || !remoteRef.startsWith('refs/heads/')) {
+		return 'HEAD';
+	}
+	const remoteBranch = remoteRef.slice('refs/heads/'.length);
+	const defaultBranch = (await command(`git symbolic-ref -q refs/remotes/${remote}/HEAD`)).trim();
+	if (!defaultBranch || defaultBranch === `refs/remotes/${remote}/${remoteBranch}`) {
+		return 'HEAD';
+	}
+	return remoteBranch;
+}
+
 async function fetchTags(options, overrides) {
 	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
 	const format = `%(refname:short)${DIVIDER}%(creatordate:short)`;
@@ -195,7 +216,7 @@ async function fetchTags(options, overrides) {
 	const latestTag = options.latestVersion ? `${tagPrefix || ''}${v}${options.latestVersion}` : null;
 	const latestVersion = tags.some(({ tag }) => tag === latestTag) ? null : options.latestVersion;
 	if (latestVersion || unreleased || unreleasedOnly) {
-		const compareTo = latestVersion ? latestTag : 'HEAD';
+		const compareTo = latestVersion ? latestTag : await getUnreleasedTarget(options, command);
 		const latestTitle = stripTagPrefix ? `${v}${latestVersion}` : latestTag;
 		tags.unshift({
 			tag: null,
