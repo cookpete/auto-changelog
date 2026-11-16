@@ -50,9 +50,36 @@ function parseTag(options) {
 	};
 }
 
-function enrichTag({ getCompareLink }) {
+function isStable(version) {
+	return !!semver.valid(version) && !semver.prerelease(version);
+}
+
+// A stable release covers the changes since the previous stable release, including those of
+// the prereleases in between, which keep their own entries too. `rollupPrereleasesDisabled`
+// turns that off, or, given a version, turns it off only for releases up to that version,
+// so that turning it on doesn't rewrite releases already in a changelog.
+function getRollsUp({ rollupPrereleasesDisabled: disabled, tagPrefix }) {
+	if (disabled === true) {
+		return () => false;
+	}
+	if (!disabled) {
+		return isStable;
+	}
+	const until = inferSemver(removePrefix(String(disabled), tagPrefix));
+	if (!semver.valid(until)) {
+		throw new TypeError(`\`--rollup-prereleases-disabled\` takes a version, or no value; got \`${disabled}\``);
+	}
+	return (version) => isStable(version) && semver.gt(version, until);
+}
+
+function getPrevious(tags, index, rollsUp) {
+	const earlier = tags.slice(index + 1);
+	return rollsUp(tags[index].version) ? earlier.find((t) => isStable(t.version)) : earlier[0];
+}
+
+function enrichTag({ getCompareLink }, rollsUp) {
 	return (t, index, tags) => {
-		const previous = tags[index + 1];
+		const previous = getPrevious(tags, index, rollsUp);
 		return {
 			isoDate: t.date.slice(0, 10),
 			niceDate: niceDate(t.date),
@@ -200,6 +227,7 @@ async function fetchTags(options, overrides) {
 	const tags = filterByPrefix(parsed, options)
 		.filter(isValidTag(options))
 		.sort(sortTags(options));
+	const rollsUp = getRollsUp(options);
 
 	const {
 		unreleased,
@@ -218,16 +246,17 @@ async function fetchTags(options, overrides) {
 	if (latestVersion || unreleased || unreleasedOnly) {
 		const compareTo = latestVersion ? latestTag : await getUnreleasedTarget(options, command);
 		const latestTitle = stripTagPrefix ? `${v}${latestVersion}` : latestTag;
+		const base = latestVersion && rollsUp(latestVersion) ? tags.find((t) => isStable(t.version)) : previous;
 		tags.unshift({
 			tag: null,
 			title: latestVersion ? latestTitle : 'Unreleased',
 			date: new Date().toISOString(),
-			diff: previous ? `${previous.tag}..` : 'HEAD',
-			href: previous ? getCompareLink(previous.tag, compareTo) : null,
+			diff: base ? `${base.tag}..` : 'HEAD',
+			href: base ? getCompareLink(base.tag, compareTo) : null,
 		});
 	}
 
-	const enriched = tags.map(enrichTag(options));
+	const enriched = tags.map(enrichTag(options, rollsUp));
 	return enriched.slice(getStartIndex(enriched, options), getEndIndex(enriched, options));
 }
 

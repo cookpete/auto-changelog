@@ -536,3 +536,81 @@ test('fetchTags: the unreleased compare link targets HEAD when no other branch i
 	t.equal(await getUnreleasedHref({ upstream: 'fork---refs/heads/feature/x' }), head, 'an upstream on another remote');
 	t.equal(await getUnreleasedHref({ remoteHead: '' }), head, 'an unknown default branch');
 });
+
+const PRERELEASE_TAGS = gitTags([
+	'v1.0.0---2000-01-01',
+	'v2.0.0-beta.1---2000-02-01',
+	'v2.0.0-rc.1---2000-03-01',
+	'v2.0.0---2000-04-01',
+	'v2.1.0---2000-05-01',
+	'v3.0.0-rc.1---2000-06-01',
+	'v3.0.0---2000-07-01',
+].join('\n'));
+
+async function getDiffs(extra, tags = PRERELEASE_TAGS) {
+	const fetched = await fetchTags({ ...options, ...extra }, tags);
+	return Object.fromEntries(fetched.map(({ title, diff }) => [title, diff]));
+}
+
+test('fetchTags: a release after prereleases also covers their changes', async (t) => {
+	t.deepEqual(await getDiffs({}), {
+		'v3.0.0': 'v2.1.0..v3.0.0',
+		'v3.0.0-rc.1': 'v2.1.0..v3.0.0-rc.1',
+		'v2.1.0': 'v2.0.0..v2.1.0',
+		'v2.0.0': 'v1.0.0..v2.0.0',
+		'v2.0.0-rc.1': 'v2.0.0-beta.1..v2.0.0-rc.1',
+		'v2.0.0-beta.1': 'v1.0.0..v2.0.0-beta.1',
+		'v1.0.0': 'v1.0.0',
+	});
+
+	const [v3] = await fetchTags(options, PRERELEASE_TAGS);
+	t.equal(v3.href, 'https://github.com/user/repo/compare/v2.1.0...v3.0.0', 'the compare link matches');
+	t.equal(v3.major, true, 'major relative to the previous release');
+
+	const onlyPrereleases = gitTags('v1.0.0-beta.1---2000-01-01\nv1.0.0---2000-02-01');
+	t.deepEqual(await getDiffs({}, onlyPrereleases), {
+		'v1.0.0': 'v1.0.0',
+		'v1.0.0-beta.1': 'v1.0.0-beta.1',
+	}, 'the first release covers everything');
+});
+
+test('fetchTags: --rollup-prereleases-disabled', async (t) => {
+	const never = await getDiffs({ rollupPrereleasesDisabled: true });
+	t.equal(never['v3.0.0'], 'v3.0.0-rc.1..v3.0.0', 'with no value, never');
+	t.equal(never['v2.0.0'], 'v2.0.0-rc.1..v2.0.0', 'with no value, never');
+
+	const untils = ['2.0.0', 'v2.0.0', '2.1'];
+	const results = await Promise.all(untils.map((until) => getDiffs({ rollupPrereleasesDisabled: until })));
+	results.forEach((diffs, i) => {
+		t.equal(diffs['v2.0.0'], 'v2.0.0-rc.1..v2.0.0', `not for releases up to ${untils[i]}`);
+		t.equal(diffs['v3.0.0'], 'v2.1.0..v3.0.0', `for releases after ${untils[i]}`);
+	});
+
+	const prefixed = await getDiffs({ tagPrefix: 'v', rollupPrereleasesDisabled: 'v2.0.0' });
+	t.equal(prefixed['v2.0.0'], 'v2.0.0-rc.1..v2.0.0', 'a version with the tag prefix');
+
+	t.equal((await getDiffs({ rollupPrereleasesDisabled: false }))['v2.0.0'], 'v1.0.0..v2.0.0', '`false` from config leaves it on');
+
+	await fetchTags({ ...options, rollupPrereleasesDisabled: 'soon' }, PRERELEASE_TAGS).then(
+		() => t.fail('should throw'),
+		(error) => t.match(error.message, /`--rollup-prereleases-disabled` takes a version, or no value; got `soon`/, 'not a version'),
+	);
+});
+
+test('fetchTags: a latest version after prereleases also covers their changes', async (t) => {
+	const tags = gitTags('v1.0.0---2000-01-01\nv2.0.0-rc.1---2000-02-01');
+	const [rolled] = await fetchTags({ ...options, latestVersion: '2.0.0' }, tags);
+	t.deepEqual({ diff: rolled.diff, href: rolled.href }, {
+		diff: 'v1.0.0..',
+		href: 'https://github.com/user/repo/compare/v1.0.0...v2.0.0',
+	});
+
+	const [disabled] = await fetchTags({ ...options, latestVersion: '2.0.0', rollupPrereleasesDisabled: true }, tags);
+	t.equal(disabled.diff, 'v2.0.0-rc.1..', 'unless disabled');
+
+	const [prerelease] = await fetchTags({ ...options, latestVersion: '2.0.0-rc.2' }, tags);
+	t.equal(prerelease.diff, 'v2.0.0-rc.1..', 'a prerelease does not roll up');
+
+	const [unreleased] = await fetchTags({ ...options, unreleased: true }, gitTags('v1.0.0---2000-01-01\nv2.0.0-rc.1---2000-02-01'));
+	t.equal(unreleased.diff, 'v2.0.0-rc.1..', 'unreleased changes do not roll up');
+});

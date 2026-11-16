@@ -50,6 +50,7 @@ Releases:
       --no-strip-tag-prefix           # keep the tag prefix in release titles
       --autodetect-monorepo-disabled  # disable monorepo autodetection
       --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
+      --rollup-prereleases-disabled [version] # do not include prerelease changes in the release that follows them; given a version, only for releases up to it
       --starting-version [tag]        # specify earliest version to include in changelog
       --starting-date [yyyy-mm-dd]    # specify earliest release date to include in changelog (filters releases by tag date, not commits)
       --ending-version [tag]          # specify latest version to include in changelog
@@ -133,6 +134,7 @@ What may look different:
 - **Monorepos**: [monorepo autodetection](#monorepos) is now on by default, so a detected package gets its tag prefix from its `name` (unless one is configured), and release titles without it. Set `autodetectMonorepoDisabled` to `true` to keep the v2 behavior.
 - **Tag prefixes**: with a [tag prefix](#tag-prefixes), whether set or derived for a monorepo package, only tags that start with it are releases. Version tags without it, which v2 included, are left out and listed on stderr; if no version tags have the prefix, that is now an error.
 - **Progress messages** go to stderr, so stdout carries only the changelog.
+- **Prereleases**: a release after prereleases now [also lists their changes](#prereleases). To keep releases already in your changelog as they are, set `rollupPrereleasesDisabled` to your latest version, like `"rollupPrereleasesDisabled": "2.7.0"`; set it to `true` to never do this.
 - **`--version`** prints the version with a `v` prefix, like `v3.0.0`.
 - **`--ignore-commit-pattern`** also matches merged pull request titles, so it can hide merges as well as commits.
 
@@ -321,6 +323,17 @@ auto-changelog --tag-parser-pattern "^my-package@(\d+)\.(\d+) build(\d+)$" --tag
 ```
 
 Note, both options need to be supplied for this to work. Also note, `$` signs in the replacement string must be escaped (not applicable when configuring through package.json).
+
+#### Prereleases
+
+A prerelease, like `2.0.0-rc.1`, lists the changes since the release before it. A release after prereleases, like `2.0.0`, lists the changes since the previous release that is not a prerelease, including those already listed under its prereleases, so that upgrading from `1.x` shows everything that changed. The prereleases keep their own entries.
+
+To list only a release's own changes, use `--rollup-prereleases-disabled`. To do that only for releases up to a version, so that the releases already in your changelog stay as they are, give it that version:
+
+```bash
+# Releases after 2.7.0 include the changes from their prereleases
+auto-changelog --rollup-prereleases-disabled=2.7.0
+```
 
 #### Breaking changes
 

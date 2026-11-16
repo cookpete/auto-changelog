@@ -270,6 +270,14 @@ test('getOptions: --autodetect-monorepo-disabled still disables autodetection', 
 	t.notOk(options.stripTagPrefix);
 });
 
+test('getOptions: --rollup-prereleases-disabled takes no value, or a version', async (t) => {
+	t.equal((await getOptions(['', ''], deps)).rollupPrereleasesDisabled, undefined, 'off by default');
+	t.equal((await getOptions(['', '', '--rollup-prereleases-disabled'], deps)).rollupPrereleasesDisabled, true, 'no value');
+	t.equal((await getOptions(['', '', '--rollup-prereleases-disabled', '--stdout'], deps)).rollupPrereleasesDisabled, true, 'followed by another option');
+	t.equal((await getOptions(['', '', '--rollup-prereleases-disabled=2.0.0'], deps)).rollupPrereleasesDisabled, '2.0.0', 'a version');
+	t.equal((await getOptions(['', '', '--rollup-prereleases-disabled', '2.0.0'], deps)).rollupPrereleasesDisabled, '2.0.0', 'a separate version');
+});
+
 test('getOptions: neither flag leaves in-repo config in charge', async (t) => {
 	function readJson(file) {
 		return file === 'package.json'

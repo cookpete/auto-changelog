@@ -315,6 +315,13 @@ async function getOptions(argv, overrides) {
 				type: 'boolean',
 				description: 'disable detecting a monorepo package and stripping its name-based tag prefix from release titles',
 			},
+			'rollup-prereleases-disabled': {
+				group: 'Releases',
+				type: 'string',
+				placeholder: 'version',
+				optionalValue: true,
+				description: 'do not include prerelease changes in the release that follows them; given a version, only for releases up to it',
+			},
 			'starting-version': {
 				group: 'Releases',
 				type: 'string',
