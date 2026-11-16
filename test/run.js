@@ -7,6 +7,7 @@ const {
 	mkdtempSync,
 	realpathSync,
 	rmSync,
+	writeFileSync,
 } = require('fs');
 const { tmpdir } = require('os');
 const { execFileSync } = require('child_process');
@@ -498,14 +499,45 @@ test('getOptions: --unsafe-config honors unsafe options from in-repo config', as
 	t.equal(options.appendGitLog, '--output=anywhere');
 });
 
+async function withPlugins(fn) {
+	const original = process.cwd();
+	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	try {
+		for (const name of ['foo', 'bar']) {
+			const plugin = join(tmp, 'node_modules', `auto-changelog-${name}`);
+			mkdirSync(plugin, { recursive: true });
+			writeFileSync(join(plugin, 'index.js'), `module.exports = { name: '${name}' };`);
+		}
+		mkdirSync(join(tmp, 'packages', 'nested'), { recursive: true });
+		process.chdir(join(tmp, 'packages', 'nested'));
+		return await fn((argv) => getOptions(['', '', ...argv], deps));
+	} finally {
+		process.chdir(original);
+		rmSync(tmp, { recursive: true, force: true });
+	}
+}
+
 test('getOptions: honors plugins from the command line', async (t) => {
-	const options = await getOptions(['', '', '--plugins', 'foo'], { importCwd: (name) => name });
-	t.deepEqual(options.plugins, ['auto-changelog-foo']);
+	await withPlugins(async (getPluginOptions) => {
+		const options = await getPluginOptions(['--plugins', 'foo']);
+		t.deepEqual(options.plugins, [{ name: 'foo' }]);
+	});
+});
+
+test('getOptions: a missing plugin throws', async (t) => {
+	await withPlugins(async (getPluginOptions) => {
+		try {
+			await getPluginOptions(['--plugins', 'missing']);
+			t.fail('should throw');
+		} catch (error) {
+			t.equal(error.code, 'MODULE_NOT_FOUND');
+		}
+	});
 });
 
 test('getOptions: throws a useful error for --plugins with no names', async (t) => {
 	try {
-		await getOptions(['', '', '--plugins'], { importCwd: (name) => name });
+		await getOptions(['', '', '--plugins'], deps);
 		t.fail('should throw');
 	} catch (error) {
 		t.match(error.message, /--plugins requires at least one plugin name/);
@@ -628,8 +660,10 @@ test('getOptions: --append-git-tag rejects a dash-leading value given separately
 });
 
 test('getOptions: honors repeated --plugins', async (t) => {
-	const options = await getOptions(['', '', '--plugins', 'foo', '--plugins=bar'], { importCwd: (name) => name });
-	t.deepEqual(options.plugins, ['auto-changelog-foo', 'auto-changelog-bar']);
+	await withPlugins(async (getPluginOptions) => {
+		const options = await getPluginOptions(['--plugins', 'foo', '--plugins=bar']);
+		t.deepEqual(options.plugins, [{ name: 'foo' }, { name: 'bar' }]);
+	});
 });
 
 test('getOptions: --plugins takes one name per flag', async (t) => {
