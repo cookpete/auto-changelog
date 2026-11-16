@@ -113,6 +113,26 @@ There are some less strict requirements to improve your changelog:
 - [Close issues using keywords](https://help.github.com/articles/closing-issues-using-keywords)
 - Merge pull requests using the standard merge commit message for your platform
 
+### Upgrading to v3
+
+What to change:
+
+- **node**: v3 requires node `^22.23 || ^24.20 || >= 25.9`.
+- **Node API**: `require('auto-changelog')` no longer runs the CLI; call the exported [`run`](#node-api) instead.
+- **`--package <file>`**: `--package` no longer takes a file; use `--package-file <file>`. In a config file, a file path in `package` is now an error; use `packageFile`.
+- **`--commit-limit false`, `--backfill-limit false`**: these now take only an integer; use `--no-commit-limit` or `--no-backfill-limit`. `false` still works in a config file.
+- **`--plugins a b`**: repeat the flag for each plugin, as in `--plugins a --plugins b`. A `plugins` array in a config file is unchanged.
+- **`--append-git-log`, `--append-git-tag`**: attach a value starting with a dash with `=`, as in `--append-git-log=--first-parent`.
+- **Short flags**: `-v`, `-i`, `-h`, and `-V` are gone; use `--latest-version`, `--issue-url`, `--help`, and `--version`.
+- **`--sort-commits`**: an unsupported value is now an error, rather than sorting by relevance.
+
+What may look different:
+
+- **Monorepos**: [monorepo autodetection](#monorepos) is now on by default, so a detected package gets its tag prefix from its `name` (unless one is configured), and release titles without it. Set `autodetectMonorepoDisabled` to `true` to keep the v2 behavior.
+- **Progress messages** go to stderr, so stdout carries only the changelog.
+- **`--version`** prints the version with a `v` prefix, like `v3.0.0`.
+- **`--ignore-commit-pattern`** also matches merged pull request titles, so it can hide merges as well as commits.
+
 ### What you might do if you’re clever
 
 Install `auto-changelog` to dev dependencies:
