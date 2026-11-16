@@ -9,6 +9,7 @@ const {
 const { default: pargs } = require('pargs');
 const importCwd = require('import-cwd');
 const cmd = require('./cmd');
+const resolveConfig = require('./extends');
 const { fetchRemote } = require('./remote');
 const {
 	readJson,
@@ -167,6 +168,11 @@ async function getOptions(argv, overrides) {
 				short: 'c',
 				description: 'config file location',
 				defaultDescription: DEFAULT_OPTIONS.config,
+			},
+			extends: {
+				type: 'string',
+				placeholder: 'config',
+				description: 'extend a JSON config file, by relative path or package path (e.g. my-config/auto-changelog.json)',
 			},
 			template: {
 				type: 'string',
@@ -381,8 +387,24 @@ async function getOptions(argv, overrides) {
 
 	const pkg = await readJSON(PACKAGE_FILE);
 	const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null;
-	const dotOptions = await readJSON(commandOptions.config || DEFAULT_OPTIONS.config);
-	const repoOptions = { ...dotOptions, ...packageOptions };
+	const configFile = commandOptions.config || DEFAULT_OPTIONS.config;
+	const dotOptions = await readJSON(configFile);
+	// `extends` takes precedence like any other option, and a relative path resolves from wherever it was set.
+	const fromConfigFile = commandOptions.extends === undefined &&
+		!Object.hasOwn(packageOptions || {}, 'extends') &&
+		Object.hasOwn(dotOptions || {}, 'extends');
+	const repoOptions = await resolveConfig(
+		{
+			...dotOptions,
+			...packageOptions,
+			extends: commandOptions.extends ?? packageOptions?.extends ?? dotOptions?.extends,
+		},
+		fromConfigFile ? dirname(resolve(configFile)) : process.cwd(),
+		[
+			[dotOptions, configFile],
+			[packageOptions, `the ${PACKAGE_FILE} "${PACKAGE_OPTIONS_KEY}" key`],
+		],
+	);
 	if (!commandOptions.unsafeConfig) {
 		assertRepoConfigSafe(repoOptions);
 	}

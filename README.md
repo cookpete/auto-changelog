@@ -23,6 +23,7 @@ Options:
 
   -o, --output [file]                 # output file (default: CHANGELOG.md)
   -c, --config [file]                 # config file location (default: .auto-changelog)
+      --extends [config]              # extend a JSON config file, by relative path or package path
   -t, --template [template]           # specify template to use [compact, keepachangelog, json] (default: compact)
   -r, --remote [remote]               # specify git remote to use for links (default: origin)
   -p, --package                       # use version from package.json as latest release
@@ -191,6 +192,25 @@ You can also store config options in an `.auto-changelog` file in your project r
 ```
 
 Note that any options set in `package.json` will take precedence over any set in `.auto-changelog`.
+
+#### Sharing configuration
+
+To share options between projects, put them in a JSON file and point `extends` at it, either by a path relative to the config that sets it, or by a path inside a package, resolved the way `require` would:
+
+```js
+{
+  "extends": "@my-org/changelog-config/auto-changelog.json",
+  "output": "HISTORY.md"
+}
+```
+
+You can also pass `--extends` on the command line, where a relative path is resolved from the current directory.
+
+- An extended config can itself use `extends`.
+- Options set directly take precedence over extended ones (and `--extends` replaces any `extends` set in config, like every other option).
+- `replaceText` maps are combined: your patterns are added to the extended ones, a pattern with the same key replaces the extended one, and a pattern set to `null` removes the extended one.
+- An extended config is only ever read as JSON (never run as code), must resolve to a `.json` file inside the repository (including its `node_modules`), and is held to the same [security rules](#security-and-untrusted-repositories) as in-repo config.
+- A config that uses `extends`, or is extended, can't set options that only apply on the command line (`config`, `unsafeConfig`, `help`, `version`).
 
 #### Security and untrusted repositories
 
