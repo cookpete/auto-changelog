@@ -43,6 +43,8 @@ Releases:
   -u, --unreleased                    # include section for unreleased changes
       --tag-pattern [regex]           # override regex pattern for version tags
       --tag-prefix [prefix]           # prefix used in version tags
+      --strip-tag-prefix              # strip the tag prefix from release titles (default: on for a detected monorepo package)
+      --no-strip-tag-prefix           # keep the tag prefix in release titles
       --autodetect-monorepo-disabled  # disable monorepo autodetection
       --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
       --starting-version [tag]        # specify earliest version to include in changelog
@@ -221,12 +223,14 @@ auto-changelog --tag-prefix my-package/
 
 Tags with a leading `v`, like `v1.2.3`, are already valid version tags, so they do not need `--tag-prefix v`.
 
+By default, release titles show the full tag, like `my-package/1.2.3`. Pass `--strip-tag-prefix` to show only the version, like `1.2.3`; compare links still use the full tags.
+
 #### Monorepos
 
 In a monorepo, each package's version tags are typically prefixed with the package name, like `my-package@1.2.3`. By default, `auto-changelog` detects a monorepo package - by a `repository.directory` field in `package.json`, or an ancestor `package.json` within the same git repository declaring npm `workspaces` - and, for a detected package:
 
 - derives the [tag prefix](#tag-prefixes) from the `name` in `package.json` (so you don't have to set `--tag-prefix` for every package), unless one is already configured, and
-- strips that prefix from the release titles in the changelog (so headings read `## [1.2.3]` rather than `## [my-package@1.2.3]`), while still using the full tags for the compare links.
+- strips that prefix from the release titles in the changelog (so headings read `## [1.2.3]` rather than `## [my-package@1.2.3]`), while still using the full tags for the compare links, unless [`--no-strip-tag-prefix`](#tag-prefixes) (or `"stripTagPrefix": false`) is set.
 
 Autodetection is controlled by `--autodetect-monorepo-disabled`, which defaults to `false`. To opt out for a single run, pass `--autodetect-monorepo-disabled`. To opt out for the project, set it to `true`:
 

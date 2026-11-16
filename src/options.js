@@ -287,6 +287,11 @@ async function getOptions(argv, overrides) {
 				placeholder: 'prefix',
 				description: 'prefix used in version tags',
 			},
+			'strip-tag-prefix': {
+				group: 'Releases',
+				type: 'boolean',
+				description: 'strip the tag prefix from release titles (default: on for a detected monorepo package)',
+			},
 			// `allowNegative` gives `--no-autodetect-monorepo-disabled` for free, and only puts a value in
 			// `values` when one of the two spellings was actually passed - so in-repo config still wins by
 			// default, which the two separate commander declarations existed to achieve.
@@ -394,8 +399,8 @@ async function getOptions(argv, overrides) {
 			options.tagPrefix = `${pkg.name}@`;
 		}
 		// Strip the (derived or configured) prefix from release titles, while still
-		// using the full tags for compare links.
-		options.stripTagPrefix = true;
+		// using the full tags for compare links, unless `stripTagPrefix` was set explicitly.
+		options.stripTagPrefix ??= true;
 	}
 	const remote = await fR(options);
 	const latestVersion = await getLatestVersion(options, fE, readJSON);

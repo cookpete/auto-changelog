@@ -217,6 +217,34 @@ test('getOptions: in-repo config can disable monorepo autodetection', async (t) 
 	t.notOk(options.stripTagPrefix);
 });
 
+test('getOptions: stripTagPrefix in config keeps the prefix in a detected monorepo', async (t) => {
+	function readJson(file) {
+		return file === 'package.json'
+			? { name: 'my-package', repository: { directory: 'packages/my-package' }, 'auto-changelog': { stripTagPrefix: false } }
+			: null;
+	}
+	const options = await getOptions(['', ''], { readJson });
+	t.equal(options.tagPrefix, 'my-package@', 'still derives the prefix');
+	t.equal(options.stripTagPrefix, false);
+});
+
+test('getOptions: --no-strip-tag-prefix keeps the prefix in a detected monorepo', async (t) => {
+	function readJson(file) {
+		return file === 'package.json'
+			? { name: 'my-package', repository: { directory: 'packages/my-package' } }
+			: null;
+	}
+	const options = await getOptions(['', '', '--no-strip-tag-prefix'], { readJson });
+	t.equal(options.tagPrefix, 'my-package@', 'still derives the prefix');
+	t.equal(options.stripTagPrefix, false);
+});
+
+test('getOptions: --strip-tag-prefix strips an explicit prefix outside a monorepo', async (t) => {
+	const options = await getOptions(['', '', '--strip-tag-prefix', '--tag-prefix', 'my-package@'], deps);
+	t.equal(options.tagPrefix, 'my-package@');
+	t.equal(options.stripTagPrefix, true);
+});
+
 test('getOptions: --no-autodetect-monorepo-disabled enables autodetection', async (t) => {
 	function readJson(file) {
 		return file === 'package.json'
