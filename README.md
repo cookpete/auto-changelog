@@ -66,7 +66,7 @@ Commits:
       --breaking-pattern [regex]      # regex pattern for breaking change commits
       --merge-pattern [regex]         # add custom regex pattern for merge commits
       --commit-pattern [regex]        # pattern to include when parsing commits
-      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits
+      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits, matched against commit subjects and merged pull request titles
       --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc] (default: relevance)
       --append-git-log [string]       # string to append to git log command
 

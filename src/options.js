@@ -279,7 +279,7 @@ async function getOptions(argv, overrides) {
 				group: 'Commits',
 				type: 'string',
 				placeholder: 'regex',
-				description: 'pattern to ignore when parsing commits',
+				description: 'pattern to ignore when parsing commits, matched against commit subjects and merged pull request titles',
 			},
 			'tag-pattern': {
 				group: 'Releases',

@@ -23,8 +23,11 @@ const MERGE_PATTERNS = [
 ];
 
 function filterCommit(commit, { ignoreCommitPattern, commitPattern }) {
-	if (ignoreCommitPattern && new RegExp(ignoreCommitPattern).test(commit.subject)) {
-		return false;
+	if (ignoreCommitPattern) {
+		const ignore = new RegExp(ignoreCommitPattern);
+		if (ignore.test(commit.subject) || (commit.merge && ignore.test(commit.merge.message))) {
+			return false;
+		}
 	}
 	if (commitPattern) {
 		return new RegExp(commitPattern).test(commit.subject);

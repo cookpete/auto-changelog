@@ -85,6 +85,23 @@ test('parseCommits: supports commitPattern option', async (t) => {
 	t.equal(result.length, 1);
 });
 
+test('parseCommits: supports ignoreCommitPattern option', async (t) => {
+	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
+	const all = parseCommits(gitLog, remotes.github).map((c) => c.subject);
+	const result = parseCommits(gitLog, { ignoreCommitPattern: '^Second', ...remotes.github }).map((c) => c.subject);
+	t.deepEqual(result, all.filter((subject) => subject !== 'Second commit'), 'drops only the commit whose subject matches');
+});
+
+test('parseCommits: ignoreCommitPattern also matches a merged pull request\'s title', async (t) => {
+	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
+	const result = parseCommits(gitLog, { ignoreCommitPattern: '^Should not parse', ...remotes.github });
+	t.deepEqual(
+		result.filter((c) => c.merge).map((c) => c.merge.id),
+		['3'],
+		'drops PR #5, whose title matches, but not PR #3',
+	);
+});
+
 test('getFixes: returns null with no fixes', (t) => {
 	const message = 'Commit message with no fixes';
 	t.equal(getFixes(message, 'Commit Author', remotes.github), null);
