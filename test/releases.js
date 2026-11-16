@@ -157,6 +157,95 @@ test('parseReleases: sorts commits with no stats by relevance', async (t) => {
 	t.equal(releases[0].commits[1].subject, 'Small commit');
 });
 
+// Newest first. `tag` is the previous release, so it is not among the release's commits.
+// PR #10 branched inside the release, from `after`; PR #11 branched before it, from `tag`.
+const MERGE_HISTORY = [
+	{ hash: 'later-direct-old', parents: ['later-direct-test1'], message: 'old title' },
+	{ hash: 'later-direct-test1', parents: ['merge-11'], message: 'test1' },
+	{
+		hash: 'merge-11',
+		parents: ['merge-10', 'pr-11-commit'],
+		message: 'Merge pull request #11 from user/old\n\nold title',
+	},
+	{ hash: 'pr-11-commit', parents: ['tag'], message: 'old title' },
+	{
+		hash: 'merge-10',
+		parents: ['direct-test1', 'pr-10-tip'],
+		message: 'Merge pull request #10 from user/feat\n\ntest1',
+	},
+	{ hash: 'direct-test1', parents: ['after'], message: 'test1' },
+	{ hash: 'pr-10-tip', parents: ['pr-10-first'], message: 'test1' },
+	{ hash: 'pr-10-first', parents: ['after'], message: 'pr commit one' },
+	{ hash: 'after', parents: ['tag'], message: 'after release' },
+];
+
+async function getShownHashes(options) {
+	const map = { 'v1.0.0..v2.0.0': generateCommits(MERGE_HISTORY) };
+	const tags = [{ tag: 'v2.0.0', date: '2000-01-01', diff: 'v1.0.0..v2.0.0' }];
+	const allOptions = {
+		commitLimit: false,
+		...remotes.github,
+		...options,
+	};
+	const [release] = await parseReleases(tags, allOptions, null, commitsFrom(map));
+	return {
+		merges: release.merges.map(({ id }) => id),
+		commits: release.commits.map(({ hash }) => hash).sort(),
+	};
+}
+
+test('parseReleases: hides only a merge\'s own commits that repeat its message', async (t) => {
+	t.deepEqual(await getShownHashes({}), {
+		merges: ['11', '10'],
+		commits: [
+			'after',
+			'direct-test1',
+			'later-direct-old',
+			'later-direct-test1',
+			'pr-10-first',
+		],
+	}, 'commits with a pull request title that were not part of that pull request are listed');
+});
+
+test('parseReleases: when commits may be missing from the log, keeps hiding what it can\'t rule out', async (t) => {
+	const expected = {
+		merges: ['11', '10'],
+		commits: [
+			'after',
+			'direct-test1',
+			'later-direct-test1',
+			'pr-10-first',
+		],
+	};
+	t.deepEqual(await getShownHashes({ ignoreCommitPattern: 'unmatched' }), expected, '--ignore-commit-pattern');
+	t.deepEqual(await getShownHashes({ commitPattern: '' }), await getShownHashes({}), 'an empty --commit-pattern filters nothing');
+	t.deepEqual(await getShownHashes({ appendGitLog: '--no-merges' }), expected, '--append-git-log');
+	t.deepEqual(await getShownHashes({ plugins: [{ processCommits(commits) { return commits; } }] }), expected, 'a processCommits plugin');
+});
+
+test('parseReleases: without parents, hides every commit that repeats a merge\'s message', async (t) => {
+	const map = {
+		'v1.0.0': generateCommits([
+			'Squashed title (#5)',
+			'Squashed title',
+			'Plugin title',
+			'Other commit',
+		]),
+	};
+	const plugin = {
+		processCommits(commits) { commits.push({ hash: 'plugin-commit', subject: 'Plugin commit' }); },
+		processMerges(merges) { merges.push({ id: '6', message: 'Plugin title' }); },
+	};
+	const options = {
+		commitLimit: false,
+		plugins: [plugin],
+		...remotes.github,
+	};
+	const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
+	const [release] = await parseReleases(tags, options, null, commitsFrom(map));
+	t.deepEqual(release.commits.map(({ subject }) => subject).sort(), ['Other commit', 'Plugin commit']);
+});
+
 test('parseReleases: hides empty releases', async (t) => {
 	const map = {
 		'v1.0.0': [],

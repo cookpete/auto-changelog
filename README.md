@@ -316,7 +316,7 @@ Each release covers the commits since the previous version tag (`git log <previo
 
 - **Merges**: merged pull requests, detected from GitHub merge and squash merge commits (a subject ending in `(#123)`), BitBucket and GitLab merge commits, and any `--merge-pattern`.
 - **Fixes**: commits whose message closes an issue, like `Fixes #123` or `Closes https://github.com/user/repo/issues/123`, or matches `--issue-pattern`.
-- **Commits**: everything else, except version commits (like `1.2.3`), `Merge branch` commits, and commits with the same subject as a merged pull request's title.
+- **Commits**: everything else, except version commits (like `1.2.3`), `Merge branch` commits, and a merged pull request's own commits that have the same subject as its title. When the log may be missing commits (with `--commit-pattern`, `--ignore-commit-pattern`, `--append-git-log`, or a `processCommits` plugin), and a pull request branched off before the previous release, any commit with its title is left out, since it can't be ruled out as one of the pull request's own.
 
 All merges and fixes are listed, but **commits are limited** to the 3 most relevant (the most lines changed) per release, or `--commit-limit`; a release with no merges or fixes uses `--backfill-limit` instead. Use `--no-commit-limit` to list every commit, and `--sort-commits` to change the order. [Breaking changes](#breaking-changes) are always listed, first.
 

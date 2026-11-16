@@ -8,7 +8,60 @@ const COMMIT_MESSAGE_PATTERN = /\n+([\S\s]+)/;
 
 const DEPENDENCIES = { fetchCommits };
 
-function filterCommits(merges) {
+// `leftRelease` says whether it reached a parent that is not one of those commits.
+function walkCommits(starts, parentsByHash, stop = new Set()) {
+	const reached = new Set();
+	const pending = [...starts];
+	let leftRelease = false;
+	while (pending.length > 0) {
+		const hash = pending.pop();
+		if (!reached.has(hash) && !stop.has(hash)) {
+			if (parentsByHash.has(hash)) {
+				reached.add(hash);
+				pending.push(...parentsByHash.get(hash));
+			} else {
+				leftRelease = true;
+			}
+		}
+	}
+	return { reached, leftRelease };
+}
+
+// A merge brought in the commits reachable from its later parents but not from its first.
+// A parent outside the release's commits is normally from an earlier release, which can't
+// lead back into this one; but when commits may have been left out of the log, it could
+// hide a path, so a commit that can't be ruled out is treated as the merge's, as before.
+function getMergeMembership(commits, options) {
+	const parentsByHash = new Map(commits.map(({ hash, parents = [] }) => [hash, parents]));
+	const logMayBeIncomplete = !!(options.commitPattern ||
+		options.ignoreCommitPattern ||
+		options.appendGitLog ||
+		(options.plugins || []).some((plugin) => plugin.processCommits));
+	const cache = new Map();
+	return (commit, merge) => {
+		const [first, ...later] = (merge.commit && merge.commit.parents) || [];
+		if (later.length === 0) {
+			return true;
+		}
+		if (!cache.has(merge)) {
+			const { reached: mainline } = walkCommits([first], parentsByHash);
+			const { reached: branch, leftRelease } = walkCommits(later, parentsByHash, mainline);
+			cache.set(merge, {
+				mainline,
+				branch,
+				unsure: leftRelease && logMayBeIncomplete,
+			});
+		}
+		const {
+			mainline,
+			branch,
+			unsure,
+		} = cache.get(merge);
+		return !mainline.has(commit.hash) && (branch.has(commit.hash) || unsure);
+	};
+}
+
+function filterCommits(merges, isPartOfMerge) {
 	return (commit) => {
 		if (commit.fixes || commit.merge) {
 			// Filter out commits that already appear in fix or merge lists
@@ -25,8 +78,8 @@ function filterCommits(merges) {
 			// Filter out merge commits
 			return false;
 		}
-		if (merges.findIndex((m) => m.message === commit.subject) !== -1) {
-			// Filter out commits with the same message as an existing merge
+		if (merges.some((m) => m.message === commit.subject && isPartOfMerge(commit, m))) {
+			// Filter out a merge's own commits that repeat its message
 			return false;
 		}
 		return true;
@@ -97,7 +150,7 @@ async function parseReleases(tags, options, onParsed, overrides) {
 		const { message } = commits[0] || { message: null };
 		const breakingCount = commits.filter((c) => c.breaking).length;
 		const filteredCommits = commits
-			.filter(filterCommits(merges))
+			.filter(filterCommits(merges, getMergeMembership(commits, options)))
 			.sort(sortCommits(options))
 			.slice(0, getCommitLimit(options, emptyRelease, breakingCount));
 
