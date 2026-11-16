@@ -8,7 +8,14 @@ const commits = require('./data/commits');
 const commitsNoRemote = require('./data/commits-no-remote');
 const { fetchCommits } = require('../src/commits');
 const getLogFormat = require('../src/log-format');
-const { parseCommits, getFixes, getMerge, getSubject } = require('../src/parse-commits');
+const {
+	COMMIT_SEPARATOR,
+	MESSAGE_SEPARATOR,
+	parseCommits,
+	getFixes,
+	getMerge,
+	getSubject,
+} = require('../src/parse-commits');
 
 test('fetchCommits: fetches commits', async (t) => {
 	const gitLog = await readFile(join(__dirname, 'data', 'git-log.txt'));
@@ -251,6 +258,32 @@ test('getMerge github: parses a squash merge with no message', (t) => {
 		author: 'Commit Author',
 		commit: EXAMPLE_COMMIT,
 	});
+	t.end();
+});
+
+test('getMerge github: parses a squash merge with no message and a trailing newline', (t) => {
+	const message = 'Generate changelogs that show the commits between tags (#411)\n';
+	t.deepEqual(getMerge(EXAMPLE_COMMIT, message, remotes.github), {
+		id: '411',
+		message: 'Generate changelogs that show the commits between tags',
+		href: 'https://github.com/user/repo/pull/411',
+		author: 'Commit Author',
+		commit: EXAMPLE_COMMIT,
+	});
+	t.end();
+});
+
+test('parseCommits: parses a squash merge with no message', (t) => {
+	const gitLog = `${COMMIT_SEPARATOR}2401ee4706e94629f48830bab9ed5812c032734a
+2015-12-29 21:57:19 +0000
+Commit Author
+commit@author.com
+Generate changelogs that show the commits between tags (#411)
+${MESSAGE_SEPARATOR}
+ 1 file changed, 1 insertion(+)
+`;
+	const [commit] = parseCommits(gitLog, remotes.github);
+	t.equal(commit.merge && commit.merge.id, '411', 'is parsed as a merge');
 	t.end();
 });
 
