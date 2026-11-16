@@ -310,6 +310,18 @@ If you use a certain pattern before or after the issue number, like `fixes {id}`
 auto-changelog --issue-pattern "[Ff]ixes ([A-Z]+-\d+)"
 ```
 
+#### How releases are built
+
+Each release covers the commits since the previous version tag (`git log <previous tag>..<tag>`), and lists them in three groups:
+
+- **Merges**: merged pull requests, detected from GitHub merge and squash merge commits (a subject ending in `(#123)`), BitBucket and GitLab merge commits, and any `--merge-pattern`.
+- **Fixes**: commits whose message closes an issue, like `Fixes #123` or `Closes https://github.com/user/repo/issues/123`, or matches `--issue-pattern`.
+- **Commits**: everything else, except version commits (like `1.2.3`), `Merge branch` commits, and commits with the same subject as a merged pull request's title.
+
+All merges and fixes are listed, but **commits are limited** to the 3 most relevant (the most lines changed) per release, or `--commit-limit`; a release with no merges or fixes uses `--backfill-limit` instead. Use `--no-commit-limit` to list every commit, and `--sort-commits` to change the order. [Breaking changes](#breaking-changes) are always listed, first.
+
+Commit message conventions aren't special: a `feat:` or `fix:` prefix is just part of the subject, so to group commits by type, use the [`commit-list` helper](#commit-list-helper) in a custom template. To leave commits out entirely, use `--ignore-commit-pattern`, or `--commit-pattern` to only include matching commits.
+
 #### Custom templates
 
 If you aren’t happy with the default templates or want to tweak something, you can point to a [handlebars](https://handlebarsjs.com) template in your local repo. Check out the [existing templates](templates) to see what is possible.
