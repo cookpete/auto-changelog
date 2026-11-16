@@ -126,6 +126,12 @@ function parsePlugins(plugins) {
 	return plugins.map((p) => require(require.resolve(`auto-changelog-${p}`, { paths: [process.cwd()] }))); // eslint-disable-line global-require
 }
 
+function assertReleaseLimit({ releaseLimit }) {
+	if (releaseLimit !== undefined && !(Number.isInteger(releaseLimit) && releaseLimit > 0)) {
+		throw new RangeError(`\`releaseLimit\` must be a positive integer; got \`${releaseLimit}\``);
+	}
+}
+
 async function getLatestVersion(options, exists, readJSON) {
 	if (options.latestVersion) {
 		return options.latestVersion;
@@ -315,6 +321,12 @@ async function getOptions(argv, overrides) {
 				type: 'boolean',
 				description: 'disable detecting a monorepo package and stripping its name-based tag prefix from release titles',
 			},
+			'release-limit': {
+				group: 'Releases',
+				type: 'integer',
+				placeholder: 'count',
+				description: 'number of releases to display, newest first, counting an unreleased or latest version section',
+			},
 			'rollup-prereleases-disabled': {
 				group: 'Releases',
 				type: 'string',
@@ -440,6 +452,7 @@ async function getOptions(argv, overrides) {
 		// using the full tags for compare links, unless `stripTagPrefix` was set explicitly.
 		options.stripTagPrefix ??= true;
 	}
+	assertReleaseLimit(options);
 	const remote = await fR(options);
 	const latestVersion = await getLatestVersion(options, fE, readJSON);
 	return {

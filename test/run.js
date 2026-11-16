@@ -270,6 +270,27 @@ test('getOptions: --autodetect-monorepo-disabled still disables autodetection', 
 	t.notOk(options.stripTagPrefix);
 });
 
+test('getOptions: --release-limit takes a positive integer', async (t) => {
+	t.equal((await getOptions(['', ''], deps)).releaseLimit, undefined, 'no limit by default');
+	t.equal((await getOptions(['', '', '--release-limit', '5'], deps)).releaseLimit, 5);
+	t.match(await rejectedWith(t, ['--release-limit', 'five']), /Invalid integer value for option "release-limit"/, 'not an integer');
+
+	async function rejects(args, overrides, pattern, message) {
+		try {
+			await getOptions(['', '', ...args], { ...deps, ...overrides });
+			t.fail(`${message}: should throw`);
+		} catch (error) {
+			t.match(error.message, pattern, message);
+		}
+	}
+	await rejects(['--release-limit', '0'], {}, /`releaseLimit` must be a positive integer; got `0`/, 'zero');
+	await rejects(['--release-limit=-1'], {}, /got `-1`/, 'negative');
+	function readJson(file) {
+		return file === 'package.json' ? { 'auto-changelog': { releaseLimit: '5' } } : null;
+	}
+	await rejects([], { readJson }, /got `5`/, 'a string from config');
+});
+
 test('getOptions: --rollup-prereleases-disabled takes no value, or a version', async (t) => {
 	t.equal((await getOptions(['', ''], deps)).rollupPrereleasesDisabled, undefined, 'off by default');
 	t.equal((await getOptions(['', '', '--rollup-prereleases-disabled'], deps)).rollupPrereleasesDisabled, true, 'no value');

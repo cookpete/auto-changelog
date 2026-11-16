@@ -273,3 +273,19 @@ test('parseReleases: limits how many releases fetch commits at once, and keeps t
 	t.equal(maxRunning, limit, `at most ${limit} at once`);
 	t.deepEqual(releases.map(({ tag }) => tag), tags.map(({ tag }) => tag), 'in tag order, though later ones finish first');
 });
+
+test('parseReleases: --release-limit counts releases after hiding empty ones', async (t) => {
+	const map = {
+		'v3.0.0': [],
+		'v2.0.0': generateCommits(['Second commit']),
+		'v1.0.0': generateCommits(['First commit']),
+		'v0.1.0': generateCommits(['Initial commit']),
+	};
+	const tags = Object.keys(map).map((tag) => ({ tag, date: '2000-01-01', diff: tag }));
+	const limits = { commitLimit: 3, backfillLimit: 3, releaseLimit: 2 };
+	const hidden = await parseReleases(tags, { ...limits, hideEmptyReleases: true }, null, commitsFrom(map));
+	t.deepEqual(hidden.map(({ tag }) => tag), ['v2.0.0', 'v1.0.0']);
+
+	const shown = await parseReleases(tags, limits, null, commitsFrom(map));
+	t.deepEqual(shown.map(({ tag }) => tag), ['v3.0.0', 'v2.0.0'], 'empty releases count when shown');
+});

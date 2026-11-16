@@ -614,3 +614,23 @@ test('fetchTags: a latest version after prereleases also covers their changes', 
 	const [unreleased] = await fetchTags({ ...options, unreleased: true }, gitTags('v1.0.0---2000-01-01\nv2.0.0-rc.1---2000-02-01'));
 	t.equal(unreleased.diff, 'v2.0.0-rc.1..', 'unreleased changes do not roll up');
 });
+
+test('fetchTags: --release-limit keeps the newest releases', async (t) => {
+	const limited = await fetchTags({ ...options, releaseLimit: 2 }, defaultTags);
+	t.deepEqual(limited.map(({ title, diff }) => ({ title, diff })), [
+		{ title: 'v1.0.0', diff: 'v0.3.0..v1.0.0' },
+		{ title: 'v0.3.0', diff: 'v0.2.2..v0.3.0' },
+	], 'the oldest shown release still covers its own changes');
+
+	const unreleased = await fetchTags({ ...options, releaseLimit: 2, unreleased: true }, defaultTags);
+	t.deepEqual(unreleased.map(({ title }) => title), ['Unreleased', 'v1.0.0'], 'an unreleased section counts');
+
+	const ending = await fetchTags({ ...options, releaseLimit: 2, endingVersion: 'v0.3.0' }, defaultTags);
+	t.deepEqual(ending.map(({ title }) => title), ['v0.3.0', 'v0.2.2'], 'after --ending-version');
+
+	const starting = await fetchTags({ ...options, releaseLimit: 5, startingVersion: 'v0.3.0' }, defaultTags);
+	t.deepEqual(starting.map(({ title }) => title), ['v1.0.0', 'v0.3.0'], 'within --starting-version');
+
+	const hidingEmpty = await fetchTags({ ...options, releaseLimit: 2, hideEmptyReleases: true }, defaultTags);
+	t.equal(hidingEmpty.length, 6, 'not yet, when empty releases are hidden');
+});

@@ -50,6 +50,7 @@ Releases:
       --no-strip-tag-prefix           # keep the tag prefix in release titles
       --autodetect-monorepo-disabled  # disable monorepo autodetection
       --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
+      --release-limit [count]         # number of releases to display, newest first, counting an unreleased or latest version section
       --rollup-prereleases-disabled [version] # do not include prerelease changes in the release that follows them; given a version, only for releases up to it
       --starting-version [tag]        # specify earliest version to include in changelog
       --starting-date [yyyy-mm-dd]    # specify earliest release date to include in changelog (filters releases by tag date, not commits)
@@ -89,6 +90,9 @@ auto-changelog --output HISTORY.md --template keepachangelog
 
 # Disable the commit limit, rendering all commits for every release
 auto-changelog --no-commit-limit
+
+# Only include the 5 newest releases
+auto-changelog --release-limit 5
 
 # Append arguments to git log; a value starting with a dash must be attached with `=`
 auto-changelog --append-git-log=--first-parent
@@ -382,6 +386,8 @@ Each release covers the commits since the previous version tag (`git log <previo
 - **Commits**: everything else, except version commits (like `1.2.3`), `Merge branch` commits, and a merged pull request's own commits that have the same subject as its title. When the log may be missing commits (with `--commit-pattern`, `--ignore-commit-pattern`, `--append-git-log`, or a `processCommits` plugin), and a pull request branched off before the previous release, any commit with its title is left out, since it can't be ruled out as one of the pull request's own.
 
 All merges and fixes are listed, but **commits are limited** to the 3 most relevant (the most lines changed) per release, or `--commit-limit`; a release with no merges or fixes uses `--backfill-limit` instead. Use `--no-commit-limit` to list every commit, and `--sort-commits` to change the order. [Breaking changes](#breaking-changes) are always listed, first.
+
+To only include the newest releases, use `--release-limit`. It counts an `Unreleased` or `--latest-version` section, and applies after `--starting-version`, `--starting-date`, `--ending-version`, and `--hide-empty-releases`; each release shown still lists its changes since the release before it.
 
 Commit message conventions aren't special: a `feat:` or `fix:` prefix is just part of the subject, so to group commits by type, use the [`commit-list` helper](#commit-list-helper) in a custom template. To leave commits out entirely, use `--ignore-commit-pattern`, or `--commit-pattern` to only include matching commits.
 

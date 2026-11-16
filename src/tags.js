@@ -257,7 +257,12 @@ async function fetchTags(options, overrides) {
 	}
 
 	const enriched = tags.map(enrichTag(options, rollsUp));
-	return enriched.slice(getStartIndex(enriched, options), getEndIndex(enriched, options));
+	const start = getStartIndex(enriched, options);
+	const end = getEndIndex(enriched, options);
+	// Hidden empty releases aren't known until their commits are fetched, so the limit then
+	// waits for `parseReleases`; otherwise, limiting here skips fetching the rest.
+	const limitHere = options.releaseLimit && !options.hideEmptyReleases;
+	return enriched.slice(start, limitHere ? Math.min(end, start + options.releaseLimit) : end);
 }
 
 module.exports = {

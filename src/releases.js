@@ -172,7 +172,7 @@ async function parseReleases(tags, options, onParsed, overrides) {
 		if (plugin.processReleases) { await plugin.processReleases(releases); }
 	}
 
-	return releases.filter(filterReleases(options));
+	return releases.filter(filterReleases(options)).slice(0, options.releaseLimit);
 }
 
 module.exports = {
