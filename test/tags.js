@@ -692,3 +692,12 @@ test('fetchTags: --verbose says which releases each option left out', async (t) 
 	], 'each release once, when the options cross');
 	t.deepEqual(await verboseTagLines(t, {}), [], 'nothing left out');
 });
+
+test('fetchTags: an empty --rollup-prereleases-disabled is not a version', async (t) => {
+	try {
+		await fetchTags({ ...options, rollupPrereleasesDisabled: '' }, PRERELEASE_TAGS);
+		t.fail('should reject');
+	} catch (error) {
+		t.match(error.message, /`--rollup-prereleases-disabled` takes a version, or no value; got ``/);
+	}
+});

@@ -67,7 +67,7 @@ function getRollsUp({ rollupPrereleasesDisabled: disabled, tagPrefix }) {
 	if (disabled === true) {
 		return () => false;
 	}
-	if (!disabled) {
+	if (disabled === undefined || disabled === false) {
 		return isStable;
 	}
 	const until = inferSemver(removePrefix(String(disabled), tagPrefix));
