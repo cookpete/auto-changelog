@@ -862,6 +862,17 @@ test('getOptions: --help prints usage and parses no options', async (t) => {
 	t.ok(printed.join('\n').includes('Usage: auto-changelog'), 'prints the usage text');
 });
 
+test('getOptions: the README usage matches --help', async (t) => {
+	const { exitCode } = process;
+	const logs = captureLog(t);
+	await getOptions(['', '', '--help'], deps);
+	const printed = logs();
+	process.exitCode = exitCode;
+	const readme = await readFile(join(__dirname, '..', 'README.md'));
+	const { usage } = readme.match(/^```sh\n(?<usage>Usage: auto-changelog[\s\S]*?)\n```$/m).groups;
+	t.equal(printed.join('\n').trimEnd(), usage);
+});
+
 test('getOptions: --version prints the v-prefixed version', async (t) => {
 	const { exitCode } = process;
 	const logs = captureLog(t);

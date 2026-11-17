@@ -19,73 +19,66 @@ npm install -g auto-changelog
 
 Simply run `auto-changelog` in the root folder of a git repository. `git log` is run behind the scenes in order to parse the commit history.
 
-```bash
+```sh
 Usage: auto-changelog [options]
 
 Options:
-
-  -o, --output [file]                 # output file (default: CHANGELOG.md)
-  -c, --config [file]                 # config file location (default: .auto-changelog)
-      --extends [config]              # extend a JSON config file, by relative path or package path
-  -t, --template [template]           # specify template to use [compact, keepachangelog, conventional, json] (default: compact)
-  -r, --remote [remote]               # specify git remote to use for links (default: origin)
-  -p, --package                       # use version from package.json as latest release
-      --package-file [file]           # use version from the specified file as latest release
-      --latest-version [version]      # use specified version as latest release
-      --hide-credit                   # hide auto-changelog credit
-      --handlebars-setup [file]       # handlebars setup file
-      --keep-indentation              # keep indentation from the template in the output
-      --prepend                       # prepend changelog to output file
-      --stdout                        # output changelog to stdout
-      --verbose                       # explain on stderr what was left out of the changelog, and why
-      --plugins [name]                # use plugins to augment commit/merge/release information; repeat for each plugin
-      --unsafe-config                 # trust unsafe options from in-repo config (see Security)
-      --version                       # output the version number
-      --help                          # output usage information
+  -o, --output <file>                          output file (default: CHANGELOG.md)
+  -c, --config <file>                          config file location (default: .auto-changelog)
+      --extends <config>                       extend a JSON config file, by relative path or package path (e.g. my-config/auto-changelog.json)
+  -t, --template <template>                    specify template to use [compact, keepachangelog, conventional, json] (default: compact)
+  -r, --remote <remote>                        specify git remote to use for links (default: origin)
+  -p, --[no-]package                           use version from package.json as latest release
+      --package-file <file>                    use version from the specified file as latest release
+      --latest-version <version>               use specified version as latest release
+      --[no-]hide-credit                       hide auto-changelog credit
+      --handlebars-setup <file>                handlebars setup file
+      --[no-]keep-indentation                  keep indentation from the template in the output
+      --[no-]prepend                           prepend changelog to output file
+      --[no-]stdout                            output changelog to stdout
+      --plugins [name]...                      use plugins to augment commit/merge/release information
+      --[no-]verbose                           explain on stderr what was left out of the changelog, and why
+      --[no-]unsafe-config                     trust in-repo config completely, honoring options that can load code, run git commands, or make network requests; do not use with untrusted repositories
+      --help                                   Show this help text
+      --version                                Show the version number
 
 Releases:
-
-  -u, --unreleased                    # include section for unreleased changes
-      --tag-pattern [regex]           # override regex pattern for version tags
-      --tag-prefix [prefix]           # prefix used in version tags; only tags starting with it are releases
-      --tag-parser-pattern [regex]    # pattern used to capture values in tags for replacement
-      --tag-parser-replacement [string] # replaces captures supplied in the --tag-parser-pattern option to create valid semver tags
-      --strip-tag-prefix              # strip the tag prefix from release titles (default: on for a detected monorepo package)
-      --no-strip-tag-prefix           # keep the tag prefix in release titles
-      --autodetect-monorepo-disabled  # disable monorepo autodetection
-      --no-autodetect-monorepo-disabled # enable monorepo autodetection (default)
-      --release-limit [count]         # number of releases to display, newest first, counting an unreleased or latest version section
-      --rollup-prereleases-disabled [version] # do not include prerelease changes in the release that follows them; given a version, only for releases up to it
-      --starting-version [tag]        # specify earliest version to include in changelog
-      --starting-date [yyyy-mm-dd]    # specify earliest release date to include in changelog (filters releases by tag date, not commits)
-      --ending-version [tag]          # specify latest version to include in changelog
-      --release-summary               # display tagged commit message body as release summary
-      --unreleased-only               # only output unreleased changes
-      --hide-empty-releases           # hide empty releases
-      --append-git-tag [string]       # string to append to git tag command
+  -u, --[no-]unreleased                        include section for unreleased changes
+      --tag-pattern <regex>                    override regex pattern for version tags
+      --tag-prefix <prefix>                    prefix used in version tags; only tags starting with it are releases
+      --tag-parser-pattern <regex>             pattern used to capture values in tags for replacement
+      --tag-parser-replacement <string>        replaces captures supplied in the --tag-parser-pattern option to create valid semver tags
+      --[no-]strip-tag-prefix                  strip the tag prefix from release titles (default: on for a detected monorepo package)
+      --[no-]autodetect-monorepo-disabled      disable detecting a monorepo package and stripping its name-based tag prefix from release titles
+      --release-limit <count>                  number of releases to display, newest first, counting an unreleased or latest version section
+      --rollup-prereleases-disabled [version]  do not include prerelease changes in the release that follows them; given a version, only for releases up to it
+      --starting-version <tag>                 specify earliest version to include in changelog
+      --starting-date <yyyy-mm-dd>             specify earliest release date to include in changelog (filters releases by tag date, not commits)
+      --ending-version <tag>                   specify latest version to include in changelog
+      --[no-]release-summary                   use tagged commit message body as release summary
+      --[no-]unreleased-only                   only output unreleased changes
+      --[no-]hide-empty-releases               hide empty releases
+      --append-git-tag <string>                string to append to git tag command
 
 Commits:
-
-  -l, --commit-limit [count]          # number of commits to display per release (default: 3)
-      --no-commit-limit               # display all commits for every release
-  -b, --backfill-limit [count]        # number of commits to backfill empty releases with (default: 3)
-      --no-backfill-limit             # backfill empty releases with all commits
-      --issue-pattern [regex]         # override regex pattern for issues in commit messages
-      --breaking-pattern [regex]      # regex pattern for breaking change commits
-      --merge-pattern [regex]         # add custom regex pattern for merge commits
-      --commit-pattern [regex]        # pattern to include when parsing commits
-      --ignore-commit-pattern [regex] # pattern to ignore when parsing commits, matched against commit subjects and merged pull request titles
-      --sort-commits [property]       # sort commits by property [relevance, date, date-desc, subject, subject-desc] (default: relevance)
-      --append-git-log [string]       # string to append to git log command
+  -l, --[no-]commit-limit <count>              number of commits to display per release (default: 3)
+  -b, --[no-]backfill-limit <count>            number of commits to backfill empty releases with (default: 3)
+      --issue-pattern <regex>                  override regex pattern for issues in commit messages
+      --breaking-pattern <regex>               regex pattern for breaking change commits
+      --merge-pattern <regex>                  add custom regex pattern for merge commits
+      --commit-pattern <regex>                 pattern to include when parsing commits
+      --ignore-commit-pattern <regex>          pattern to ignore when parsing commits, matched against commit subjects and merged pull request titles
+      --sort-commits <property>                sort commits by property [relevance, date, date-desc, subject, subject-desc] (default: relevance)
+      --append-git-log <string>                string to append to git log command
 
 Links:
+      --commit-url <url>                       override url for commits, use {id} for commit id
+      --issue-url <url>                        override url for issues, use {id} for issue id
+      --merge-url <url>                        override url for merges, use {id} for merge id
+      --compare-url <url>                      override url for compares, use {from} and {to} for tags
+```
 
-      --commit-url [url]              # override url for commits, use {id} for commit id
-      --issue-url [url]               # override url for issues, use {id} for issue id
-      --merge-url [url]               # override url for merges, use {id} for merge id
-      --compare-url [url]             # override url for compares, use {from} and {to} for tags
-
-
+```bash
 # Write log to CHANGELOG.md in current directory
 auto-changelog
 
