@@ -63,7 +63,10 @@
     "tape": "^5.10.3"
   },
   "auto-changelog": {
-    "breakingPattern": "^\\[Breaking\\]|Breaking change"
+    "breakingPattern": "^\\[Breaking\\]|Breaking change",
+    "replaceText": {
+      "^\\[Breaking\\] ": ""
+    }
   },
   "publishConfig": {
     "ignore": [
