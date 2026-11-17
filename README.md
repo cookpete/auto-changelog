@@ -1,10 +1,13 @@
-# auto-changelog
+# auto-changelog <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
+
+[![github actions][actions-image]][actions-url]
+[![coverage][codecov-image]][codecov-url]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
+
+[![npm badge][npm-badge-png]][package-url]
 
 Command line tool for generating a changelog from git tags and commit history. Used by [Modernizr](https://modernizr.com), [Netlify](https://netlify.com), and [Velocity.js](http://velocityjs.org).
-
-[![Latest npm version](https://img.shields.io/npm/v/auto-changelog.svg)](https://www.npmjs.com/package/auto-changelog)
-[![Build Status](https://img.shields.io/travis/cookpete/auto-changelog/master.svg)](https://travis-ci.org/cookpete/auto-changelog)
-[![Test Coverage](https://img.shields.io/codecov/c/github/cookpete/auto-changelog.svg)](https://codecov.io/gh/cookpete/auto-changelog)
 
 ### Installation
 
@@ -517,3 +520,15 @@ The command parses your git commit history and generates a changelog based on ta
 #### Why do I need it?
 
 Because keeping a changelog can be tedious and difficult to get right. If you don’t have the patience for a hand-crafted, bespoke changelog then this makes keeping one rather easy. It also can be [automated if you’re feeling extra lazy](#what-you-might-do-if-youre-clever).
+
+[package-url]: https://npmjs.org/package/auto-changelog
+[npm-version-svg]: https://versionbadg.es/cookpete/auto-changelog.svg
+[npm-badge-png]: https://nodei.co/npm/auto-changelog.png?downloads=true&stars=true
+[license-image]: https://img.shields.io/npm/l/auto-changelog.svg
+[license-url]: LICENSE.md
+[downloads-image]: https://img.shields.io/npm/dm/auto-changelog.svg
+[downloads-url]: https://npm-stat.com/charts.html?package=auto-changelog
+[codecov-image]: https://codecov.io/gh/cookpete/auto-changelog/branch/master/graphs/badge.svg
+[codecov-url]: https://app.codecov.io/gh/cookpete/auto-changelog/
+[actions-image]: https://img.shields.io/github/check-runs/cookpete/auto-changelog/master
+[actions-url]: https://github.com/cookpete/auto-changelog/actions
