@@ -19,7 +19,8 @@ function isInside(root, path) {
 }
 
 async function getRoot() {
-	const toplevel = (await cmd('git rev-parse --show-toplevel')).trim();
+	// Outside a git repository, the working directory stands in for it.
+	const toplevel = (await cmd('git rev-parse --show-toplevel').catch(() => '')).trim();
 	return realpath(toplevel || process.cwd());
 }
 

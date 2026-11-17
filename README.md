@@ -143,6 +143,7 @@ What may look different:
 - **Monorepos**: [monorepo autodetection](#monorepos) is now on by default, so a detected package gets its tag prefix from its `name` (unless one is configured), and release titles without it. Set `autodetectMonorepoDisabled` to `true` to keep the v2 behavior.
 - **Tag prefixes**: with a [tag prefix](#tag-prefixes), whether set or derived for a monorepo package, only tags that start with it are releases. Version tags without it, which v2 included, are left out and listed on stderr; if no version tags have the prefix, that is now an error.
 - **Progress messages** go to stderr, so stdout carries only the changelog.
+- **Failing git commands**: when a `git` command fails, for example because of a bad `--append-git-log` argument or when run outside a git repository, `auto-changelog` now stops with git's error, rather than writing an incomplete or empty changelog.
 - **Prereleases**: a release after prereleases now [also lists their changes](#prereleases). To keep releases already in your changelog as they are, set `rollupPrereleasesDisabled` to your latest version, like `"rollupPrereleasesDisabled": "2.7.0"`; set it to `true` to never do this.
 - **`--version`** prints the version with a `v` prefix, like `v3.0.0`.
 - **`--ignore-commit-pattern`** also matches merged pull request titles, so it can hide merges as well as commits.

@@ -227,7 +227,8 @@ function filterByPrefix(tags, options) {
 // link to the remote branch it tracks. Anything unknown keeps `HEAD`, which also keeps
 // existing links unchanged when the changelog is generated on the default branch.
 async function getUnreleasedTarget({ remote }, command) {
-	const branch = (await command('git symbolic-ref -q HEAD')).trim();
+	// `git symbolic-ref -q` fails quietly when the ref isn't symbolic: a detached `HEAD`, or a remote without a default branch.
+	const branch = (await command('git symbolic-ref -q HEAD').catch(() => '')).trim();
 	if (!branch) {
 		return 'HEAD';
 	}
@@ -237,7 +238,7 @@ async function getUnreleasedTarget({ remote }, command) {
 		return 'HEAD';
 	}
 	const remoteBranch = remoteRef.slice('refs/heads/'.length);
-	const defaultBranch = (await command(`git symbolic-ref -q refs/remotes/${remote}/HEAD`)).trim();
+	const defaultBranch = (await command(`git symbolic-ref -q refs/remotes/${remote}/HEAD`).catch(() => '')).trim();
 	if (!defaultBranch || defaultBranch === `refs/remotes/${remote}/${remoteBranch}`) {
 		return 'HEAD';
 	}

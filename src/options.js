@@ -126,7 +126,7 @@ async function isMonorepoPackage(pkg, readJSON) {
 	if (pkg && pkg.repository && pkg.repository.directory) {
 		return true;
 	}
-	const toplevel = (await cmd('git rev-parse --show-toplevel')).trim();
+	const toplevel = (await cmd('git rev-parse --show-toplevel').catch(() => '')).trim();
 	const root = toplevel ? resolve(toplevel) : null;
 	let dir = process.cwd();
 	let parent = dirname(dir);

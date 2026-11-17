@@ -41,6 +41,31 @@ test('cmd: runs onProgress', async (t) => {
 	t.equal(typeof result, 'string');
 });
 
+test('cmd: separates arguments by any whitespace', async (t) => {
+	t.equal(await cmd('  node   -p\t1+1 '), '2\n');
+});
+
+test('cmd: rejects when the command fails, with what it wrote to stderr', async (t) => {
+	try {
+		await cmd('node -e process.stderr.write("broken");process.exit(2)');
+		t.fail('should reject');
+	} catch (error) {
+		t.equal(error.message, '`node -e process.stderr.write("broken");process.exit(2)` failed: broken');
+	}
+	try {
+		await cmd('node -e process.exit(3)');
+		t.fail('should reject');
+	} catch (error) {
+		t.equal(error.message, '`node -e process.exit(3)` failed with exit code 3', 'or its exit code, when stderr is empty');
+	}
+	try {
+		await cmd('auto-changelog-no-such-command');
+		t.fail('should reject');
+	} catch (error) {
+		t.equal(error.code, 'ENOENT', 'a missing command');
+	}
+});
+
 test('niceDate: formats string into nice date', (t) => {
 	t.match(niceDate('2015-10-03'), /^\d October 2015$/);
 	t.match(niceDate('2017-11-07T19:19:02.635Z'), /^\d November 2017$/);

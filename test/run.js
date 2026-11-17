@@ -506,6 +506,46 @@ rejectsConfig('sets an absolute output path', { output: '/tmp/pwned.md' });
 rejectsConfig('sets an appendGitLog with --output', { appendGitLog: '--output=../pwned' });
 rejectsConfig('sets an appendGitTag with --output', { appendGitTag: '--first-parent --output ../pwned' });
 
+test('run: a failing git command is an error, and leaves the changelog alone', async (t) => {
+	const original = process.cwd();
+	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	function git(...args) {
+		execFileSync('git', args, { cwd: tmp });
+	}
+	git('init', '-q');
+	git('-c', 'user.name=Test', '-c', 'user.email=test@example.com', '-c', 'commit.gpgSign=false', 'commit', '-q', '--allow-empty', '-m', 'First commit');
+	git('-c', 'user.name=Test', '-c', 'user.email=test@example.com', '-c', 'tag.gpgSign=false', 'tag', '-m', 'v1.0.0', 'v1.0.0');
+	writeFileSync(join(tmp, 'CHANGELOG.md'), 'old content');
+	try {
+		process.chdir(tmp);
+		await run(['', '', '--append-git-log=--no-such-flag'], { fetchRemote: deps.fetchRemote });
+		t.fail('should reject');
+	} catch (error) {
+		t.match(error.message, /^`git log v1\.0\.0 .+--no-such-flag` failed: .*--no-such-flag/, 'with git\'s error');
+	} finally {
+		process.chdir(original);
+	}
+	t.equal(await readFile(join(tmp, 'CHANGELOG.md')), 'old content', 'the changelog is not overwritten');
+	rmSync(tmp, { recursive: true, force: true });
+});
+
+test('run: a repository with no commits yet has no unreleased changes', async (t) => {
+	const original = process.cwd();
+	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	execFileSync('git', ['init', '-q'], { cwd: tmp });
+	const stdout = t.capture(process.stdout, 'write');
+	try {
+		process.chdir(tmp);
+		await run(['', '', '--stdout', '-u', '--latest-version', '1.0.0'], { fetchRemote: deps.fetchRemote });
+	} finally {
+		process.chdir(original);
+		rmSync(tmp, { recursive: true, force: true });
+	}
+	const output = stdout().map((call) => call.args[0]).join('');
+	stdout.restore?.();
+	t.match(output, /#### 1\.0\.0\n/, 'an empty section');
+});
+
 async function optionsInRepo(setup, args = []) {
 	const original = process.cwd();
 	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));

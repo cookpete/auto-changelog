@@ -94,7 +94,8 @@ function getRemote(remoteURL, options = {}) {
 
 async function fetchRemote(options, overrides) {
 	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
-	const remoteURL = await command(`git config --get remote.${options.remote}.url`);
+	// `git config --get` fails when the remote isn't configured.
+	const remoteURL = await command(`git config --get remote.${options.remote}.url`).catch(() => '');
 	return getRemote(remoteURL.trim(), options);
 }
 
