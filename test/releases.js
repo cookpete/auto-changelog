@@ -5,6 +5,7 @@ const { availableParallelism } = require('os');
 const remotes = require('./data/remotes');
 const { generateCommits } = require('./utils/commits');
 const { parseReleases } = require('../src/releases');
+const { getRemote } = require('../src/remote');
 const { captureStderr } = require('./utils/stderr');
 
 function commitsFrom(map) {
@@ -351,4 +352,60 @@ test('parseReleases: --verbose says which releases were hidden or over the limit
 		'left out 1 release with no changes (`--hide-empty-releases`): v3.0.0',
 		'left out 1 release over `--release-limit`: v0.1.0',
 	]);
+});
+
+test('parseReleases: lists a pull request merged more than once only once', async (t) => {
+	const map = {
+		'v1.0.0': generateCommits([
+			'Fix a thing (#5)',
+			'Add another thing (#6)',
+			'Fix a thing (#5)',
+			'Merge pull request #5 from user/branch\n\nFix a thing',
+		]),
+	};
+	const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
+	const [release] = await parseReleases(tags, { commitLimit: false, ...remotes.github }, null, commitsFrom(map));
+	t.deepEqual(release.merges.map(({ id, message }) => `${id} ${message}`), ['5 Fix a thing', '6 Add another thing']);
+	t.deepEqual(release.commits, [], 'and the repeats are not listed as commits');
+
+	const unlinked = { 'v1.0.0': generateCommits(['Fix a thing (#5)', 'Fix a thing (#5)'], {}, remotes.null) };
+	const [noRemote] = await parseReleases(tags, { commitLimit: false, ...remotes.null }, null, commitsFrom(unlinked));
+	t.deepEqual(noRemote.merges.map(({ id, href }) => [id, href]), [['5', null]], 'without links, by number');
+});
+
+test('parseReleases: only a merge with the same number and title is a repeat', async (t) => {
+	const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
+	const gitlab = getRemote('https://gitlab.com/o/r');
+	const map = {
+		'v1.0.0': generateCommits([
+			'Handle empty input (#12)',
+			'Merge branch \'feat\' into \'main\'\n\nAdd dark mode\n\nSee merge request o/r!12',
+		], {}, gitlab),
+	};
+	const [release] = await parseReleases(tags, { commitLimit: false, ...gitlab }, null, commitsFrom(map));
+	t.deepEqual(release.merges.map(({ message }) => message).sort(), ['Add dark mode', 'Handle empty input'], 'a GitLab issue number and a merge request number');
+
+	const custom = { mergePattern: '^Feature: ([a-z]+)' };
+	const customMap = { 'v1.0.0': generateCommits(['Feature: alpha', 'Feature: beta'], {}, { ...remotes.github, ...custom }) };
+	const customOptions = { commitLimit: false, ...custom, ...remotes.github };
+	const [customRelease] = await parseReleases(tags, customOptions, null, commitsFrom(customMap));
+	t.equal(customRelease.merges.length, 2, 'a custom merge pattern without a number');
+});
+
+test('parseReleases: a repeated merge\'s fixes are not listed again, and --verbose says it was left out', async (t) => {
+	const tags = [{ tag: 'v1.0.0', title: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
+	const map = {
+		'v1.0.0': generateCommits([
+			{ hash: 'a'.repeat(40), message: 'Fix X (#5)\n\nFixes #3\n\n(cherry picked from commit bbb)' },
+			{ hash: 'b'.repeat(40), message: 'Fix X (#5)\n\nFixes #3' },
+		]),
+	};
+	const { result: [release], lines } = await captureStderr(t, () => parseReleases(tags, {
+		commitLimit: false,
+		verbose: true,
+		...remotes.github,
+	}, null, commitsFrom(map)));
+	t.equal(release.merges.length, 1, 'one merge');
+	t.deepEqual(release.fixes.map(({ commit }) => commit.hash), ['a'.repeat(40)], 'one fix');
+	t.deepEqual(lines, ['left out commit bbbbbbb "Fix X (#5)": it repeats merge #5']);
 });

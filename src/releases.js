@@ -95,6 +95,22 @@ function filterCommits(merges, isPartOfMerge, options) {
 	};
 }
 
+// A pull request can be merged more than once, like a squash merge backported to another branch.
+// Only a merge with the same number and title as an earlier one is a repeat: a GitLab issue
+// number in a squash merge, or a custom merge pattern without a number, can match another's.
+function getRepeatedMerges(commits) {
+	const seen = new Set();
+	return new Set(commits.filter(({ merge }) => {
+		if (!merge || !merge.id) {
+			return false;
+		}
+		const key = `${merge.href || merge.id}\n${merge.message}`;
+		const repeated = seen.has(key);
+		seen.add(key);
+		return repeated;
+	}));
+}
+
 function getRelevance({ insertions = 0, deletions = 0 }) {
 	return insertions + deletions;
 }
@@ -147,8 +163,11 @@ async function parseReleases(tags, options, onParsed, overrides) {
 	// Each release runs its own `git log`; running them all at once overwhelms large repositories.
 	const releases = await mapLimit(tags, availableParallelism(), async (tag) => {
 		const commits = await fetchC(tag.diff, options);
-		const merges = commits.filter((commit) => commit.merge).map((commit) => commit.merge);
-		const fixes = commits.filter((commit) => commit.fixes).map((commit) => ({ fixes: commit.fixes, commit }));
+		const repeats = getRepeatedMerges(commits);
+		repeats.forEach((commit) => logLeftOutCommit(options, commit, `it repeats merge #${commit.merge.id}`));
+		const listed = commits.filter((commit) => !repeats.has(commit));
+		const merges = listed.filter((commit) => commit.merge).map((commit) => commit.merge);
+		const fixes = listed.filter((commit) => commit.fixes).map((commit) => ({ fixes: commit.fixes, commit }));
 
 		for (const plugin of options.plugins || []) {
 			if (plugin.processCommits) { await plugin.processCommits(commits); }
