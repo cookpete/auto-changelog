@@ -313,7 +313,7 @@ By default, `auto-changelog` looks for valid semver tags to build a list of rele
 
 ```bash
 # When all versions are tagged like build-12345
-auto-changelog --tag-pattern build-\d+
+auto-changelog --tag-pattern 'build-\d+'
 
 # Include any tag as a release
 auto-changelog --tag-pattern .+
@@ -357,17 +357,17 @@ By default, `auto-changelog` will parse [GitHub-style issue fixes](https://help.
 
 ```bash
 # Parse Jira-style issues in your commit messages, like PROJECT-418
-auto-changelog --issue-pattern [A-Z]+-\d+ --issue-url https://issues.apache.org/jira/browse/{id}
+auto-changelog --issue-pattern '[A-Z]+-\d+' --issue-url https://issues.apache.org/jira/browse/{id}
 ```
 
 Or, in your `package.json`:
 
-```js
+```json
 {
   "name": "my-awesome-package",
   "auto-changelog": {
     "issueUrl": "https://issues.apache.org/jira/browse/{id}",
-    "issuePattern": "[A-Z]+-\d+"
+    "issuePattern": "[A-Z]+-\\d+"
   }
 }
 ```
