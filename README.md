@@ -136,6 +136,7 @@ What to change:
 - **`--append-git-log`, `--append-git-tag`**: attach a value starting with a dash with `=`, as in `--append-git-log=--first-parent`.
 - **Short flags**: `-v`, `-i`, `-h`, and `-V` are gone; use `--latest-version`, `--issue-url`, `--help`, and `--version`.
 - **`--sort-commits`**: an unsupported value is now an error, rather than sorting by relevance.
+- **Unexpected arguments**: an argument that is neither an option nor an option's value, like the `foo` in `auto-changelog foo`, is now an error; v2 ignored it.
 - **Files outside the repository**: in-repo config, or a symlink in the repository, can no longer lead `auto-changelog` to read or write a file outside it ([Security](#security-and-untrusted-repositories)); pass such a path on the command line instead.
 
 What may look different:
@@ -147,6 +148,8 @@ What may look different:
 - **Prereleases**: a release after prereleases now [also lists their changes](#prereleases). To keep releases already in your changelog as they are, set `rollupPrereleasesDisabled` to your latest version, like `"rollupPrereleasesDisabled": "2.7.0"`; set it to `true` to never do this.
 - **`--version`** prints the version with a `v` prefix, like `v3.0.0`.
 - **`--ignore-commit-pattern`** also matches merged pull request titles, so it can hide merges as well as commits.
+- **`--ending-version`** finds its release the way `--starting-version` does: the tag prefix and `v` are optional, and a version without a tag ends at the nearest older release. A value that is neither a tag nor a version is now an error; v2 ignored such a value, and listed every release.
+- **Squash merges**: a commit whose subject ends in a pull request number, like `Fix a thing (#123)`, is now listed as a merged pull request even without a commit body, rather than as a commit; a pull request merged more than once in a release, like one that was also backported, is listed once.
 
 ### What you might do if you’re clever
 
