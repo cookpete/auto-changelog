@@ -409,3 +409,51 @@ test('parseReleases: a repeated merge\'s fixes are not listed again, and --verbo
 	t.deepEqual(release.fixes.map(({ commit }) => commit.hash), ['a'.repeat(40)], 'one fix');
 	t.deepEqual(lines, ['left out commit bbbbbbb "Fix X (#5)": it repeats merge #5']);
 });
+
+test('parseReleases: --sort-commits orders the commits, after breaking changes', async (t) => {
+	const map = {
+		'v1.0.0': generateCommits([
+			{ message: 'Delta', breaking: true },
+			{ message: 'Alpha', date: '2000-01-02 00:00:00 +0000', insertions: 3 },
+			{ message: 'Bravo', date: '2000-01-03 00:00:00 +0000', insertions: 1 },
+			{ message: 'Charlie', date: '2000-01-01 00:00:00 +0000', insertions: 2 },
+		]),
+	};
+	const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
+	async function sortedBy(sortCommits) {
+		const options = { commitLimit: false, sortCommits, ...remotes.github };
+		const [release] = await parseReleases(tags, options, null, commitsFrom(map));
+		return release.commits.map(({ subject }) => subject);
+	}
+	t.deepEqual(await sortedBy('relevance'), ['Delta', 'Alpha', 'Charlie', 'Bravo'], 'relevance');
+	t.deepEqual(await sortedBy('date'), ['Delta', 'Charlie', 'Alpha', 'Bravo'], 'date');
+	t.deepEqual(await sortedBy('date-desc'), ['Delta', 'Bravo', 'Alpha', 'Charlie'], 'date-desc');
+	t.deepEqual(await sortedBy('subject'), ['Delta', 'Alpha', 'Bravo', 'Charlie'], 'subject');
+	t.deepEqual(await sortedBy('subject-desc'), ['Delta', 'Charlie', 'Bravo', 'Alpha'], 'subject-desc');
+});
+
+test('parseReleases: --release-summary uses the body of a release\'s newest commit', async (t) => {
+	const map = {
+		'v1.0.0..v2.0.0': generateCommits(['2.0.0\n\nThe summary\n\n- a point', 'Other commit']),
+		'v1.0.0': generateCommits(['1.0.0']),
+	};
+	const tags = [
+		{ tag: 'v2.0.0', date: '2000-02-01', diff: 'v1.0.0..v2.0.0' },
+		{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' },
+	];
+	const summaries = await parseReleases(tags, { releaseSummary: true, ...remotes.github }, null, commitsFrom(map));
+	t.deepEqual(summaries.map(({ summary }) => summary), ['The summary\n\n- a point', null], 'none without a body');
+	const off = await parseReleases(tags, remotes.github, null, commitsFrom(map));
+	t.deepEqual(off.map(({ summary }) => summary), [null, null], 'none without --release-summary');
+});
+
+test('parseReleases: a plugin can process the releases', async (t) => {
+	const map = { 'v1.0.0': generateCommits(['First commit']) };
+	const tags = [{ tag: 'v1.0.0', date: '2000-01-01', diff: 'v1.0.0' }];
+	let received;
+	const plugin = {
+		processReleases(releases) { received = releases.map(({ tag }) => tag); },
+	};
+	await parseReleases(tags, { plugins: [plugin], ...remotes.github }, null, commitsFrom(map));
+	t.deepEqual(received, ['v1.0.0']);
+});

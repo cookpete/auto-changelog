@@ -15,8 +15,10 @@ const { execFileSync } = require('child_process');
 const { readFile } = require('../src/utils');
 const remotes = require('./data/remotes');
 const releases = require('./data/releases');
-const { tags } = require('./data/commits-map');
+const { tags, commitsMap } = require('./data/commits-map');
 const { run } = require('../src/run');
+const { parseReleases } = require('../src/releases');
+const { fetchTags } = require('../src/tags');
 const getOptions = require('../src/options');
 const { captureStderr } = require('./utils/stderr');
 
@@ -362,20 +364,41 @@ test('run: generates a changelog', async (t) => {
 	});
 });
 
+// The real `parseReleases`, given each release's commits.
+function releasesFrom(getCommits) {
+	return (tagList, options, onParsed) => parseReleases(tagList, options, onParsed, {
+		fetchCommits: (diff) => Promise.resolve(getCommits(diff)),
+	});
+}
+
+// The real `fetchTags`, given what `git tag` lists, on a detached `HEAD`.
+function tagsFrom(tagList) {
+	const listed = tagList.map(({ tag, date }) => `${tag}---${date.slice(0, 10)}`).join('\n');
+	return (options) => fetchTags(options, {
+		cmd: (command) => (command.startsWith('git tag') ? Promise.resolve(listed) : Promise.reject(new Error('not a symbolic ref'))),
+	});
+}
+
 const noRemote = require('./data/commits-no-remote');
 
-test.skip('run: generates a changelog with no remote', async (t) => {
-	const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'));
+// The same commits as `commitsMap`, parsed without a remote.
+function commitsWithoutRemote(diff) {
+	return commitsMap[diff].map(({ hash }) => noRemote.find((commit) => commit.hash === hash));
+}
 
+test('run: generates a changelog with no remote', async (t) => {
+	const expected = await readFile(join(__dirname, 'data', 'template-compact-no-remote.md'));
+	let written;
 	await run(['', ''], {
 		...deps,
 		fetchRemote: () => remotes.null,
-		fetchCommits: () => noRemote,
+		fetchTags: tagsFrom(tags),
+		parseReleases: releasesFrom(commitsWithoutRemote),
 		writeFile(output, log) {
-			t.equal(output, 'CHANGELOG.md');
-			t.equal(log, expected);
+			written = log;
 		},
 	});
+	t.equal(written, expected);
 });
 
 test('run: uses options from package.json', async (t) => {
@@ -396,48 +419,47 @@ test('run: uses options from package.json', async (t) => {
 	});
 });
 
-test.skip('run: uses version from package.json', async (t) => {
-	await run(['', '', '--package'], {
+async function runWritten(argv, overrides) {
+	let written;
+	await run(['', '', ...argv], {
 		...deps,
-		fileExists: () => true,
-		readJson: () => ({
-			version: '2.0.0',
-		}),
+		...overrides,
 		writeFile(output, log) {
-			t.ok(log.includes('v2.0.0'));
+			written = log;
 		},
 	});
+	return written;
+}
+
+test('run: uses version from package.json', async (t) => {
+	const written = await runWritten(['--package'], {
+		fileExists: (file) => file === 'package.json',
+		readJson: (file) => (file === 'package.json' ? { version: '2.0.0' } : null),
+		fetchTags: tagsFrom(tags),
+		parseReleases: releasesFrom((diff) => commitsMap[diff]),
+	});
+	t.ok(written.includes('#### [v2.0.0](https://github.com/user/repo/compare/v1.0.0...v2.0.0)'));
 });
 
-test.skip('run: uses version from custom package file', async (t) => {
-	await run(['', '', '--package-file', 'test.json'], {
-		...deps,
-		fileExists: () => true,
-		readJson(file) {
-			if (file === 'test.json') {
-				return { version: '2.0.0' };
-			}
-			return {};
-		},
-		writeFile(output, log) {
-			t.ok(log.includes('v2.0.0'));
-		},
+test('run: uses version from custom package file', async (t) => {
+	const written = await runWritten(['--package-file', 'test.json'], {
+		fileExists: (file) => file === 'test.json',
+		readJson: (file) => (file === 'test.json' ? { version: '2.0.0' } : null),
+		fetchTags: tagsFrom(tags),
+		parseReleases: releasesFrom((diff) => commitsMap[diff]),
 	});
+	t.ok(written.includes('#### [v2.0.0](https://github.com/user/repo/compare/v1.0.0...v2.0.0)'));
 });
 
-test.skip('run: uses version from package.json with no prefix', async (t) => {
-	await run(['', '', '--package'], {
-		...deps,
-		fileExists: () => true,
-		readJson: () => ({
-			version: '2.0.0',
-		}),
-		fetchTags: () => Promise.resolve(tags.map((tag) => tag.replace('v', ''))),
-		writeFile(output, log) {
-			t.ok(log.includes('2.0.0'));
-			t.ok(!log.includes('v2.0.0'));
-		},
+test('run: uses version from package.json with no prefix', async (t) => {
+	const written = await runWritten(['--package'], {
+		fileExists: (file) => file === 'package.json',
+		readJson: (file) => (file === 'package.json' ? { version: '2.0.0' } : null),
+		fetchTags: tagsFrom(tags.map((tag) => ({ ...tag, tag: tag.tag.replace('v', '') }))),
+		parseReleases: releasesFrom(() => []),
 	});
+	t.ok(written.includes('#### [2.0.0](https://github.com/user/repo/compare/1.0.0...2.0.0)'));
+	t.notOk(written.includes('v2.0.0'));
 });
 
 test('run: command line options override options from package.json', async (t) => {
@@ -796,42 +818,30 @@ test('getOptions: --plugins requires a plugin name', async (t) => {
 	}
 });
 
-test.skip('run: supports unreleased option', async (t) => {
-	await run(['', '', '--unreleased'], {
-		...deps,
-		writeFile(output, log) {
-			t.ok(log.includes('Unreleased'));
-			t.ok(log.includes('https://github.com/user/repo/compare/v1.0.0...HEAD'));
-		},
+test('run: supports unreleased option', async (t) => {
+	const written = await runWritten(['--unreleased'], {
+		fetchTags: tagsFrom(tags),
+		parseReleases: releasesFrom((diff) => commitsMap[diff]),
 	});
+	t.ok(written.includes('#### [Unreleased](https://github.com/user/repo/compare/v1.0.0...HEAD)'));
+	t.ok(written.includes('- Unreleased commit'));
 });
 
-const { commitsMap } = require('./data/commits-map');
-
-test.skip('run: supports breakingPattern option', async (t) => {
+test('run: lists breaking changes despite the commit limit', async (t) => {
 	function addBreakingFlag(commit) {
-		if ((/Some breaking change/).test(commit.message)) {
-			return { ...commit, breaking: true };
-		}
-		return commit;
+		return (/Some breaking change/).test(commit.message) ? { ...commit, breaking: true } : commit;
 	}
-	// No need to actually pass in the option here as we amend the commits
-	await run(['', '', '--commit-limit', '0'], {
-		...deps,
-		fetchCommits: (diff) => Promise.resolve(commitsMap[diff].map(addBreakingFlag)),
-		writeFile(output, log) {
-			t.ok(log.includes('**Breaking change:** Some breaking change'));
-		},
+	const written = await runWritten(['--commit-limit', '0'], {
+		parseReleases: releasesFrom((diff) => commitsMap[diff].map(addBreakingFlag)),
 	});
+	t.ok(written.includes('**Breaking change:** Some breaking change'));
 });
 
-test.skip('run: supports releaseSummary option', async (t) => {
-	await run(['', '', '--release-summary'], {
-		...deps,
-		writeFile(output, log) {
-			t.ok(log.includes('This is my major release description.\n\n- And a bullet point'));
-		},
+test('run: supports releaseSummary option', async (t) => {
+	const written = await runWritten(['--release-summary'], {
+		parseReleases: releasesFrom((diff) => commitsMap[diff]),
 	});
+	t.ok(written.includes('This is my major release description.\n\n- And a bullet point'));
 });
 
 test('run: does not error when using latest version option', async (t) => {
@@ -839,10 +849,44 @@ test('run: does not error when using latest version option', async (t) => {
 	t.pass('did not error');
 });
 
-// For some reason is preventing the fetchTags test from running…?`
-test.skip('run: does not error when using stdout option', async (t) => {
-	await run(['', '', '--stdout'], deps);
-	t.pass('did not error');
+test('run: writes to stdout, and no file, with the stdout option', async (t) => {
+	const expected = await readFile(join(__dirname, 'data', 'template-compact.md'));
+	let written = false;
+	// tape writes its output to stdout too, so it is restored before asserting.
+	const stdout = t.capture(process.stdout, 'write');
+	try {
+		await run(['', '', '--stdout'], {
+			...deps,
+			writeFile() {
+				written = true;
+			},
+		});
+	} finally {
+		stdout.restore?.();
+	}
+	t.equal(stdout().map((call) => call.args[0]).join(''), expected);
+	t.equal(written, false, 'no file');
+});
+
+const PREPEND_TOKEN = '<!-- auto-changelog-above -->';
+
+test('run: replaces only what is above the prepend token in the output file', async (t) => {
+	const expected = await readFile(join(__dirname, 'data', 'template-compact.md'));
+	const { result: written, lines } = await captureStderr(t, () => runWritten([], {
+		fileExists: (file) => file === 'CHANGELOG.md',
+		readFile: () => Promise.resolve(`old changelog\n${PREPEND_TOKEN}\nkept`),
+	}));
+	t.equal(written, `${expected}\n${PREPEND_TOKEN}\nkept`);
+	t.match(lines.join('\n'), /prepended to CHANGELOG\.md/);
+});
+
+test('run: --prepend keeps the whole output file below the changelog', async (t) => {
+	const expected = await readFile(join(__dirname, 'data', 'template-compact.md'));
+	const written = await captureStderr(t, () => runWritten(['--prepend'], {
+		fileExists: (file) => file === 'CHANGELOG.md',
+		readFile: () => Promise.resolve('older changelog\n'),
+	}));
+	t.equal(written.result, `${expected}\nolder changelog\n`);
 });
 
 test('run: throws an error when no package found', (t) => run(['', '', '--package'], deps)

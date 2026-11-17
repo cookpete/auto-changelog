@@ -130,6 +130,14 @@ test('fetchTags: supports --starting-version with non-semver tags', async (t) =>
 	t.equal(tags.length, 2);
 });
 
+test('fetchTags: orders tags that are not semver by name, newest first', async (t) => {
+	const tags = await fetchTags(
+		{ ...options, tagPattern: '^build-' },
+		gitTags(['build-a---2001-01-01', 'build-c---2003-01-01', 'build-b---2002-01-01'].join('\n')),
+	);
+	t.deepEqual(tags.map(({ tag }) => tag), ['build-c', 'build-b', 'build-a']);
+});
+
 test('fetchTags: supports --ending-version', async (t) => {
 	t.equal((await fetchTags({ ...options, endingVersion: 'v0.2.2' }, defaultTags)).length, 4);
 });
@@ -491,14 +499,15 @@ function gitRepo({
 			if (command.startsWith('git tag')) {
 				return Promise.resolve(DEFAULT_TAGS);
 			}
+			// Like git, `symbolic-ref` fails when the ref is not symbolic.
 			if (command === 'git symbolic-ref -q HEAD') {
-				return Promise.resolve(`${branch}\n`);
+				return branch ? Promise.resolve(`${branch}\n`) : Promise.reject(new Error('not a symbolic ref'));
 			}
 			if (command.startsWith('git for-each-ref') && command.endsWith(` ${branch}`)) {
 				return Promise.resolve(`${upstream}\n`);
 			}
 			if (command === 'git symbolic-ref -q refs/remotes/origin/HEAD') {
-				return Promise.resolve(`${remoteHead}\n`);
+				return remoteHead ? Promise.resolve(`${remoteHead}\n`) : Promise.reject(new Error('not a symbolic ref'));
 			}
 			return Promise.reject(new Error(`unexpected command: ${command}`));
 		},
@@ -534,6 +543,7 @@ test('fetchTags: the unreleased compare link targets HEAD when no other branch i
 	t.equal(await getUnreleasedHref({ upstream: 'origin---refs/heads/main', branch: 'refs/heads/main' }), head, 'the default branch');
 	t.equal(await getUnreleasedHref({ branch: '' }), head, 'a detached HEAD');
 	t.equal(await getUnreleasedHref({ upstream: '---' }), head, 'a branch with no upstream');
+	t.equal(await getUnreleasedHref({ upstream: '' }), head, 'a branch with no commits yet');
 	t.equal(await getUnreleasedHref({ upstream: 'fork---refs/heads/feature/x' }), head, 'an upstream on another remote');
 	t.equal(await getUnreleasedHref({ remoteHead: '' }), head, 'an unknown default branch');
 });

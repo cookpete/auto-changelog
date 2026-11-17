@@ -19,7 +19,7 @@ function toTagRange(diff) {
 	return diff.split('..').map((ref) => (ref && ref !== 'HEAD' ? `refs/tags/${ref}` : ref)).join('..');
 }
 
-async function fetchCommits(diff, options = {}, overrides = {}) {
+async function fetchCommits(diff, options, overrides = {}) {
 	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
 	// Without any tags, unreleased changes are everything up to `HEAD`, which a new repository doesn't have yet.
 	if (diff === 'HEAD' && !(await command('git rev-parse -q --verify HEAD').catch(() => '')).trim()) {

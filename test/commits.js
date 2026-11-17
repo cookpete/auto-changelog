@@ -438,6 +438,31 @@ ${MESSAGE_SEPARATOR}
 	t.end();
 });
 
+test('parseCommits: parses stats with only insertions, or only deletions', (t) => {
+	const gitLog = `${COMMIT_SEPARATOR}92839699a6aaea148dcd72ea897321e66cae0c18
+2015-12-24 20:28:22 +0000
+Commit Author
+commit@author.com
+Additions
+${MESSAGE_SEPARATOR}
+ 2 files changed, 3 insertions(+)
+
+${COMMIT_SEPARATOR}158fdde54b6188c9f9ca3034e9cb5bcc3fe3ff69
+2015-12-24 20:27:22 +0000
+Commit Author
+commit@author.com
+Removals
+${MESSAGE_SEPARATOR}
+ 1 file changed, 4 deletions(-)
+`;
+	const parsed = parseCommits(gitLog, remotes.github);
+	t.deepEqual(parsed.map(({ files, insertions, deletions }) => ({ files, insertions, deletions })), [
+		{ files: 2, insertions: 3, deletions: 0 },
+		{ files: 1, insertions: 0, deletions: 4 },
+	]);
+	t.end();
+});
+
 test('getMerge gitlab: parses a merge', (t) => {
 	const message = 'Merge branch \'branch\' into \'master\'\n\nMemoize GitLab logger to reduce open file descriptors\n\nCloses gitlab-ee#3664\n\nSee merge request !15007';
 	t.deepEqual(getMerge(EXAMPLE_COMMIT, message, remotes.gitlab), {

@@ -53,16 +53,6 @@ function getFixPattern(options) {
 	return DEFAULT_FIX_PATTERN;
 }
 
-function getFixID(match) {
-	// Get the last non-falsey value in the match array
-	for (let i = match.length; i >= 0; i--) {
-		if (match[i]) {
-			return match[i];
-		}
-	}
-	return void undefined;
-}
-
 // A full link to one of this repository's own issues or pull requests, which can differ in
 // letter case (like an owner's capitalization) from the remote's, is spelled like the remote's links.
 function getFixLink(url, id, { getIssueLink, getMergeLink }) {
@@ -70,13 +60,14 @@ function getFixLink(url, id, { getIssueLink, getMergeLink }) {
 	return ownLinks.find((link) => link && link.toLowerCase() === url.toLowerCase()) || url;
 }
 
-function getFixes(message, author, options = {}) {
+function getFixes(message, author, options) {
 	const pattern = getFixPattern(options);
 	const fixes = [];
 	let match = pattern.exec(message);
 	if (!match) { return null; }
 	while (match) {
-		const id = getFixID(match);
+		// The last captured value, or the whole match
+		const id = match.findLast((value) => value);
 		const href = isLink(match[2]) ? getFixLink(match[2], id, options) : options.getIssueLink(id);
 		if (!fixes.some((fix) => fix.id === id && fix.href === href)) {
 			fixes.push({
@@ -97,7 +88,7 @@ function getMergePatterns(options) {
 	return MERGE_PATTERNS;
 }
 
-function getMerge(commit, message, options = {}) {
+function getMerge(commit, message, options) {
 	const patterns = getMergePatterns(options);
 	for (const pattern of patterns) {
 		const match = pattern.exec(message);
@@ -125,13 +116,13 @@ function getStats(stats) {
 		deletions,
 	] = stats.match(MATCH_STATS);
 	return {
-		files: parseInt(files || 0, 10),
+		files: parseInt(files, 10),
 		insertions: parseInt(insertions || 0, 10),
 		deletions: parseInt(deletions || 0, 10),
 	};
 }
 
-function parseCommit(commit, options = {}) {
+function parseCommit(commit, options) {
 	const [
 		,
 		hashes,
@@ -164,7 +155,7 @@ function parseCommit(commit, options = {}) {
 	};
 }
 
-function parseCommits(string, options = {}) {
+function parseCommits(string, options) {
 	return string
 		.split(COMMIT_SEPARATOR)
 		.slice(1)

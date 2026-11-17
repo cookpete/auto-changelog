@@ -75,6 +75,16 @@ test('compileTemplate: supports handlebarsSetup option', async (t) => {
 	);
 });
 
+test('compileTemplate: requires a handlebarsSetup file by absolute path, even when it exports no function', async (t) => {
+	t.equal(
+		await compileTemplate(releases, {
+			template: join(__dirname, 'data', 'template-on-require.hbs'),
+			handlebarsSetup: join(__dirname, 'data', 'handlebars-setup-on-require.js'),
+		}),
+		'registered on require\n',
+	);
+});
+
 test('compileTemplate: supports keepIndentation option', async (t) => {
 	const template = join(__dirname, 'data', 'template-indented.hbs');
 	const titles = releases.map(({ title }) => title);

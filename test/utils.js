@@ -115,6 +115,14 @@ test('readFile: reads file', async (t) => {
 	t.equal(await readFile(null, { fs: { readFile: (path, type, cb) => cb(null, 'abc') } }), 'abc');
 });
 
+test('readFile: rejects when the file cannot be read', async (t) => {
+	const error = new Error('cannot read');
+	await readFile(null, { fs: { readFile: (path, type, cb) => cb(error) } }).then(
+		() => t.fail('should reject'),
+		(e) => t.equal(e, error),
+	);
+});
+
 test('writeFile: reads file', async (t) => {
 	t.equal(await writeFile(null, null, { fs: { writeFile: (path, data, cb) => cb(null, 'abc') } }), 'abc');
 });
