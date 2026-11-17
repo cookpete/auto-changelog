@@ -701,3 +701,12 @@ test('fetchTags: an empty --rollup-prereleases-disabled is not a version', async
 		t.match(error.message, /`--rollup-prereleases-disabled` takes a version, or no value; got ``/);
 	}
 });
+
+test('fetchTags: with no tag that has the tag prefix, the error suggests a tag pattern for a first release', async (t) => {
+	try {
+		await fetchTags({ ...options, tagPrefix: '@my.org/pkg@' }, gitTags('v1.0.0---2000-01-01'));
+		t.fail('should reject');
+	} catch (error) {
+		t.match(error.message, /Before a package's first release, use `--tag-pattern '\^@my\\\.org\/pkg@'` in place of the tag prefix \(and `--autodetect-monorepo-disabled` for a monorepo package\)$/);
+	}
+});

@@ -216,7 +216,7 @@ function filterByPrefix(tags, options) {
 	if (skipped.length > 0) {
 		const count = skipped.length === 1 ? '1 version tag' : `${skipped.length} version tags`;
 		if (!prefixed.some(isValidTag(options))) {
-			throw new Error(`No version tags start with the tag prefix "${tagPrefix}", but ${count} without it ${skipped.length === 1 ? 'does' : 'do'} (${listTags(skipped, options)}); check \`--tag-prefix\`, or for a monorepo package, its \`name\` and \`--autodetect-monorepo-disabled\``);
+			throw new Error(`No version tags start with the tag prefix "${tagPrefix}", but ${count} without it ${skipped.length === 1 ? 'does' : 'do'} (${listTags(skipped, options)}); check \`--tag-prefix\`, or for a monorepo package, its \`name\` and \`--autodetect-monorepo-disabled\`. Before a package's first release, use \`--tag-pattern '^${tagPrefix.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&')}'\` in place of the tag prefix (and \`--autodetect-monorepo-disabled\` for a monorepo package)`);
 		}
 		updateLog(`skipped ${count} without the tag prefix "${tagPrefix}" (${listTags(skipped, options)})\n`);
 	}
