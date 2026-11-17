@@ -3,8 +3,8 @@
 Command line tool for generating a changelog from git tags and commit history. Used by [Modernizr](https://modernizr.com), [Netlify](https://netlify.com), and [Velocity.js](http://velocityjs.org).
 
 [![Latest npm version](https://img.shields.io/npm/v/auto-changelog.svg)](https://www.npmjs.com/package/auto-changelog)
-[![Build Status](https://img.shields.io/travis/CookPete/auto-changelog/master.svg)](https://travis-ci.org/CookPete/auto-changelog)
-[![Test Coverage](https://img.shields.io/codecov/c/github/cookpete/auto-changelog.svg)](https://codecov.io/gh/CookPete/auto-changelog)
+[![Build Status](https://img.shields.io/travis/cookpete/auto-changelog/master.svg)](https://travis-ci.org/cookpete/auto-changelog)
+[![Test Coverage](https://img.shields.io/codecov/c/github/cookpete/auto-changelog.svg)](https://codecov.io/gh/cookpete/auto-changelog)
 
 ### Installation
 

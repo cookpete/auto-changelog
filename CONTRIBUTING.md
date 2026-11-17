@@ -3,7 +3,7 @@
 Installing the library locally is relatively easy:
 
 ```bash
-git clone https://github.com/CookPete/auto-changelog.git
+git clone https://github.com/cookpete/auto-changelog.git
 cd auto-changelog
 npm install
 ```

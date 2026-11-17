@@ -46,13 +46,13 @@
     "version": "node bin/auto-changelog.js --package && git add CHANGELOG.md"
   },
   "author": "Pete Cook (https://github.com/cookpete)",
-  "homepage": "https://github.com/CookPete/auto-changelog",
+  "homepage": "https://github.com/cookpete/auto-changelog",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CookPete/auto-changelog.git"
+    "url": "https://github.com/cookpete/auto-changelog.git"
   },
   "bugs": {
-    "url": "https://github.com/CookPete/auto-changelog/issues"
+    "url": "https://github.com/cookpete/auto-changelog/issues"
   },
   "keywords": [
     "auto",
