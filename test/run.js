@@ -634,6 +634,20 @@ test('getOptions: refuses in-repo files that resolve outside the repository', as
 	});
 });
 
+test('getOptions: an unsafe option\'s refusal names the config it came from', async (t) => {
+	const fromEach = await optionsInRepo(({ repo }) => {
+		writeFileSync(join(repo, 'package.json'), JSON.stringify({ 'auto-changelog': { handlebarsSetup: 'evil.js' } }));
+		writeConfig({ plugins: ['evil'], remote: 'origin --evil' })({ repo });
+	});
+	t.match(fromEach.error && fromEach.error.message, /^Refusing to run: in-repo config sets unsafe options: "handlebarsSetup" loads code, in the package\.json "auto-changelog" key; "plugins" loads code, in \.auto-changelog; "remote" contains whitespace .+, in \.auto-changelog\./);
+
+	const extended = await optionsInRepo(({ repo }) => {
+		mkdirSync(join(repo, 'cfg'));
+		writeFileSync(join(repo, 'cfg', 'shared.json'), JSON.stringify({ handlebarsSetup: 'evil.js' }));
+	}, ['--extends', './cfg/shared.json']);
+	t.match(extended.error && extended.error.message, /"handlebarsSetup" loads code, in the extended config \.\/cfg\/shared\.json\./, 'an extended config');
+});
+
 test('getOptions: in-repo files inside the repository, or given on the command line, are honored', async (t) => {
 	const inside = await optionsInRepo(({ repo }) => {
 		writeFileSync(join(repo, 'notes.hbs'), 'notes');

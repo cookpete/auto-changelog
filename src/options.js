@@ -72,6 +72,42 @@ async function getOutsideFiles(files) {
 	return outside.flatMap((entry) => entry || []);
 }
 
+function getUnsafeOptions(config) {
+	const unsafe = CODE_LOADING_OPTIONS
+		.filter((x) => x in config)
+		.map((key) => [key, 'loads code']);
+
+	if (typeof config.template === 'string' && isURL(config.template)) {
+		unsafe.push(['template', 'is a URL (makes a network request)']);
+	}
+	if (typeof config.remote === 'string' && !SAFE_REMOTE.test(config.remote)) {
+		unsafe.push(['remote', 'contains whitespace or unexpected characters (injects git arguments)']);
+	}
+	if (typeof config.output === 'string' && hasTraversal(config.output)) {
+		unsafe.push(['output', 'is absolute or escapes the repository (writes outside it)']);
+	}
+	for (const key of ['appendGitLog', 'appendGitTag']) {
+		if (typeof config[key] === 'string' && hasOutputArg(config[key])) {
+			unsafe.push([key, 'contains --output (writes to an arbitrary file)']);
+		}
+	}
+	return unsafe;
+}
+
+// The config an option's value came from, in order of precedence, so an error can say where to look.
+function getConfigSource({
+	dotOptions,
+	configFile,
+	packageOptions,
+	extendsConfig,
+}) {
+	return (key) => [].concat(
+		Object.hasOwn(packageOptions || {}, key) ? `the ${PACKAGE_FILE} "${PACKAGE_OPTIONS_KEY}" key` : [],
+		Object.hasOwn(dotOptions || {}, key) ? configFile : [],
+		`the extended config ${extendsConfig}`,
+	)[0];
+}
+
 function getConfiguredFiles(commandOptions, options) {
 	return [].concat(
 		commandOptions.template === undefined && !isURL(options.template) ? [['template', options.template]] : [],
@@ -80,27 +116,10 @@ function getConfiguredFiles(commandOptions, options) {
 	);
 }
 
-function assertRepoConfigSafe(config, outsideFiles) {
-	const unsafe = CODE_LOADING_OPTIONS
-		.filter((x) => x in config)
-		.map((key) => `"${key}" loads code`);
-
-	if (typeof config.template === 'string' && isURL(config.template)) {
-		unsafe.push('"template" is a URL (makes a network request)');
-	}
-	if (typeof config.remote === 'string' && !SAFE_REMOTE.test(config.remote)) {
-		unsafe.push('"remote" contains whitespace or unexpected characters (injects git arguments)');
-	}
-	if (typeof config.output === 'string' && hasTraversal(config.output)) {
-		unsafe.push('"output" is absolute or escapes the repository (writes outside it)');
-	}
-	for (const key of ['appendGitLog', 'appendGitTag']) {
-		if (typeof config[key] === 'string' && hasOutputArg(config[key])) {
-			unsafe.push(`"${key}" contains --output (writes to an arbitrary file)`);
-		}
-	}
+function assertRepoConfigSafe(config, outsideFiles, getSource) {
+	const unsafe = getUnsafeOptions(config).map(([key, reason]) => `"${key}" ${reason}, in ${getSource(key)}`);
 	const problems = [].concat(
-		unsafe.length > 0 ? `in-repo config (.auto-changelog or the package.json "auto-changelog" key) sets unsafe options: ${unsafe.join('; ')}` : [],
+		unsafe.length > 0 ? `in-repo config sets unsafe options: ${unsafe.join('; ')}` : [],
 		outsideFiles.length > 0 ? `these files resolve outside the repository: ${outsideFiles.join(', ')}` : [],
 	);
 	if (problems.length > 0) {
@@ -490,7 +509,14 @@ async function getOptions(argv, overrides) {
 		...commandOptions,
 	};
 	if (!options.unsafeConfig) {
-		assertRepoConfigSafe(repoOptions, await getOutsideFiles(getConfiguredFiles(commandOptions, options)));
+		const getSource = getConfigSource({
+			dotOptions,
+			configFile,
+			packageOptions,
+			extendsConfig,
+		});
+		const outsideFiles = await getOutsideFiles(getConfiguredFiles(commandOptions, options));
+		assertRepoConfigSafe(repoOptions, outsideFiles, getSource);
 	}
 	logVerbose(options, `config read from: ${describeConfig({
 		dotOptions,
