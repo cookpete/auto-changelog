@@ -55,13 +55,6 @@ function formatBytes(bytes) {
 	return `${Math.max(1, Math.round(bytes / 1024))} kB`;
 }
 
-async function getGitVersion(overrides) {
-	const { cmd: command } = { ...DEPENDENCIES, ...overrides };
-	const output = await command('git --version');
-	const match = output.match(/\d+\.\d+\.\d+/);
-	return match ? match[0] : null;
-}
-
 function niceDate(string) {
 	const date = new Date(string);
 	const day = date.getUTCDate();
@@ -142,7 +135,6 @@ module.exports = {
 	logLeftOutCommit,
 	formatBytes,
 	cmd,
-	getGitVersion,
 	niceDate,
 	isLink,
 	isURL,

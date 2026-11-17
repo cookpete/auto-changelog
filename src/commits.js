@@ -1,7 +1,6 @@
 'use strict';
 
 const cmd = require('./cmd');
-const getLogFormat = require('./log-format');
 const {
 	COMMIT_SEPARATOR,
 	MESSAGE_SEPARATOR,
@@ -9,6 +8,9 @@ const {
 	parseCommit,
 } = require('./parse-commits');
 const { logVerbose } = require('./utils');
+
+// `cmd` splits its command on spaces, so the space between the hash and its parents is escaped.
+const LOG_FORMAT = `${COMMIT_SEPARATOR}%H%x20%P%n%ai%n%an%n%ae%n%B${MESSAGE_SEPARATOR}`;
 
 const DEPENDENCIES = { cmd };
 
@@ -18,8 +20,7 @@ async function fetchCommits(diff, options = {}, overrides = {}) {
 	if (diff === 'HEAD' && !(await command('git rev-parse -q --verify HEAD').catch(() => '')).trim()) {
 		return [];
 	}
-	const format = await getLogFormat(overrides);
-	const logCommand = `git log ${diff} --shortstat --pretty=format:${format} ${options.appendGitLog}`;
+	const logCommand = `git log ${diff} --shortstat --pretty=format:${LOG_FORMAT} ${options.appendGitLog}`;
 	logVerbose(options, `running ${logCommand.trim()}`);
 	const log = await command(logCommand);
 	return parseCommits(log, options);

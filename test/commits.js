@@ -14,7 +14,6 @@ const remotes = require('./data/remotes');
 const commits = require('./data/commits');
 const commitsNoRemote = require('./data/commits-no-remote');
 const { fetchCommits } = require('../src/commits');
-const getLogFormat = require('../src/log-format');
 const {
 	COMMIT_SEPARATOR,
 	MESSAGE_SEPARATOR,
@@ -511,25 +510,15 @@ test('getSubject: returns no commit message', (t) => {
 	t.end();
 });
 
-test('getLogFormat: returns modern format', async (t) => {
-	function getGitVersion() {
-		return Promise.resolve('1.7.2');
+test('fetchCommits: reads whole commit messages with `%B`', async (t) => {
+	const commands = [];
+	function cmd(command) {
+		commands.push(command);
+		return Promise.resolve('');
 	}
-	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
-});
-
-test('getLogFormat: returns fallback format', async (t) => {
-	function getGitVersion() {
-		return Promise.resolve('1.7.1');
-	}
-	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
-});
-
-test('getLogFormat: returns fallback format when null', async (t) => {
-	function getGitVersion() {
-		return Promise.resolve(null);
-	}
-	t.equal(await getLogFormat({ getGitVersion }), '__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%s%n%n%b__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
+	await fetchCommits('v1.0.0..v2.0.0', { ...remotes.github, appendGitLog: '' }, { cmd });
+	t.equal(commands.length, 1);
+	t.equal(commands[0].trim(), 'git log v1.0.0..v2.0.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
 });
 
 function gitLogOf(commitsToLog) {
@@ -540,7 +529,7 @@ function gitLogOf(commitsToLog) {
 
 test('fetchCommits: --verbose says which git command it runs', async (t) => {
 	const verbose = { ...remotes.github, verbose: true, appendGitLog: '' };
-	const { lines } = await captureStderr(t, () => fetchCommits('v1.0.0..v2.0.0', verbose, { cmd: () => Promise.resolve(''), getGitVersion: () => Promise.resolve(null) }));
+	const { lines } = await captureStderr(t, () => fetchCommits('v1.0.0..v2.0.0', verbose, { cmd: () => Promise.resolve('') }));
 	t.equal(lines.length, 1);
 	t.match(lines[0], /^running git log v1\.0\.0\.\.v2\.0\.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__\S+$/);
 });

@@ -6,7 +6,6 @@ const {
 	cmd,
 	niceDate,
 	isLink,
-	getGitVersion,
 	readFile,
 	writeFile,
 	fileExists,
@@ -110,14 +109,6 @@ test('isLink: returns true for links', (t) => {
 test('isLink: returns false for non-links', (t) => {
 	t.equal(isLink('not a link'), false);
 	t.end();
-});
-
-test('getGitVersion: returns git version', async (t) => {
-	t.equal(await getGitVersion({ cmd: () => 'git version 2.15.2 (Apple Git-101.1)' }), '2.15.2');
-});
-
-test('getGitVersion: returns null', async (t) => {
-	t.equal(await getGitVersion({ cmd: () => 'some sort of random output' }), null);
 });
 
 test('readFile: reads file', async (t) => {
