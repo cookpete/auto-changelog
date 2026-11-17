@@ -6,6 +6,7 @@ const {
 	mkdtempSync,
 	realpathSync,
 	rmSync,
+	writeFileSync,
 } = require('fs');
 const { tmpdir } = require('os');
 const { execFileSync } = require('child_process');
@@ -61,6 +62,41 @@ test('fetchCommits: reads parent hashes from a real git log', async (t) => {
 		t.equal(byHash.get(merge).merge.message, 'Pull request title', 'the rest of the format is still parsed');
 		t.deepEqual(byHash.get(first).parents, [root], 'a commit has its parent');
 		t.deepEqual(byHash.get(root).parents, [], 'a root commit has no parents');
+	} finally {
+		process.chdir(original);
+		rmSync(repo, { recursive: true, force: true });
+	}
+});
+
+test('fetchCommits: a file named like a tag does not hide the tag', async (t) => {
+	const original = process.cwd();
+	const repo = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	function git(...args) {
+		return execFileSync('git', [
+			'-c',
+			'user.name=Example Author',
+			'-c',
+			'user.email=email@example.com',
+			'-c',
+			'commit.gpgsign=false',
+			'-c',
+			'tag.gpgsign=false',
+			...args,
+		], { cwd: repo }).toString().trim();
+	}
+	try {
+		git('init', '-q');
+		git('commit', '-q', '--allow-empty', '-m', 'One');
+		git('tag', '-m', 'v1.0.0', 'v1.0.0');
+		git('commit', '-q', '--allow-empty', '-m', 'Two');
+		git('tag', '-m', 'v1.1.0', 'v1.1.0');
+		writeFileSync(join(repo, 'v1.0.0'), '');
+		writeFileSync(join(repo, 'v1.1.0'), '');
+		process.chdir(repo);
+		const options = { ...remotes.github, appendGitLog: '' };
+		t.deepEqual((await fetchCommits('v1.0.0', options)).map(({ subject }) => subject), ['One'], 'a single tag');
+		t.deepEqual((await fetchCommits('v1.0.0..v1.1.0', options)).map(({ subject }) => subject), ['Two'], 'a range');
+		t.deepEqual((await fetchCommits('v1.0.0..', options)).map(({ subject }) => subject), ['Two'], 'a range to `HEAD`');
 	} finally {
 		process.chdir(original);
 		rmSync(repo, { recursive: true, force: true });
@@ -518,7 +554,7 @@ test('fetchCommits: reads whole commit messages with `%B`', async (t) => {
 	}
 	await fetchCommits('v1.0.0..v2.0.0', { ...remotes.github, appendGitLog: '' }, { cmd });
 	t.equal(commands.length, 1);
-	t.equal(commands[0].trim(), 'git log v1.0.0..v2.0.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
+	t.equal(commands[0].trim(), 'git log refs/tags/v1.0.0..refs/tags/v2.0.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__%H%x20%P%n%ai%n%an%n%ae%n%B__AUTO_CHANGELOG_MESSAGE_SEPARATOR__');
 });
 
 function gitLogOf(commitsToLog) {
@@ -531,7 +567,7 @@ test('fetchCommits: --verbose says which git command it runs', async (t) => {
 	const verbose = { ...remotes.github, verbose: true, appendGitLog: '' };
 	const { lines } = await captureStderr(t, () => fetchCommits('v1.0.0..v2.0.0', verbose, { cmd: () => Promise.resolve('') }));
 	t.equal(lines.length, 1);
-	t.match(lines[0], /^running git log v1\.0\.0\.\.v2\.0\.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__\S+$/);
+	t.match(lines[0], /^running git log refs\/tags\/v1\.0\.0\.\.refs\/tags\/v2\.0\.0 --shortstat --pretty=format:__AUTO_CHANGELOG_COMMIT_SEPARATOR__\S+$/);
 });
 
 test('parseCommits: --verbose says which commits the commit patterns left out', async (t) => {

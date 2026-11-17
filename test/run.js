@@ -521,7 +521,7 @@ test('run: a failing git command is an error, and leaves the changelog alone', a
 		await run(['', '', '--append-git-log=--no-such-flag'], { fetchRemote: deps.fetchRemote });
 		t.fail('should reject');
 	} catch (error) {
-		t.match(error.message, /^`git log v1\.0\.0 .+--no-such-flag` failed: .*--no-such-flag/, 'with git\'s error');
+		t.match(error.message, /^`git log refs\/tags\/v1\.0\.0 .+--no-such-flag` failed: .*--no-such-flag/, 'with git\'s error');
 	} finally {
 		process.chdir(original);
 	}
