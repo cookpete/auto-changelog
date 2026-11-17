@@ -18,3 +18,11 @@ test('bin: runs the CLI', (t) => {
 	t.equal(output.trim(), `v${version}`);
 	t.end();
 });
+
+test('package exports: only the entry point and package.json', (t) => {
+	t.equal(require.resolve('auto-changelog/package.json'), join(__dirname, '..', 'package.json'), 'package.json');
+	for (const specifier of ['auto-changelog/src', 'auto-changelog/src/run', 'auto-changelog/src/utils.js', 'auto-changelog/package']) {
+		t.throws(() => require.resolve(specifier), { code: 'ERR_PACKAGE_PATH_NOT_EXPORTED' }, `${specifier} is not exported`);
+	}
+	t.end();
+});

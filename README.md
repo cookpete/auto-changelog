@@ -129,7 +129,7 @@ There are some less strict requirements to improve your changelog:
 What to change:
 
 - **node**: v3 requires node `^22.23 || ^24.20 || >= 25.9`.
-- **Node API**: `require('auto-changelog')` no longer runs the CLI; call the exported [`run`](#node-api) instead.
+- **Node API**: `require('auto-changelog')` no longer runs the CLI; call the exported [`run`](#node-api) instead. Only `auto-changelog` and `auto-changelog/package.json` can be required; the internal `auto-changelog/src/*` modules, which changed in v3, are no longer exported.
 - **`--package <file>`**: `--package` no longer takes a file; use `--package-file <file>`. In a config file, a file path in `package` is now an error; use `packageFile`.
 - **`--commit-limit false`, `--backfill-limit false`**: these now take only an integer; use `--no-commit-limit` or `--no-backfill-limit`. `false` still works in a config file.
 - **`--plugins a b`**: repeat the flag for each plugin, as in `--plugins a --plugins b`. A `plugins` array in a config file is unchanged.
