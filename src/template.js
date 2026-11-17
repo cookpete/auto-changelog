@@ -1,6 +1,6 @@
 'use strict';
 
-const { join } = require('path');
+const { dirname, join } = require('path');
 const Handlebars = require('handlebars');
 const {
 	readFile,
@@ -90,7 +90,7 @@ async function getTemplate(template) {
 		return readFile(template);
 	}
 	const path = join(TEMPLATES_DIR, `${template}.hbs`);
-	if (await fileExists(path) === false) {
+	if (dirname(path) !== TEMPLATES_DIR || await fileExists(path) === false) {
 		throw new Error(`Template '${template}' was not found`);
 	}
 	return readFile(path);

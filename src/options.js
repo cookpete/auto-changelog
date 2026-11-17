@@ -9,6 +9,7 @@ const {
 const { default: pargs } = require('pargs');
 const cmd = require('./cmd');
 const resolveConfig = require('./extends');
+const { getRoot, isInsideRepository } = require('./repository');
 const { fetchRemote } = require('./remote');
 const {
 	readJson,
@@ -62,7 +63,24 @@ function hasOutputArg(value) {
 	return value.split(/\s+/).some((token) => (/^--output(=|$)/).test(token));
 }
 
-function assertRepoConfigSafe(config) {
+// Files that in-repo config, or the repository itself, makes auto-changelog read or write.
+// A symlink or a relative path could lead anywhere on the machine, and what is read can end
+// up in the changelog, so each must really be inside the repository unless given on the command line.
+async function getOutsideFiles(files) {
+	const root = await getRoot();
+	const outside = await Promise.all(files.map(async ([key, path]) => !await isInsideRepository(root, path) && `"${key}" (${path})`));
+	return outside.flatMap((entry) => entry || []);
+}
+
+function getConfiguredFiles(commandOptions, options) {
+	return [].concat(
+		commandOptions.template === undefined && !isURL(options.template) ? [['template', options.template]] : [],
+		commandOptions.packageFile === undefined && options.packageFile ? [['packageFile', options.packageFile]] : [],
+		commandOptions.output === undefined && !options.stdout ? [['output', options.output]] : [],
+	);
+}
+
+function assertRepoConfigSafe(config, outsideFiles) {
 	const unsafe = CODE_LOADING_OPTIONS
 		.filter((x) => x in config)
 		.map((key) => `"${key}" loads code`);
@@ -81,8 +99,23 @@ function assertRepoConfigSafe(config) {
 			unsafe.push(`"${key}" contains --output (writes to an arbitrary file)`);
 		}
 	}
-	if (unsafe.length > 0) {
-		throw new Error(`Refusing to run: in-repo config (.auto-changelog or the package.json "auto-changelog" key) sets unsafe options: ${unsafe.join('; ')}. Pass them on the command line instead, or re-run with --unsafe-config if you fully trust this repository.`);
+	const problems = [].concat(
+		unsafe.length > 0 ? `in-repo config (.auto-changelog or the package.json "auto-changelog" key) sets unsafe options: ${unsafe.join('; ')}` : [],
+		outsideFiles.length > 0 ? `these files resolve outside the repository: ${outsideFiles.join(', ')}` : [],
+	);
+	if (problems.length > 0) {
+		throw new Error(`Refusing to run: ${problems.join('; and ')}. Pass them on the command line instead, or re-run with --unsafe-config if you fully trust this repository.`);
+	}
+}
+
+// The config files are checked before they are read, so that not even a parse error shows an outside file.
+async function assertConfigInside({ unsafeConfig, config }) {
+	if (!unsafeConfig) {
+		const files = [].concat(
+			[[PACKAGE_FILE, PACKAGE_FILE]],
+			config === undefined ? [['config', DEFAULT_OPTIONS.config]] : [],
+		);
+		assertRepoConfigSafe({}, await getOutsideFiles(files));
 	}
 }
 
@@ -429,6 +462,7 @@ async function getOptions(argv, overrides) {
 	}
 	const commandOptions = Object.fromEntries(Object.entries(values).map(([key, value]) => [camelCase(key), value]));
 
+	await assertConfigInside(commandOptions);
 	const pkg = await readJSON(PACKAGE_FILE);
 	const packageOptions = pkg ? pkg[PACKAGE_OPTIONS_KEY] : null;
 	const configFile = commandOptions.config || DEFAULT_OPTIONS.config;
@@ -450,14 +484,14 @@ async function getOptions(argv, overrides) {
 			[packageOptions, `the ${PACKAGE_FILE} "${PACKAGE_OPTIONS_KEY}" key`],
 		],
 	);
-	if (!commandOptions.unsafeConfig) {
-		assertRepoConfigSafe(repoOptions);
-	}
 	const options = {
 		...DEFAULT_OPTIONS,
 		...repoOptions,
 		...commandOptions,
 	};
+	if (!options.unsafeConfig) {
+		assertRepoConfigSafe(repoOptions, await getOutsideFiles(getConfiguredFiles(commandOptions, options)));
+	}
 	logVerbose(options, `config read from: ${describeConfig({
 		dotOptions,
 		configFile,

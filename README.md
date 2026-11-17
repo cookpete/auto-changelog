@@ -136,6 +136,7 @@ What to change:
 - **`--append-git-log`, `--append-git-tag`**: attach a value starting with a dash with `=`, as in `--append-git-log=--first-parent`.
 - **Short flags**: `-v`, `-i`, `-h`, and `-V` are gone; use `--latest-version`, `--issue-url`, `--help`, and `--version`.
 - **`--sort-commits`**: an unsupported value is now an error, rather than sorting by relevance.
+- **Files outside the repository**: in-repo config, or a symlink in the repository, can no longer lead `auto-changelog` to read or write a file outside it ([Security](#security-and-untrusted-repositories)); pass such a path on the command line instead.
 
 What may look different:
 
@@ -262,6 +263,8 @@ These options _are_ honored from in-repo config, but a value that would do one o
 - `remote`/`--remote` is used in a git command, so a value containing whitespace (which would inject extra git arguments) is rejected; ordinary remote names like `upstream` are fine.
 - `output`/`--output` is a write path, so an absolute path or one containing `..` (which could write outside the repository) is rejected; ordinary in-repo paths like `HISTORY.md` are fine.
 - `--append-git-log` and `--append-git-tag` are appended to the git commands, so a value containing `--output` (which would write to an arbitrary file) is rejected; ordinary arguments like `--first-parent` are fine.
+
+The files `auto-changelog` reads or writes because of the repository must also really be inside it, following symlinks: `.auto-changelog`, `package.json`, a `template` file, a `packageFile`, and the output file (including the default `CHANGELOG.md`, unless you use `--stdout`). Otherwise, a symlink or a relative path in the repository could read any file on the machine into the changelog, or write over one. A path given on the command line is used as-is.
 
 In every case, "rejected" means `auto-changelog` stops with an error - it never silently drops the value or produces a changelog from sanitized config. If you fully trust the repository you are running against and want to honor its config as-is, pass `--unsafe-config`. **Do not use `--unsafe-config` with repositories you do not control.**
 

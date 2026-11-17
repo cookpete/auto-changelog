@@ -90,3 +90,14 @@ test('compileTemplate: supports keepIndentation option', async (t) => {
 		'keeps indentation with keepIndentation',
 	);
 });
+
+test('compileTemplate: a built-in template name can\'t be a path', async (t) => {
+	const templates = ['../test/data/template-indented', 'nested/compact'];
+	const errors = await Promise.all(templates.map((template) => compileTemplate([], { template }).then(
+		() => null,
+		(error) => error,
+	)));
+	templates.forEach((template, i) => {
+		t.equal(errors[i] && errors[i].message, `Template '${template}' was not found`, template);
+	});
+});

@@ -1,14 +1,8 @@
 'use strict';
 
-const {
-	dirname,
-	extname,
-	isAbsolute,
-	relative,
-	sep,
-} = require('path');
+const { dirname, extname } = require('path');
 const { realpath } = require('fs/promises');
-const cmd = require('./cmd');
+const { getRoot, isInside } = require('./repository');
 const { readJson } = require('./utils');
 
 const CLI_ONLY_OPTIONS = [
@@ -57,16 +51,6 @@ function toSpecifiers(specifiers) {
 		throw new TypeError('`extends` must be a non-empty string');
 	}
 	return [specifiers];
-}
-
-function isInside(root, path) {
-	const rel = relative(root, path);
-	return rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
-}
-
-async function getRoot() {
-	const toplevel = (await cmd('git rev-parse --show-toplevel')).trim();
-	return realpath(toplevel || process.cwd());
 }
 
 // Extended configs are as untrusted as in-repo config: they are only ever read as JSON

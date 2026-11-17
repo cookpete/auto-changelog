@@ -7,6 +7,7 @@ const {
 	mkdtempSync,
 	realpathSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } = require('fs');
 const { tmpdir } = require('os');
@@ -504,6 +505,113 @@ rejectsConfig('sets a traversing output path', { output: '../../.git/hooks/pre-c
 rejectsConfig('sets an absolute output path', { output: '/tmp/pwned.md' });
 rejectsConfig('sets an appendGitLog with --output', { appendGitLog: '--output=../pwned' });
 rejectsConfig('sets an appendGitTag with --output', { appendGitTag: '--first-parent --output ../pwned' });
+
+async function optionsInRepo(setup, args = []) {
+	const original = process.cwd();
+	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));
+	const repo = join(tmp, 'repo');
+	const outside = join(tmp, 'outside');
+	mkdirSync(repo);
+	mkdirSync(outside);
+	execFileSync('git', ['init', '-q'], { cwd: repo });
+	writeFileSync(join(outside, 'secret.hbs'), 'secret');
+	writeFileSync(join(outside, 'secret.json'), '{ "version": "9.9.9" }');
+	setup({ repo, outside });
+	try {
+		process.chdir(repo);
+		return { options: await getOptions(['', '', ...args], { fetchRemote: deps.fetchRemote }) };
+	} catch (error) {
+		return { error };
+	} finally {
+		process.chdir(original);
+		rmSync(tmp, { recursive: true, force: true });
+	}
+}
+
+function writeConfig(config) {
+	return ({ repo }) => writeFileSync(join(repo, '.auto-changelog'), JSON.stringify(config));
+}
+
+test('getOptions: refuses in-repo files that resolve outside the repository', async (t) => {
+	const refusals = [
+		['a relative template', writeConfig({ template: '../outside/secret.hbs' }), /"template" \(\.\.\/outside\/secret\.hbs\)/],
+		['a symlinked template', ({ repo, outside }) => {
+			symlinkSync(join(outside, 'secret.hbs'), join(repo, 'notes.hbs'));
+			writeConfig({ template: 'notes.hbs' })({ repo });
+		}, /"template" \(notes\.hbs\)/],
+		['a symlink named like a built-in template', ({ repo, outside }) => symlinkSync(join(outside, 'secret.hbs'), join(repo, 'compact')), /"template" \(compact\)/],
+		['a packageFile', writeConfig({ packageFile: '../outside/secret.json' }), /"packageFile" \(\.\.\/outside\/secret\.json\)/],
+		['a symlinked default output', ({ repo, outside }) => symlinkSync(join(outside, 'victim.md'), join(repo, 'CHANGELOG.md')), /"output" \(CHANGELOG\.md\)/],
+		['an output in a symlinked directory', ({ repo, outside }) => {
+			symlinkSync(outside, join(repo, 'docs'));
+			writeConfig({ output: 'docs/CHANGELOG.md' })({ repo });
+		}, /"output" \(docs\/CHANGELOG\.md\)/],
+		['a symlinked config file', ({ repo, outside }) => symlinkSync(join(outside, 'secret.json'), join(repo, '.auto-changelog')), /"config" \(\.auto-changelog\)/],
+		['a symlinked package.json', ({ repo, outside }) => symlinkSync(join(outside, 'secret.json'), join(repo, 'package.json')), /"package\.json" \(package\.json\)/],
+		['a package.json that is not JSON, without showing it', ({ repo, outside }) => {
+			writeFileSync(join(outside, 'token'), 'TOKEN=secret');
+			symlinkSync(join(outside, 'token'), join(repo, 'package.json'));
+		}, /"package\.json" \(package\.json\)/],
+		['a dangling output symlink that goes back up through a symlinked directory', ({ repo, outside }) => {
+			mkdirSync(join(outside, 'sub'));
+			symlinkSync('../outside/sub', join(repo, 'dlink'));
+			symlinkSync('dlink/../pwned.md', join(repo, 'CHANGELOG.md'));
+		}, /"output" \(CHANGELOG\.md\)/],
+		['a dangling output symlink in a symlinked directory', ({ repo }) => {
+			mkdirSync(join(repo, 'real'));
+			mkdirSync(join(repo, 'x'));
+			symlinkSync('../real', join(repo, 'x', 'd'));
+			symlinkSync('../../outside/pwned.md', join(repo, 'real', 'CHANGELOG.md'));
+			writeConfig({ output: 'x/d/CHANGELOG.md' })({ repo });
+		}, /"output" \(x\/d\/CHANGELOG\.md\)/],
+		['a template that goes back up through a symlinked directory', ({ repo, outside }) => {
+			mkdirSync(join(outside, 'sub'));
+			symlinkSync('../outside/sub', join(repo, 'dlink'));
+			writeConfig({ template: 'dlink/../secret.hbs' })({ repo });
+		}, /"template" \(dlink\/\.\.\/secret\.hbs\)/],
+		['a packageFile that goes back up through a symlinked directory', ({ repo, outside }) => {
+			mkdirSync(join(outside, 'sub'));
+			symlinkSync('../outside/sub', join(repo, 'dlink'));
+			writeConfig({ packageFile: 'dlink/../secret.json' })({ repo });
+		}, /"packageFile" \(dlink\/\.\.\/secret\.json\)/],
+	];
+	const loop = await optionsInRepo(({ repo }) => {
+		symlinkSync(join(repo, 'b.md'), join(repo, 'a.md'));
+		symlinkSync(join(repo, 'a.md'), join(repo, 'b.md'));
+		writeConfig({ output: 'a.md' })({ repo });
+	});
+	t.equal(loop.error && loop.error.code, 'ELOOP', 'a symlink loop is an error');
+
+	// One at a time, since each changes the working directory.
+	const errors = await refusals.reduce(
+		async (previous, [, setup]) => [...await previous, (await optionsInRepo(setup)).error],
+		Promise.resolve([]),
+	);
+	refusals.forEach(([label, , pattern], i) => {
+		const error = errors[i];
+		t.match(error && error.message, /^Refusing to run: these files resolve outside the repository: /, label);
+		t.match(error && error.message, pattern, `${label}: names it`);
+	});
+});
+
+test('getOptions: in-repo files inside the repository, or given on the command line, are honored', async (t) => {
+	const inside = await optionsInRepo(({ repo }) => {
+		writeFileSync(join(repo, 'notes.hbs'), 'notes');
+		symlinkSync(join(repo, 'notes.hbs'), join(repo, 'linked.hbs'));
+		writeConfig({ template: 'linked.hbs', output: 'docs/CHANGELOG.md' })({ repo });
+	});
+	t.equal(inside.error, undefined, 'a symlink within the repository, and an output directory that does not exist yet');
+
+	function symlinkedOutput({ repo, outside }) {
+		symlinkSync(join(outside, 'victim.md'), join(repo, 'CHANGELOG.md'));
+	}
+	t.equal((await optionsInRepo(symlinkedOutput, ['--stdout'])).error, undefined, 'nothing is written with --stdout');
+	t.equal((await optionsInRepo(symlinkedOutput, ['--output', 'CHANGELOG.md'])).error, undefined, '--output');
+	t.equal((await optionsInRepo(symlinkedOutput, ['--unsafe-config'])).error, undefined, '--unsafe-config');
+
+	const outsideTemplate = await optionsInRepo(() => {}, ['--template', '../outside/secret.hbs']);
+	t.equal(outsideTemplate.error, undefined, '--template');
+});
 
 test('getOptions: keeps a non-URL template from in-repo config', async (t) => {
 	function readJson(file) {
