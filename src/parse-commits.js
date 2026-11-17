@@ -63,6 +63,13 @@ function getFixID(match) {
 	return void undefined;
 }
 
+// A full link to one of this repository's own issues or pull requests, which can differ in
+// letter case (like an owner's capitalization) from the remote's, is spelled like the remote's links.
+function getFixLink(url, id, { getIssueLink, getMergeLink }) {
+	const ownLinks = [getIssueLink, getMergeLink].map((getLink) => getLink && getLink(id));
+	return ownLinks.find((link) => link && link.toLowerCase() === url.toLowerCase()) || url;
+}
+
 function getFixes(message, author, options = {}) {
 	const pattern = getFixPattern(options);
 	const fixes = [];
@@ -70,7 +77,7 @@ function getFixes(message, author, options = {}) {
 	if (!match) { return null; }
 	while (match) {
 		const id = getFixID(match);
-		const href = isLink(match[2]) ? match[2] : options.getIssueLink(id);
+		const href = isLink(match[2]) ? getFixLink(match[2], id, options) : options.getIssueLink(id);
 		if (!fixes.some((fix) => fix.id === id && fix.href === href)) {
 			fixes.push({
 				id,

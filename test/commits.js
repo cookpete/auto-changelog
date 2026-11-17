@@ -178,6 +178,23 @@ test('getFixes: parses a commit that closes a pull request', (t) => {
 	t.end();
 });
 
+test('getFixes: spells a full link to the repository\'s own issue or pull request like the remote does', (t) => {
+	const message = 'Fixes https://github.com/USER/Repo/issues/5, fixes https://GitHub.com/User/Repo/pull/6, fixes https://github.com/other/repo/issues/7';
+	t.deepEqual(getFixes(message, 'Commit Author', remotes.github), [
+		{ id: '5', href: 'https://github.com/user/repo/issues/5', author: 'Commit Author' },
+		{ id: '6', href: 'https://github.com/user/repo/pull/6', author: 'Commit Author' },
+		{ id: '7', href: 'https://github.com/other/repo/issues/7', author: 'Commit Author' },
+	]);
+	const noMergeLink = { getIssueLink: remotes.github.getIssueLink };
+	t.deepEqual(getFixes('Fixes https://github.com/User/Repo/pull/6', 'Commit Author', noMergeLink), [
+		{ id: '6', href: 'https://github.com/User/Repo/pull/6', author: 'Commit Author' },
+	], 'without a merge link, a pull request link is kept as written');
+	t.deepEqual(getFixes('Fixes https://github.com/User/Repo/issues/5', 'Commit Author', remotes.null), [
+		{ id: '5', href: 'https://github.com/User/Repo/issues/5', author: 'Commit Author' },
+	], 'without a remote, as written');
+	t.end();
+});
+
 test('getFixes: parses multiple fixes', (t) => {
 	const message = 'Commit message\n\nFixes #1, fix #2, resolved #3, closes #4';
 	t.deepEqual(getFixes(message, 'Commit Author', remotes.github), [
