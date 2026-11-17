@@ -24,7 +24,7 @@ const MONTH_NAMES = [
 const DEPENDENCIES = { cmd, fs };
 
 function updateLog(string, clearLine = true) {
-	if (clearLine) {
+	if (clearLine && process.stderr.isTTY) {
 		readline.clearLine(process.stderr);
 		readline.cursorTo(process.stderr, 0);
 	}

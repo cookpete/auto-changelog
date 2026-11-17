@@ -546,6 +546,23 @@ test('run: a repository with no commits yet has no unreleased changes', async (t
 	t.match(output, /#### 1\.0\.0\n/, 'an empty section');
 });
 
+test('run: progress messages are only shown on a terminal, and the result always is', async (t) => {
+	const { isTTY } = process.stderr;
+	async function stderrOf(tty) {
+		process.stderr.isTTY = tty;
+		const { lines } = await captureStderr(t, () => run(['', ''], deps));
+		return lines;
+	}
+	try {
+		t.deepEqual(await stderrOf(false), ['1 kB written to CHANGELOG.md'], 'piped');
+		const shown = await stderrOf(true);
+		t.equal(shown[0], 'Fetching tags…', 'on a terminal, progress');
+		t.equal(shown[shown.length - 1], '1 kB written to CHANGELOG.md', 'and the result');
+	} finally {
+		process.stderr.isTTY = isTTY;
+	}
+});
+
 async function optionsInRepo(setup, args = []) {
 	const original = process.cwd();
 	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));

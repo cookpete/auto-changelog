@@ -31,6 +31,30 @@ test('updateLog: writes to stderr, not stdout', (t) => {
 	t.end();
 });
 
+test('updateLog: clears the line only on a terminal', (t) => {
+	const { isTTY } = process.stderr;
+	const writes = [];
+	const stderr = t.capture(process.stderr, 'write', (chunk) => {
+		writes.push(chunk);
+		return true;
+	});
+	try {
+		process.stderr.isTTY = false;
+		updateLog('Piped');
+		t.deepEqual(writes, ['auto-changelog: Piped'], 'no escape codes when piped');
+
+		writes.length = 0;
+		process.stderr.isTTY = true;
+		updateLog('Shown');
+		t.equal(writes[writes.length - 1], 'auto-changelog: Shown', 'the message');
+		t.ok(writes.length > 1, 'after clearing the line on a terminal');
+	} finally {
+		process.stderr.isTTY = isTTY;
+		stderr.restore?.();
+	}
+	t.end();
+});
+
 test('cmd: runs a command', async (t) => {
 	const result = await cmd('node --version');
 	t.equal(typeof result, 'string');

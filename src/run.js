@@ -53,8 +53,10 @@ async function run(argv, overrides) {
 	if (!options) {
 		return;
 	}
+	// Progress messages without a newline are replaced by the next one, which only a terminal can do.
 	function log(string) {
-		return options.stdout ? null : updateLog(string);
+		const transient = !string.endsWith('\n');
+		return options.stdout || (transient && !process.stderr.isTTY) ? null : updateLog(string);
 	}
 	log('Fetching tags…');
 	const tags = await fT(options);
