@@ -174,7 +174,7 @@ function camelCase(string) {
 
 function parsePlugins(plugins) {
 	if (!Array.isArray(plugins)) {
-		throw new Error('--plugins requires at least one plugin name');
+		throw new TypeError(`\`plugins\` must be an array of plugin names; got \`${JSON.stringify(plugins)}\``);
 	}
 	return plugins.map((p) => require(require.resolve(`auto-changelog-${p}`, { paths: [process.cwd()] }))); // eslint-disable-line global-require
 }
@@ -467,7 +467,6 @@ async function getOptions(argv, overrides) {
 				type: 'string',
 				placeholder: 'name',
 				multiple: true,
-				optionalValue: true,
 				description: 'use plugins to augment commit/merge/release information',
 			},
 			verbose: { type: 'boolean', description: 'explain on stderr what was left out of the changelog, and why' },

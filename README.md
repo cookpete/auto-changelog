@@ -36,7 +36,7 @@ Options:
       --[no-]keep-indentation                  keep indentation from the template in the output
       --[no-]prepend                           prepend changelog to output file
       --[no-]stdout                            output changelog to stdout
-      --plugins [name]...                      use plugins to augment commit/merge/release information
+      --plugins <name>...                      use plugins to augment commit/merge/release information
       --[no-]verbose                           explain on stderr what was left out of the changelog, and why
       --[no-]unsafe-config                     trust in-repo config completely, honoring options that can load code, run git commands, or make network requests; do not use with untrusted repositories
       --help                                   Show this help text

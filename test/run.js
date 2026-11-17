@@ -782,12 +782,17 @@ test('getOptions: a missing plugin throws', async (t) => {
 	});
 });
 
-test('getOptions: throws a useful error for --plugins with no names', async (t) => {
+test('getOptions: --plugins requires a plugin name', async (t) => {
+	t.match(await rejectedWith(t, ['--plugins']), /Option '--plugins <value>' argument missing/);
+
+	function readJson(file) {
+		return file === 'package.json' ? { 'auto-changelog': { plugins: 'foo' } } : null;
+	}
 	try {
-		await getOptions(['', '', '--plugins'], deps);
+		await getOptions(['', '', '--unsafe-config'], { ...deps, readJson });
 		t.fail('should throw');
 	} catch (error) {
-		t.match(error.message, /--plugins requires at least one plugin name/);
+		t.equal(error.message, '`plugins` must be an array of plugin names; got `"foo"`', 'a config value that is not an array');
 	}
 });
 
