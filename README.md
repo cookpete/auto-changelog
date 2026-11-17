@@ -109,7 +109,7 @@ await run(['', '', '--output', 'HISTORY.md']);
 
 `auto-changelog` is designed to be as flexible as possible, providing a clear changelog for any project. There are only two absolute requirements:
 
-- You should be using git `1.7.2` or later
+- You should be using git `2.16` or later
 - All versions should be tagged using [semver](https://semver.org) tag names – this happens by default when using [`npm version`](https://docs.npmjs.com/cli/version)
 
 There are some less strict requirements to improve your changelog:
@@ -122,6 +122,7 @@ There are some less strict requirements to improve your changelog:
 What to change:
 
 - **node**: v3 requires node `^22.23 || ^24.20 || >= 25.9`.
+- **git**: v3 requires git `2.16` or later.
 - **Node API**: `require('auto-changelog')` no longer runs the CLI; call the exported [`run`](#node-api) instead. Only `auto-changelog` and `auto-changelog/package.json` can be required; the internal `auto-changelog/src/*` modules, which changed in v3, are no longer exported.
 - **`--package <file>`**: `--package` no longer takes a file; use `--package-file <file>`. In a config file, a file path in `package` is now an error; use `packageFile`.
 - **`--commit-limit false`, `--backfill-limit false`**: these now take only an integer; use `--no-commit-limit` or `--no-backfill-limit`. `false` still works in a config file.
