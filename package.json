@@ -70,7 +70,6 @@
       ".github",
       ".nycrc",
       "coverage",
-      "scripts",
       "test",
       ".markdownlintrc",
       "codecov.yml",
