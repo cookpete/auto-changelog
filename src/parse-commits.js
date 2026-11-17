@@ -144,6 +144,7 @@ function parseCommit(commit, options) {
 		niceDate: niceDate(date),
 		subject: replaceText(getSubject(message), options),
 		message: replaceText(message.trim(), options),
+		rawMessage: message.trim(),
 		fixes: getFixes(message, author, options),
 		href: options.getCommitLink(hash),
 		breaking: !!options.breakingPattern && new RegExp(options.breakingPattern).test(message),

@@ -6,6 +6,8 @@ const { join } = require('path');
 const { readFile } = require('../src/utils');
 const releases = require('./data/releases');
 const { compileTemplate } = require('../src/template');
+const { parseCommits, COMMIT_SEPARATOR, MESSAGE_SEPARATOR } = require('../src/parse-commits');
+const remotes = require('./data/remotes');
 
 test('compileTemplate: compiles using compact template', async (t) => {
 	const expected = await readFile(join(__dirname, 'data', 'template-compact.md'));
@@ -110,4 +112,30 @@ test('compileTemplate: a built-in template name can\'t be a path', async (t) => 
 	templates.forEach((template, i) => {
 		t.equal(errors[i] && errors[i].message, `Template '${template}' was not found`, template);
 	});
+});
+
+test('compileTemplate: the conventional template groups commits by their text before replaceText', async (t) => {
+	const gitLog = ['feat: add a thing', 'fix: Breaking change: remove a thing'].map((message, i) => [
+		`${COMMIT_SEPARATOR}${String(i).repeat(40)}`,
+		'2026-11-17 12:00:00 +0000',
+		'Example Author',
+		'email@example.com',
+		`${message}${MESSAGE_SEPARATOR}`,
+		' 1 file changed, 1 insertion(+)',
+		'',
+	].join('\n')).join('');
+	// What the conventional template says to configure
+	const replaceText = {
+		'([bB]reaking change:)': '',
+		'(^[fF]eat:)': '',
+		'(^[fF]ix:)': '',
+	};
+	const commits = parseCommits(gitLog, { replaceText, ...remotes.github });
+	const changelog = await compileTemplate(
+		[{ title: 'v1.0.0', commits, merges: [], fixes: [] }],
+		{ template: 'conventional' },
+	);
+	t.match(changelog, /#### Breaking Changes :warning:\n\n- +remove a thing/, 'the breaking change');
+	t.match(changelog, /#### New Features\n\n- +add a thing/, 'the feature');
+	t.doesNotMatch(changelog, /General Changes/, 'no ungrouped commits');
 });

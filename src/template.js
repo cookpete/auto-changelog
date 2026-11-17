@@ -47,15 +47,17 @@ Handlebars.registerHelper('commit-list', (context, options) => {
 	const list = context
 		.filter((item) => {
 			const commit = item.commit || item;
+			// A commit a `processCommits` plugin adds may not have a `rawMessage`
+			const text = commit.rawMessage ?? commit.message;
 			if (exclude) {
 				const pattern = new RegExp(exclude, messageFlags);
-				if (pattern.test(commit.message)) {
+				if (pattern.test(text)) {
 					return false;
 				}
 			}
 			if (message) {
 				const pattern = new RegExp(message, messageFlags);
-				return pattern.test(commit.message);
+				return pattern.test(text);
 			}
 			if (subject) {
 				const pattern = new RegExp(subject, flags);

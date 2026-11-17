@@ -142,6 +142,7 @@ What may look different:
 - **Prereleases**: a release after prereleases now [also lists their changes](#prereleases). To keep releases already in your changelog as they are, set `rollupPrereleasesDisabled` to your latest version, like `"rollupPrereleasesDisabled": "2.7.0"`; set it to `true` to never do this.
 - **`--version`** prints the version with a `v` prefix, like `v3.0.0`.
 - **`--ignore-commit-pattern`** also matches merged pull request titles, so it can hide merges as well as commits.
+- **[`replaceText`](#replacing-text)** also applies to a commit's `{{message}}`, not only its `{{subject}}`; in a custom template, use `{{rawMessage}}` for the message without it.
 - **`--ending-version`** finds its release the way `--starting-version` does: the tag prefix and `v` are optional, and a version without a tag ends at the nearest older release. A value that is neither a tag nor a version is now an error; v2 ignored such a value, and listed every release.
 - **Squash merges**: a commit whose subject ends in a pull request number, like `Fix a thing (#123)`, is now listed as a merged pull request even without a commit body, rather than as a commit; a pull request merged more than once in a release, like one that was also backported, is listed once.
 
@@ -419,6 +420,7 @@ My custom changelog template. Don’t worry about indentation here; it is automa
   {{/each}}
   {{#each commits}}
     - Commits have a {{shorthash}}, a {{subject}} and a {{href}}, {{author}} amongst other things.
+    - A commit's {{message}} has any `replaceText` applied; its {{rawMessage}} is the message without it.
   {{/each}}
 {{/each}}
 ```
@@ -467,9 +469,9 @@ Use `{{#commit-list}}` to render a list of commits depending on certain patterns
 | Option | Description |
 | --------- | ----------- |
 | `heading` | A heading for the list, only renders if at least one commit matches |
-| `message` | A regex pattern to match against the entire commit message |
+| `message` | A regex pattern to match against the entire commit message, without any [`replaceText`](#replacing-text) applied |
 | `subject` | A regex pattern to match against the commit subject only |
-| `exclude` | A regex pattern to exclude from the list – useful for avoiding listing commits more than once |
+| `exclude` | A regex pattern to exclude from the list, matched like `message` – useful for avoiding listing commits more than once |
 | `flags` | [Regex flags](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#advanced_searching_with_flags) for the patterns above: any of `i` (case-insensitive), `m`, `s`, and `u`. `message` and `exclude` always use `m` |
 
 #### Replacing text
