@@ -154,7 +154,7 @@ for (const { remotes, expected } of TEST_DATA) {
 	for (const remote of remotes) {
 		test(`fetchRemote: parses ${remote}`, async (t) => {
 			// `git config --get` emits a trailing newline; mirror that here.
-			const result = await fetchRemote({}, { cmd: () => `${remote}\n` });
+			const result = await fetchRemote({}, { cmd: () => Promise.resolve(`${remote}\n`) });
 			t.equal(result.getCommitLink('123'), expected.commit);
 			t.equal(result.getIssueLink('123'), expected.issue);
 			t.equal(result.getMergeLink('123'), expected.merge);
@@ -171,7 +171,7 @@ test('fetchRemote: supports overrides', async (t) => {
 			mergeUrl: 'https://example.com/merge/{id}',
 			compareUrl: 'https://example.com/compare/{from}-{to}',
 		},
-		{ cmd: () => '' },
+		{ cmd: () => Promise.resolve('') },
 	);
 	t.equal(result.getCommitLink('123'), 'https://example.com/commit/123');
 	t.equal(result.getIssueLink('123'), 'https://example.com/issue/123');
@@ -180,7 +180,7 @@ test('fetchRemote: supports overrides', async (t) => {
 });
 
 test('fetchRemote: returns null functions', async (t) => {
-	const result = await fetchRemote({}, { cmd: () => '' });
+	const result = await fetchRemote({}, { cmd: () => Promise.resolve('') });
 	t.equal(result.getCommitLink('123'), null);
 	t.equal(result.getIssueLink('123'), null);
 	t.equal(result.getMergeLink('123'), null);
