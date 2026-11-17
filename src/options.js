@@ -248,7 +248,7 @@ async function getOptions(argv, overrides) {
 				type: 'string',
 				placeholder: 'template',
 				short: 't',
-				description: 'specify template to use [compact, keepachangelog, json]',
+				description: 'specify template to use [compact, keepachangelog, conventional, json]',
 				defaultDescription: DEFAULT_OPTIONS.template,
 			},
 			remote: {
