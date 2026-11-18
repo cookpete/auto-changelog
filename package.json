@@ -60,7 +60,7 @@
     "markdownlint-cli": "^0.50.0",
     "npmignore": "^0.3.6",
     "nyc": "^18.0.0",
-    "tape": "^5.10.3"
+    "tape": "^5.11.0"
   },
   "auto-changelog": {
     "breakingPattern": "^\\[Breaking\\]|Breaking change",
