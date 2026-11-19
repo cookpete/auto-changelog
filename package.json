@@ -21,7 +21,7 @@
     "pretest": "npm run lint",
     "test": "npm run tests-only",
     "posttest": "npx npm@\">= 10.2\" audit --production",
-    "tests-only": "nyc tape 'test/*.js'",
+    "tests-only": "c8 tape 'test/*.js'",
     "preversion": "npm run lint && npm run test",
     "version": "node bin/auto-changelog.js --package && git add CHANGELOG.md"
   },
@@ -56,10 +56,10 @@
   },
   "devDependencies": {
     "@ljharb/eslint-config": "^22.2.5",
+    "c8": "^12.0.0",
     "eslint": "^10.15.0",
     "markdownlint-cli": "^0.50.0",
     "npmignore": "^0.3.6",
-    "nyc": "^18.0.0",
     "tape": "^5.11.0"
   },
   "auto-changelog": {

@@ -24,7 +24,7 @@ npm run lint
 
 ## Testing
 
-This project uses [tape](https://github.com/tape-testing/tape) for testing, and [nyc](https://github.com/istanbuljs/nyc) for coverage. Be sure to run tests after making changes and, if you’re feeling generous, add some tests of your own.
+This project uses [tape](https://github.com/tape-testing/tape) for testing, and [c8](https://github.com/bcoe/c8) for coverage. Be sure to run tests after making changes and, if you’re feeling generous, add some tests of your own.
 
 ```bash
 npm test

@@ -1,10 +1,9 @@
 {
     "all": true,
-    "include": "src",
-    "sourceMap": false,
-    "instrument": true,
+    "include": [
+        "src/**"
+    ],
     "report-dir": "./coverage",
-    "temp-dir": "./coverage/.nyc_output",
     "reporter": [
         "text",
         "lcov"
