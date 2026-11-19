@@ -97,10 +97,11 @@ auto-changelog --append-git-log=--first-parent
 
 ### Node API
 
-`require('auto-changelog')` runs nothing on its own; it exports `run`, which does what the command line does. It takes `process.argv`-style arguments - two leading entries, then any of the options above - and returns a promise. Invalid arguments are reported as on the command line and set `process.exitCode`; any other failure rejects the promise.
+Importing or requiring `auto-changelog` runs nothing on its own; it exports `run`, which does what the command line does. It takes `process.argv`-style arguments - two leading entries, then any of the options above - and returns a promise. Invalid arguments are reported as on the command line and set `process.exitCode`; any other failure rejects the promise.
 
 ```js
-const { run } = require('auto-changelog');
+import { run } from 'auto-changelog';
+// or, from CommonJS: const { run } = require('auto-changelog');
 
 await run(['', '', '--output', 'HISTORY.md']);
 ```

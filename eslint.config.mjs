@@ -9,7 +9,7 @@ export default [
 	},
 	...nodeConfig,
 	{
-		files: ['**/*.js'],
+		files: ['**/*.mjs'],
 		rules: {
 			'func-style': ['error', 'declaration'],
 			'multiline-comment-style': 'off',
@@ -29,16 +29,9 @@ export default [
 	},
 
 	{
-		files: ['src/template.js'],
-		rules: {
-			'global-require': 'warn',
-		},
-	},
-
-	{
 		files: [
-			'src/releases.js',
-			'src/tags.js',
+			'src/releases.mjs',
+			'src/tags.mjs',
 		],
 		rules: {
 			'id-length': 'warn',
@@ -46,14 +39,14 @@ export default [
 	},
 
 	{
-		files: ['src/tags.js'],
+		files: ['src/tags.mjs'],
 		rules: {
 			'max-len': 'warn',
 		},
 	},
 
 	{
-		files: ['src/options.js'],
+		files: ['src/options.mjs'],
 		rules: {
 			'max-lines': 'warn',
 		},
@@ -61,8 +54,8 @@ export default [
 
 	{
 		files: [
-			'src/options.js',
-			'src/remote.js',
+			'src/options.mjs',
+			'src/remote.mjs',
 		],
 		rules: {
 			'max-lines-per-function': 'warn',
@@ -71,8 +64,8 @@ export default [
 
 	{
 		files: [
-			'src/releases.js',
-			'src/run.js',
+			'src/releases.mjs',
+			'src/run.mjs',
 		],
 		rules: {
 			'max-params': 'warn',
@@ -81,9 +74,9 @@ export default [
 
 	{
 		files: [
-			'src/parse-commits.js',
-			'src/releases.js',
-			'src/remote.js',
+			'src/parse-commits.mjs',
+			'src/releases.mjs',
+			'src/remote.mjs',
 		],
 		rules: {
 			'max-statements-per-line': ['error', { max: 2 }],
@@ -92,8 +85,8 @@ export default [
 
 	{
 		files: [
-			'src/options.js',
-			'src/releases.js',
+			'src/options.mjs',
+			'src/releases.mjs',
 		],
 		rules: {
 			'no-await-in-loop': 'warn',
@@ -101,28 +94,28 @@ export default [
 	},
 
 	{
-		files: ['test/run.js'],
+		files: ['test/run.mjs'],
 		rules: {
 			'no-empty-function': 'warn',
 		},
 	},
 
 	{
-		files: ['test/template.js'],
+		files: ['test/template.mjs'],
 		rules: {
 			'no-param-reassign': 'warn',
 		},
 	},
 
 	{
-		files: ['src/template.js'],
+		files: ['src/template.mjs'],
 		rules: {
 			'no-return-await': 'warn',
 		},
 	},
 
 	{
-		files: ['test/run.js'],
+		files: ['test/run.mjs'],
 		rules: {
 			'no-unused-vars': 'warn',
 		},
@@ -130,9 +123,9 @@ export default [
 
 	{
 		files: [
-			'src/options.js',
-			'src/parse-commits.js',
-			'src/releases.js',
+			'src/options.mjs',
+			'src/parse-commits.mjs',
+			'src/releases.mjs',
 		],
 		rules: {
 			'prefer-named-capture-group': 'warn',

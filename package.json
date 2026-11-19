@@ -2,12 +2,12 @@
   "name": "auto-changelog",
   "version": "2.7.0",
   "description": "Command line tool for generating a changelog from git tags and commit history",
-  "main": "./src/index.js",
+  "main": "./src/index.mjs",
   "bin": {
-    "auto-changelog": "./bin/auto-changelog.js"
+    "auto-changelog": "./bin/auto-changelog.mjs"
   },
   "exports": {
-    ".": "./src/index.js",
+    ".": "./src/index.mjs",
     "./package.json": "./package.json"
   },
   "engines": {
@@ -21,9 +21,9 @@
     "pretest": "npm run lint",
     "test": "npm run tests-only",
     "posttest": "npx npm@\">= 10.2\" audit --production",
-    "tests-only": "c8 tape 'test/*.js'",
+    "tests-only": "c8 tape 'test/*.mjs'",
     "preversion": "npm run lint && npm run test",
-    "version": "node bin/auto-changelog.js --package && git add CHANGELOG.md"
+    "version": "node bin/auto-changelog.mjs --package && git add CHANGELOG.md"
   },
   "author": "Pete Cook (https://github.com/cookpete)",
   "homepage": "https://github.com/cookpete/auto-changelog",
