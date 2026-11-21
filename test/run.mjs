@@ -767,6 +767,20 @@ test('getOptions: --unsafe-config honors unsafe options from in-repo config', as
 	t.equal(options.appendGitLog, '--output=anywhere');
 });
 
+test('getOptions: unsafeConfig in in-repo config does not honor unsafe options', async (t) => {
+	function readJson(file) {
+		return file === '.auto-changelog'
+			? { unsafeConfig: true, handlebarsSetup: 'setup.js' }
+			: null;
+	}
+	try {
+		await getOptions(['', ''], { readJson });
+		t.fail('should throw');
+	} catch (error) {
+		t.match(error.message, /^Refusing to run: in-repo config sets unsafe options: "handlebarsSetup" loads code/);
+	}
+});
+
 async function withPlugins(fn) {
 	const original = process.cwd();
 	const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'auto-changelog-')));

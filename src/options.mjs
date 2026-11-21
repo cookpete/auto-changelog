@@ -508,7 +508,7 @@ async function getOptions(argv, overrides) {
 		...repoOptions,
 		...commandOptions,
 	};
-	if (!options.unsafeConfig) {
+	if (!commandOptions.unsafeConfig) {
 		const getSource = getConfigSource({
 			dotOptions,
 			configFile,
