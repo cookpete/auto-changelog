@@ -11,7 +11,7 @@ npm install
 You can then run it with simply:
 
 ```bash
-node bin/auto-changelog.js
+node bin/auto-changelog.mjs
 ```
 
 ## Linting
